@@ -117,7 +117,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELEASE:STRING=/INCREMENTAL:NO
 CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 
 //Path to a program.
-CMAKE_MT:FILEPATH=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/mt.exe
+CMAKE_MT:FILEPATH=C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x64/mt.exe
 
 //Value Computed by CMake
 CMAKE_PROJECT_DESCRIPTION:STATIC=
@@ -129,7 +129,7 @@ CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 CMAKE_PROJECT_NAME:STATIC=xrtcsdk
 
 //RC compiler
-CMAKE_RC_COMPILER:FILEPATH=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe
+CMAKE_RC_COMPILER:FILEPATH=C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x64/rc.exe
 
 //Flags for Windows Resource Compiler during all build types.
 CMAKE_RC_FLAGS:STRING=-DWIN32
@@ -213,6 +213,9 @@ xrtc_BINARY_DIR:STATIC=C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/x
 
 //Value Computed by CMake
 xrtc_IS_TOP_LEVEL:STATIC=OFF
+
+//Dependencies for the target
+xrtc_LIB_DEPENDS:STATIC=general;absl_bad_optional_access;general;absl_throw_delegate;general;absl_strings;general;absl_bad_variant_access;general;winmm;general;libwebrtc;
 
 //Value Computed by CMake
 xrtc_SOURCE_DIR:STATIC=C:/Users/faker/Desktop/webrtc/xrtcsdk/xrtc
