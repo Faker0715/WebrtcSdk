@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-//#include "basic_form.h"
+#include "basic_form.h"
 
 enum ThreadId {
     kThreadUI
@@ -46,12 +46,12 @@ void MainThread::Init() {
 
     ui::GlobalManager::EnableAutomation();
 
-    // 创建一个默认带有阴影的居中窗口
-//    BasicForm* window = new BasicForm(this);
-//    window->Create(NULL, BasicForm::kClassName.c_str(), WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX, 0, false);
-//    window->CenterWindow();
-//    window->ShowWindow();
-//    window->ShowMax();
+//     创建一个默认带有阴影的居中窗口
+    BasicForm* window = new BasicForm(this);
+    window->Create(NULL, BasicForm::kClassName.c_str(), WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX, 0, false);
+    window->CenterWindow();
+    window->ShowWindow();
+    window->ShowMax();
 }
 
 void MainThread::Cleanup() {

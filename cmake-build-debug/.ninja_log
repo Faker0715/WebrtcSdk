@@ -1,9 +1,0 @@
-# ninja log v5
-1	51	7049149396836432	examples/windows/CMakeFiles/windemo.dir/src/basic_form.cpp.obj	ea60a161904bf9cc
-16	1063	7049149406927018	examples/windows/CMakeFiles/windemo.dir/src/ui_wnd.cpp.obj	22d8106542095726
-5	508	7049241657861613	Windows/bin/windemo.exe	b2e7120986572d08
-6	1126	7049149407557587	examples/windows/CMakeFiles/windemo.dir/src/main.cpp.obj	284f57efb67015c7
-11	1415	7049149410441623	examples/windows/CMakeFiles/windemo.dir/src/video_wnd.cpp.obj	5ff2dab76105a473
-1	640	7049259623514314	xrtc/CMakeFiles/xrtc.dir/xrtc.cpp.obj	cfb64d4fb44f7709
-641	1064	7049259623514314	Windows/bin/xrtc.dll	cfa8045a35bbccde
-641	1064	7049259623514314	Windows/lib/xrtc.lib	cfa8045a35bbccde

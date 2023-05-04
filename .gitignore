@@ -15,6 +15,8 @@ cmake-build-debug
 
 # Mono auto generated files
 mono_crash.*
+main.exe
+main.obj
 
 # Build results
 [Dd]ebug/

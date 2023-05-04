@@ -2,25 +2,32 @@ cmake_minimum_required(VERSION 3.8)
 
 project(xrtc)
 file(GLOB all_src
-	./*.cpp)
+        ./*.cpp)
 include_directories(
-	${XRTC_DIR}
-		${XRTC_THIRD_PARTY_DIR}/include
+        ${XRTC_DIR}
+        ${XRTC_THIRD_PARTY_DIR}/include
 
 )
 
 
 link_directories(
-		${XRTC_THIRD_PARTY_DIR}/lib
+        ${XRTC_THIRD_PARTY_DIR}/lib
 )
-add_library(xrtc SHARED ${all_src})
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_definitions( -DXRTC_API_EXPORT -DWEBRTC_WIN)
+endif ()
+
+add_library(xrtc SHARED ${all_src} base/xrtc_global.cpp)
+#add_library(xrtc STATIC ${all_src} base/xrtc_global.cpp)
+
 target_link_libraries(xrtc
-		absl_bad_optional_access
-		absl_throw_delegate
-		absl_strings
-		absl_bad_variant_access
-		winmm
-		libwebrtc)
+        absl_bad_optional_access
+        absl_throw_delegate
+        absl_strings
+        absl_bad_variant_access
+        winmm
+        ws2_32
+        libwebrtc)
 
 
 
