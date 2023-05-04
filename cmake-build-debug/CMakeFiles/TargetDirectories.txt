@@ -1,0 +1,10 @@
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/xrtc/CMakeFiles/xrtc.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/xrtc/CMakeFiles/edit_cache.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/xrtc/CMakeFiles/rebuild_cache.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/examples/CMakeFiles/edit_cache.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/examples/CMakeFiles/rebuild_cache.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/examples/windows/CMakeFiles/windemo.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/examples/windows/CMakeFiles/edit_cache.dir
+C:/Users/faker/Desktop/webrtc/xrtcsdk/cmake-build-debug/examples/windows/CMakeFiles/rebuild_cache.dir

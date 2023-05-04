@@ -2,6 +2,21 @@ cmake_minimum_required(VERSION 3.8)
 project(xrtcsdk)
 
 set(XRTC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+# 默认存放静态库的目录
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+${CMAKE_BINARY_DIR}/${CMAKE_SYSTEM_NAME}/lib)
+# 默认存放动态库的目录
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+${CMAKE_BINARY_DIR}/${CMAKE_SYSTEM_NAME}/lib)
+# 默认存放可执行文件的目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+${CMAKE_BINARY_DIR}/${CMAKE_SYSTEM_NAME}/bin)
+
+set(XRTC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+	add_definitions(-DUNICODE -D_UNICODE)
+endif()
 add_subdirectory("./xrtc")
 add_subdirectory("./examples")
 

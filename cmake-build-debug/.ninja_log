@@ -1,0 +1,6 @@
+# ninja log v5
+1	51	7049149396836432	examples/windows/CMakeFiles/windemo.dir/src/basic_form.cpp.obj	ea60a161904bf9cc
+16	1063	7049149406927018	examples/windows/CMakeFiles/windemo.dir/src/ui_wnd.cpp.obj	22d8106542095726
+6	1126	7049149407557587	examples/windows/CMakeFiles/windemo.dir/src/main.cpp.obj	284f57efb67015c7
+11	1415	7049149410441623	examples/windows/CMakeFiles/windemo.dir/src/video_wnd.cpp.obj	5ff2dab76105a473
+1417	2269	7049149418514414	Windows/bin/windemo.exe	a708f6e72b048863
