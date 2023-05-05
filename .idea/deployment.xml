@@ -5,7 +5,7 @@
       <paths name="vmware (8941a15e-deab-4011-b275-ec04d5d623f3)">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/xrtcsdk" local="$PROJECT_DIR$" />
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

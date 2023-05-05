@@ -14,7 +14,7 @@ link_directories(
         ${XRTC_THIRD_PARTY_DIR}/lib
 )
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    add_definitions( -DXRTC_API_EXPORT -DWEBRTC_WIN)
+    add_definitions( -DXRTC_API_EXPORT -DWEBRTC_WIN -DNOMINMAX)
 endif ()
 
 add_library(xrtc SHARED ${all_src} base/xrtc_global.cpp)
@@ -27,6 +27,9 @@ target_link_libraries(xrtc
         absl_bad_variant_access
         winmm
         ws2_32
+        Strmiids
+        jpeg-static
+        yuv
         libwebrtc)
 
 

@@ -17,10 +17,13 @@
 #endif
 #endif
 #endif
+#include <string>
 namespace xrtc {
 class XRTC_API XRTCEngine {
 public:
     static void Init();
+    static uint32_t GetCameraCount();
+
 
 };
 

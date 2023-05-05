@@ -35,4 +35,4 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 add_subdirectory("./xrtc")
 add_subdirectory("./examples")
-
+#add_executable(xrtcsdk main.cpp)

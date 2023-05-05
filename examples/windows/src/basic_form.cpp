@@ -33,6 +33,7 @@ std::wstring BasicForm::GetWindowClassName() const
 void BasicForm::InitWindow()
 {
     xrtc::XRTCEngine::Init();
+    uint32_t cnt = xrtc::XRTCEngine::GetCameraCount();
 
 }
 
