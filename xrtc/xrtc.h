@@ -18,7 +18,24 @@
 #endif
 #endif
 #include <string>
+#include <memory>
 namespace xrtc {
+    class MediaFrame ;
+    class IXRTCConsumer {
+    public:
+        virtual ~IXRTCConsumer() {};
+        virtual void OnFrame(std::shared_ptr<MediaFrame>)  = 0;
+    };
+
+    class IVideoSource{
+    public:
+        virtual ~IVideoSource() {};
+        virtual void Start() = 0;
+        virtual void Stop() = 0;
+        virtual void Destroy() = 0;
+        virtual void AddConsumer(IXRTCConsumer* consumer) = 0;
+        virtual void RemoveConsumer(IXRTCConsumer* consumer) = 0;
+    };
 class XRTC_API XRTCEngine {
 public:
     static void Init();
