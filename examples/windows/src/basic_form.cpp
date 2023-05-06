@@ -6,129 +6,122 @@
 
 const std::wstring BasicForm::kClassName = L"Basic";
 
-BasicForm::BasicForm(MainThread* ui_thread) :
-    ui_thread_(ui_thread)
-{
+BasicForm::BasicForm(MainThread *ui_thread) :
+        ui_thread_(ui_thread) {
 }
 
-BasicForm::~BasicForm()
-{
+BasicForm::~BasicForm() {
 }
 
-std::wstring BasicForm::GetSkinFolder()
-{
-	return L"basic";
+std::wstring BasicForm::GetSkinFolder() {
+    return L"basic";
 }
 
-std::wstring BasicForm::GetSkinFile()
-{
-	return L"basic.xml";
+std::wstring BasicForm::GetSkinFile() {
+    return L"basic.xml";
 }
 
-std::wstring BasicForm::GetWindowClassName() const
-{
-	return kClassName;
+std::wstring BasicForm::GetWindowClassName() const {
+    return kClassName;
 }
+
 //
-void BasicForm::InitWindow()
-{
+void BasicForm::InitWindow() {
     xrtc::XRTCEngine::Init();
 
     InitComboCam();
-
+    m_pRoot->AttachBubbledEvent(ui::kEventAll, nbase::Bind(&BasicForm::Notify, this, std::placeholders::_1));
 
 //    uint32_t cnt = xrtc::XRTCEngine::GetCameraCount();
 
 }
 
-LRESULT BasicForm::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-{
-	PostQuitMessage(0L);
-	return __super::OnClose(uMsg, wParam, lParam, bHandled);
+LRESULT BasicForm::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled) {
+    PostQuitMessage(0L);
+    return __super::OnClose(uMsg, wParam, lParam, bHandled);
 }
+
 //
 void BasicForm::ShowMax() {
-	SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+    SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 }
 
-ui::Control* BasicForm::CreateControl(const std::wstring& pstrClass) {
-	//自定义控件
-	if (!_tcscmp(pstrClass.c_str(), _T("VideoWnd"))) {
-		CWndUI* wnd = new CWndUI(this->m_hWnd);
-		return wnd;
-	}
+ui::Control *BasicForm::CreateControl(const std::wstring &pstrClass) {
+    //自定义控件
+    if (!_tcscmp(pstrClass.c_str(), _T("VideoWnd"))) {
+        CWndUI *wnd = new CWndUI(this->m_hWnd);
+        return wnd;
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
-//bool BasicForm::Notify(ui::EventArgs* msg) {
-//	std::wstring name = msg->pSender->GetName();
-//	if (msg->Type == ui::kEventClick) {
-//		if (L"btn_device_start" == name) {
-//			OnBtnDeviceStartClick();
-//		}
-//		else if (L"btn_prev" == name) {
+bool BasicForm::Notify(ui::EventArgs *msg) {
+    std::wstring name = msg->pSender->GetName();
+    if (msg->Type == ui::kEventClick) {
+        if (L"btn_device_start" == name) {
+            OnBtnDeviceStartClick();
+        } else if (L"btn_prev" == name) {
 //			OnBtnPreviewClick();
-//		}
-//		else if (L"btn_push" == name) {
+        } else if (L"btn_push" == name) {
 //			OnBtnPushClick();
-//		}
-//	}
-//	return true;
-//}
+        }
+    }
+    return true;
+}
 
 void BasicForm::InitComboCam() {
-	int total = xrtc::XRTCEngine::GetCameraCount();
-	if (total <= 0) {
-		return;
-	}
+    int total = xrtc::XRTCEngine::GetCameraCount();
+    if (total <= 0) {
+        return;
+    }
 
-	combo_cam_ = dynamic_cast<ui::Combo*>(FindControl(L"cam_combo"));
-	if (!combo_cam_) {
-		return;
-	}
+    combo_cam_ = dynamic_cast<ui::Combo *>(FindControl(L"cam_combo"));
+    if (!combo_cam_) {
+        return;
+    }
 
 
-	for (int i = 0; i < total; ++i) {
-		std::string device_name;
-		std::string device_id;
-		xrtc::XRTCEngine::GetCameraInfo(i, device_name, device_id);
-		ui::ListContainerElement* element = new ui::ListContainerElement();
-		element->SetClass(L"listitem");
-		element->SetFixedHeight(30);
-		element->SetText(nbase::UTF8ToUTF16(device_name));
-		element->SetDataID(nbase::UTF8ToUTF16(device_id));
-		element->SetTextPadding({ 6, 0, 6, 0 });
-		combo_cam_->Add(element);
-	}
+    for (int i = 0; i < total; ++i) {
+        std::string device_name;
+        std::string device_id;
+        xrtc::XRTCEngine::GetCameraInfo(i, device_name, device_id);
+        ui::ListContainerElement *element = new ui::ListContainerElement();
+        element->SetClass(L"listitem");
+        element->SetFixedHeight(30);
+        element->SetText(nbase::UTF8ToUTF16(device_name));
+        element->SetDataID(nbase::UTF8ToUTF16(device_id));
+        element->SetTextPadding({6, 0, 6, 0});
+        combo_cam_->Add(element);
+    }
 
-	// 默认选中第一条数据
-	int count = combo_cam_->GetCount();
-	if (count > 0) {
-		combo_cam_->SelectItem(0);
-	}
+    // 默认选中第一条数据
+    int count = combo_cam_->GetCount();
+    if (count > 0) {
+        combo_cam_->SelectItem(0);
+    }
     combo_cam_->AttachSelect(nbase::Bind(&BasicForm::OnComboCamItemSelected, this,
-		std::placeholders::_1));
+                                         std::placeholders::_1));
 }
 
-bool BasicForm::OnComboCamItemSelected(ui::EventArgs* msg) {
-	return true;
+bool BasicForm::OnComboCamItemSelected(ui::EventArgs *msg) {
+    return true;
 }
 
-//void BasicForm::OnBtnDeviceStartClick() {
-//	btn_device_start_->SetEnabled(false);
-//	if (!device_init_) {
-//		if (StartDevice()) {
-//			btn_device_start_->SetText(L"停止音视频设备");
-//		}
-//	}
-//	else {
-//		if (StopDevice()) {
-//			btn_device_start_->SetText(L"启动音视频设备");
-//		}
-//	}
-//	btn_device_start_->SetEnabled(true);
-//}
+void BasicForm::OnBtnDeviceStartClick() {
+    if (!combo_cam_) {
+        return;
+    }
+    // 获取device_id
+    int index = combo_cam_->GetCurSel();
+    auto item = combo_cam_->GetItemAt(index);
+    std::wstring w_device_id = item->GetDataID();
+    cam_source_ = xrtc::XRTCEngine::CreateCamSource(
+            nbase::UTF16ToUTF8(w_device_id));
+    cam_source_->Start();
+
+
+}
 
 //bool BasicForm::StartDevice() {
 //	if (!combo_cam_) {
@@ -260,21 +253,21 @@ bool BasicForm::OnComboCamItemSelected(ui::EventArgs* msg) {
 //	return true;
 //}
 
-void BasicForm::ShowToast(const std::wstring& toast, bool err) {
-	CallOnUIThread([=]() {
-		ui::Label* toast_text = dynamic_cast<ui::Label*>(FindControl(L"toast_text"));
-		if (toast_text) {
-			if (err) {
-				toast_text->SetStateTextColor(ui::kControlStateNormal, L"red");
-			}
+void BasicForm::ShowToast(const std::wstring &toast, bool err) {
+    CallOnUIThread([=]() {
+        ui::Label *toast_text = dynamic_cast<ui::Label *>(FindControl(L"toast_text"));
+        if (toast_text) {
+            if (err) {
+                toast_text->SetStateTextColor(ui::kControlStateNormal, L"red");
+            }
 
-			toast_text->SetText(toast);
-		}
-	});
+            toast_text->SetText(toast);
+        }
+    });
 }
 
-void BasicForm::CallOnUIThread(const std::function<void(void)>& task) {
-	ui_thread_->message_loop()->PostTask(task);
+void BasicForm::CallOnUIThread(const std::function<void(void)> &task) {
+    ui_thread_->message_loop()->PostTask(task);
 }
 
 //void BasicForm::OnVideoSourceSuccess(xrtc::IVideoSource* video_source) {

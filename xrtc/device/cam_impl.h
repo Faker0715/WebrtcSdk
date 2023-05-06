@@ -19,6 +19,7 @@ namespace xrtc{
     private:
         CamImpl(const std::string& cam_id);
         ~CamImpl();
+        friend XRTCEngine;
     private:
         std::string cam_id_;
         rtc::Thread* current_thread_;

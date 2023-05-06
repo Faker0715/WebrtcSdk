@@ -39,14 +39,14 @@ public:
 //
 	void ShowMax();
 	ui::Control* CreateControl(const std::wstring& pstrClass) override;
-//	bool Notify(ui::EventArgs* msg);
+	bool Notify(ui::EventArgs* msg);
 //
 	static const std::wstring kClassName;
 //
 private:
 	void InitComboCam();
 	bool OnComboCamItemSelected(ui::EventArgs* msg);
-//	void OnBtnDeviceStartClick();
+	void OnBtnDeviceStartClick();
 //	bool StartDevice();
 //	bool StopDevice();
 //	void OnBtnPreviewClick();
@@ -79,7 +79,7 @@ private:
 	ui::RichEdit* edit_uid_ = nullptr;
 	ui::RichEdit* edit_stream_name_ = nullptr;
 	ui::Label* label_network_tips_ = nullptr;
-//	xrtc::IVideoSource* cam_source_ = nullptr;
+	xrtc::IVideoSource* cam_source_ = nullptr;
 	std::atomic<bool> device_init_{ false };
 //	xrtc::XRTCPreview* xrtc_preview_ = nullptr;
 //	xrtc::XRTCRender* xrtc_render_ = nullptr;

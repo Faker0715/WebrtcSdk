@@ -42,6 +42,7 @@ public:
     static uint32_t GetCameraCount();
     static int32_t GetCameraInfo(int index,std::string& device_name,
                                  std::string& device_id);
+    static IVideoSource* CreateCamSource(const std::string& cam_id);
 
 
 };
