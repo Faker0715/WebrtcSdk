@@ -33,7 +33,11 @@ std::wstring BasicForm::GetWindowClassName() const
 void BasicForm::InitWindow()
 {
     xrtc::XRTCEngine::Init();
-    uint32_t cnt = xrtc::XRTCEngine::GetCameraCount();
+
+    InitComboCam();
+
+
+//    uint32_t cnt = xrtc::XRTCEngine::GetCameraCount();
 
 }
 
@@ -73,39 +77,39 @@ ui::Control* BasicForm::CreateControl(const std::wstring& pstrClass) {
 //	return true;
 //}
 
-//void BasicForm::InitComboCam() {
-//	int total = xrtc::XRTCEngine::GetCameraCount();
-//	if (total <= 0) {
-//		return;
-//	}
-//
-//	combo_cam_ = dynamic_cast<ui::Combo*>(FindControl(L"cam_combo"));
-//	if (!combo_cam_) {
-//		return;
-//	}
-//
-//	for (int i = 0; i < total; ++i) {
-//		std::string device_name;
-//		std::string device_id;
-//		xrtc::XRTCEngine::GetCameraInfo(i, device_name, device_id);
-//		ui::ListContainerElement* element = new ui::ListContainerElement();
-//		element->SetClass(L"listitem");
-//		element->SetFixedHeight(30);
-//		element->SetText(nbase::UTF8ToUTF16(device_name));
-//		element->SetDataID(nbase::UTF8ToUTF16(device_id));
-//		element->SetTextPadding({ 6, 0, 6, 0 });
-//		combo_cam_->Add(element);
-//	}
-//
-//	// 默认选中第一条数据
-//	int count = combo_cam_->GetCount();
-//	if (count > 0) {
-//		combo_cam_->SelectItem(0);
-//	}
-//
-//	combo_cam_->AttachSelect(nbase::Bind(&BasicForm::OnComboCamItemSelected, this,
-//		std::placeholders::_1));
-//}
+void BasicForm::InitComboCam() {
+	int total = xrtc::XRTCEngine::GetCameraCount();
+	if (total <= 0) {
+		return;
+	}
+
+	combo_cam_ = dynamic_cast<ui::Combo*>(FindControl(L"cam_combo"));
+	if (!combo_cam_) {
+		return;
+	}
+
+
+	for (int i = 0; i < total; ++i) {
+		std::string device_name;
+		std::string device_id;
+		xrtc::XRTCEngine::GetCameraInfo(i, device_name, device_id);
+		ui::ListContainerElement* element = new ui::ListContainerElement();
+		element->SetClass(L"listitem");
+		element->SetFixedHeight(30);
+		element->SetText(nbase::UTF8ToUTF16(device_name));
+		element->SetDataID(nbase::UTF8ToUTF16(device_id));
+		element->SetTextPadding({ 6, 0, 6, 0 });
+		combo_cam_->Add(element);
+	}
+
+	// 默认选中第一条数据
+	int count = combo_cam_->GetCount();
+	if (count > 0) {
+		combo_cam_->SelectItem(0);
+	}
+    combo_cam_->AttachSelect(nbase::Bind(&BasicForm::OnComboCamItemSelected, this,
+		std::placeholders::_1));
+}
 
 bool BasicForm::OnComboCamItemSelected(ui::EventArgs* msg) {
 	return true;

@@ -23,6 +23,8 @@ class XRTC_API XRTCEngine {
 public:
     static void Init();
     static uint32_t GetCameraCount();
+    static int32_t GetCameraInfo(int index,std::string& device_name,
+                                 std::string& device_id);
 
 
 };
