@@ -47,8 +47,8 @@ private:
 	void InitComboCam();
 	bool OnComboCamItemSelected(ui::EventArgs* msg);
 	void OnBtnDeviceStartClick();
-//	bool StartDevice();
-//	bool StopDevice();
+	bool StartDevice();
+	bool StopDevice();
 //	void OnBtnPreviewClick();
 //	bool StartPreview();
 //	bool StopPreview();

@@ -7,6 +7,7 @@
 #include "modules/video_capture/video_capture_factory.h"
 #include "xrtc/base/xrtc_global.h"
 #include <rtc_base/logging.h>
+#include <rtc_base/time_utils.h>
 
 namespace xrtc {
 
@@ -94,6 +95,15 @@ namespace xrtc {
     }
 
     void CamImpl::OnFrame(const webrtc::VideoFrame &frame) {
-        RTC_LOG(LS_INFO) << "======frame ts: " << frame.render_time_ms();
+        if(0 == last_frame_ts_){
+            last_frame_ts_ = rtc::Time();
+        }
+        fps_++;
+        int64_t now = rtc::Time();
+        if(now - last_frame_ts_ > 1000){
+            RTC_LOG(LS_INFO) << "=====fps: " << fps_;
+            fps_ = 0;
+            last_frame_ts_ = now;
+        }
     }
 }

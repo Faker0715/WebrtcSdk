@@ -32,6 +32,11 @@ namespace xrtc{
         bool has_start_ = false;
         rtc::scoped_refptr<webrtc::VideoCaptureModule> video_capture_;
         webrtc::VideoCaptureModule::DeviceInfo* device_info_;
+
+
+        std::atomic<int> fps_{0};
+        std::atomic<int64_t> last_frame_ts_{0};
+
     };
 }
 

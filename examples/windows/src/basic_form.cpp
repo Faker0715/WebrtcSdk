@@ -27,6 +27,8 @@ std::wstring BasicForm::GetWindowClassName() const {
 
 //
 void BasicForm::InitWindow() {
+    btn_device_start_ = dynamic_cast<ui::Button *>(FindControl(L"btn_device_start"));
+
     xrtc::XRTCEngine::Init();
 
     InitComboCam();
@@ -109,49 +111,51 @@ bool BasicForm::OnComboCamItemSelected(ui::EventArgs *msg) {
 }
 
 void BasicForm::OnBtnDeviceStartClick() {
-    if (!combo_cam_) {
-        return;
+    btn_device_start_->SetEnabled(false);
+    if(!device_init_){
+        if(StartDevice()){
+            btn_device_start_->SetText(L"停止音视频设备");
+        }
+    }else{
+        if(StopDevice()){
+            btn_device_start_->SetText(L"启动音视频设备");
+        }
     }
-    // 获取device_id
-    int index = combo_cam_->GetCurSel();
-    auto item = combo_cam_->GetItemAt(index);
-    std::wstring w_device_id = item->GetDataID();
-    cam_source_ = xrtc::XRTCEngine::CreateCamSource(
-            nbase::UTF16ToUTF8(w_device_id));
-    cam_source_->Start();
 
+    btn_device_start_->SetEnabled(true);
 
 }
 
-//bool BasicForm::StartDevice() {
-//	if (!combo_cam_) {
-//		return false;
-//	}
+bool BasicForm::StartDevice() {
+	if (!combo_cam_) {
+		return false;
+	}
+
+	// 获取device_id
+	int index = combo_cam_->GetCurSel();
+	auto item = combo_cam_->GetItemAt(index);
+	std::wstring w_device_id = item->GetDataID();
+	cam_source_ = xrtc::XRTCEngine::CreateCamSource(
+		nbase::UTF16ToUTF8(w_device_id));
+	cam_source_->Start();
+
+    device_init_ = true;
+	return true;
+}
 //
-//	// 获取device_id
-//	int index = combo_cam_->GetCurSel();
-//	auto item = combo_cam_->GetItemAt(index);
-//	std::wstring w_device_id = item->GetDataID();
-//	cam_source_ = xrtc::XRTCEngine::CreateCamSource(
-//		nbase::UTF16ToUTF8(w_device_id));
-//	cam_source_->Start();
-//
-//	return true;
-//}
-//
-//bool BasicForm::StopDevice() {
-//	if (!device_init_ || !cam_source_) {
-//		return false;
-//	}
-//
-//	cam_source_->Stop();
-//	cam_source_->Destroy();
-//	cam_source_ = nullptr;
-//
-//	device_init_ = false;
-//
-//	return true;
-//}
+bool BasicForm::StopDevice() {
+	if (!device_init_ || !cam_source_) {
+		return false;
+	}
+
+	cam_source_->Stop();
+	cam_source_->Destroy();
+	cam_source_ = nullptr;
+
+	device_init_ = false;
+
+	return true;
+}
 
 //void BasicForm::OnBtnPreviewClick() {
 //	btn_prev_->SetEnabled(false);
