@@ -17,35 +17,57 @@
 #endif
 #endif
 #endif
+
 #include <string>
 #include <memory>
+
 namespace xrtc {
-    class MediaFrame ;
+    class MediaFrame;
+
+    enum class XRTCError {
+        kNoErr = 0,
+        kVideoCaptureCreateErr = -1000,
+        kVideoNoCapabilitiesErr,
+        kVideoNoBestCapabilitiesErr,
+        kVideoStartCaptureErr,
+    };
+
     class IXRTCConsumer {
     public:
         virtual ~IXRTCConsumer() {};
-        virtual void OnFrame(std::shared_ptr<MediaFrame>)  = 0;
+
+        virtual void OnFrame(std::shared_ptr<MediaFrame>) = 0;
     };
 
-    class IVideoSource{
+    class IVideoSource {
     public:
         virtual ~IVideoSource() {};
+
+        virtual void Setup(const std::string& json_config) = 0;
         virtual void Start() = 0;
+
         virtual void Stop() = 0;
+
         virtual void Destroy() = 0;
-        virtual void AddConsumer(IXRTCConsumer* consumer) = 0;
-        virtual void RemoveConsumer(IXRTCConsumer* consumer) = 0;
+
+        virtual void AddConsumer(IXRTCConsumer *consumer) = 0;
+
+        virtual void RemoveConsumer(IXRTCConsumer *consumer) = 0;
     };
-class XRTC_API XRTCEngine {
-public:
-    static void Init();
-    static uint32_t GetCameraCount();
-    static int32_t GetCameraInfo(int index,std::string& device_name,
-                                 std::string& device_id);
-    static IVideoSource* CreateCamSource(const std::string& cam_id);
+
+    class XRTC_API XRTCEngine {
+    public:
+        static void Init();
+
+        static uint32_t GetCameraCount();
+
+        static int32_t GetCameraInfo(int index, std::string &device_name,
+                                     std::string &device_id);
+
+        static IVideoSource *CreateCamSource(const std::string &cam_id);
 
 
-};
+    };
 
 }
 
