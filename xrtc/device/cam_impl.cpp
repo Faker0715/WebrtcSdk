@@ -65,10 +65,26 @@ namespace xrtc {
 
     void CamImpl::Stop() {
 
+        RTC_LOG(LS_INFO) << "CamImpl Stop call";
+        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+            RTC_LOG(LS_INFO) << "CamImpl Stop PostTask";
+            if(!has_start_){
+                return;
+            }
+            if(video_capture_ && video_capture_->CaptureStarted()){
+                video_capture_->StopCapture();
+                video_capture_ = nullptr;
+            }
+            has_start_ = false;
+        }));
     }
 
     void CamImpl::Destroy() {
-
+        RTC_LOG(LS_INFO) << "CamImpl Destroy call";
+        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+            RTC_LOG(LS_INFO) << "CamImpl Destroy PostTask";
+            delete this;
+        }));
     }
 
     CamImpl::CamImpl(const std::string &cam_id) : cam_id_(cam_id),
@@ -87,6 +103,7 @@ namespace xrtc {
     }
 
     CamImpl::~CamImpl() {
+
 
     }
 
