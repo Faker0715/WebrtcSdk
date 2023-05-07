@@ -55,9 +55,17 @@ namespace xrtc {
         virtual void RemoveConsumer(IXRTCConsumer *consumer) = 0;
     };
 
+
+    class XRTC_API XRTCEngineObserver{
+    public:
+        virtual void OnVideoSourceSuccess(IVideoSource* source) {};
+        virtual void OnVideoSourceFailed(IVideoSource* source, XRTCError error) {};
+    };
+
+
     class XRTC_API XRTCEngine {
     public:
-        static void Init();
+        static void Init(XRTCEngineObserver *observer);
 
         static uint32_t GetCameraCount();
 

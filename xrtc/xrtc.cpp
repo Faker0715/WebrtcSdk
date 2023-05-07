@@ -5,16 +5,12 @@
 #include "xrtc/device/cam_impl.h"
 
 namespace xrtc {
-    void XRTCEngine::Init() {
-//        XRTCGlobal::Instance()->api_thread()->Invoke<void>(RTC_FROM_HERE,[=](){
-//            int a = 1;
-//        });
-//        XRTCGlobal::Instance()->api_thread()->PostTask(webrtc::ToQueuedTask([=](){
-//            int a = 1;
-//        }));
+    void XRTCEngine::Init(XRTCEngineObserver *observer) {
         rtc::LogMessage::LogTimestamps(true);
         rtc::LogMessage::LogThreads(true);
         rtc::LogMessage::LogToDebug(rtc::LS_VERBOSE);
+        XRTCGlobal::Instance()->RegisterEngineObserver(observer);
+
         RTC_LOG(LS_INFO) << "XRTCSDK init";
     }
 
