@@ -27,13 +27,13 @@ namespace xrtc {
         SubMediaType type;
         int width;
         int height;
-        bool idr = false;
+        bool idr ;
     };
 
     class MediaFormat {
     public:
-        MainMediaType main_type;
-        union {
+        MainMediaType media_type;
+        union{
             VideoFormat video_fmt;
             AudioFormat audio_fmt;;
         } sub_fmt;
@@ -41,22 +41,19 @@ namespace xrtc {
 
     class MediaFrame {
     public:
-        MediaFrame(int size) : max_size(size) {
+        MediaFrame(int size) : max_size(size){
             memset(data, 0, sizeof(data));
             memset(data_len, 0, sizeof(data_len));
             memset(stride, 0, sizeof(stride));
             data[0] = new char[size];
             data_len[0] = size;
-        };
-
+        }
         ~MediaFrame(){
             if(data[0]){
                 delete[] data[0];
                 data[0] = nullptr;
             }
         }
-
-
     public:
         int max_size;
         MediaFormat fmt;

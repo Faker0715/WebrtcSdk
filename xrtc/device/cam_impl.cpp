@@ -6,6 +6,7 @@
 #include "rtc_base/task_utils/to_queued_task.h"
 #include "modules/video_capture/video_capture_factory.h"
 #include "xrtc/base/xrtc_global.h"
+#include "xrtc/media/base/media_frame.h"
 #include <rtc_base/logging.h>
 #include <rtc_base/time_utils.h>
 
@@ -71,7 +72,6 @@ namespace xrtc {
                 }
             }
 
-
         }));
 
     }
@@ -135,5 +135,43 @@ namespace xrtc {
             fps_ = 0;
             last_frame_ts_ = now;
         }
+
+
+        int src_width = frame.width();
+        int src_height = frame.height();
+
+        int stridey = frame.video_frame_buffer()->GetI420()->StrideY();
+        int strideu = frame.video_frame_buffer()->GetI420()->StrideU();
+        int stridev = frame.video_frame_buffer()->GetI420()->StrideV();
+        // Y + U + V
+        int size = stridey * src_height + (strideu + stridev) * (src_height + 1) / 2;
+        std::shared_ptr<MediaFrame> video_frame = std::make_shared<MediaFrame>(size);
+        video_frame->fmt.media_type = MainMediaType::kMainTypeVideo;
+        video_frame->fmt.sub_fmt.video_fmt.width = src_width;
+        video_frame->fmt.sub_fmt.video_fmt.height = src_height;
+
+        video_frame->stride[0] = stridey;
+        video_frame->stride[1] = strideu;
+        video_frame->stride[2] = stridev;
+
+        video_frame->data_len[0] = stridey * src_height;
+
+        video_frame->data_len[1] = strideu * (src_height + 1) / 2;
+        video_frame->data_len[2] = stridev * (src_height + 1) / 2;
+
+        video_frame->data[1] = video_frame->data[0] + video_frame->data_len[0];
+        video_frame->data[2] = video_frame->data[1] + video_frame->data_len[1];
+        memcpy(video_frame->data[0],frame.video_frame_buffer()->GetI420()->DataY(),video_frame->data_len[0]);
+        memcpy(video_frame->data[1],frame.video_frame_buffer()->GetI420()->DataU(),video_frame->data_len[1]);
+        memcpy(video_frame->data[2],frame.video_frame_buffer()->GetI420()->DataV(),video_frame->data_len[2]);
+
+        if(0 == start_time_){
+            start_time_ = frame.render_time_ms();
+        }
+        video_frame->ts = static_cast<uint32_t>(frame.render_time_ms() - start_time_);
+
+
+
+
     }
 }

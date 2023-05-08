@@ -33,6 +33,7 @@ namespace xrtc{
         rtc::scoped_refptr<webrtc::VideoCaptureModule> video_capture_;
         webrtc::VideoCaptureModule::DeviceInfo* device_info_;
 
+        std::atomic<int64_t>start_time_{0};
 
         std::atomic<int> fps_{0};
         std::atomic<int64_t> last_frame_ts_{0};
