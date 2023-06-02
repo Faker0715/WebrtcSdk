@@ -28,7 +28,6 @@ namespace xrtc{
     private:
         std::string cam_id_;
         rtc::Thread* current_thread_;
-//        std::vector<IXRTCConsumer* > consumers_;
         bool has_start_ = false;
         rtc::scoped_refptr<webrtc::VideoCaptureModule> video_capture_;
         webrtc::VideoCaptureModule::DeviceInfo* device_info_;
@@ -37,6 +36,8 @@ namespace xrtc{
 
         std::atomic<int> fps_{0};
         std::atomic<int64_t> last_frame_ts_{0};
+
+        std::vector<IXRTCConsumer*> consumer_list_;
 
     };
 }

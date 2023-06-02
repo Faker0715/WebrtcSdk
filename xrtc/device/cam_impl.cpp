@@ -108,10 +108,24 @@ namespace xrtc {
     }
 
     void CamImpl::AddConsumer(IXRTCConsumer *consumer) {
+        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+            RTC_LOG(LS_INFO) << "CamImpl AddConsumer PostTask" << consumer;
+            consumer_list_.push_back(consumer);
+        }));
 
     }
 
     void CamImpl::RemoveConsumer(IXRTCConsumer *consumer) {
+        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+            RTC_LOG(LS_INFO) << "CamImpl RemoveConsumer PostTask" << consumer;
+            auto iter = consumer_list_.begin();
+            for (; iter != consumer_list_.end(); iter++) {
+                if (*iter == consumer) {
+                    consumer_list_.erase(iter);
+                    break;
+                }
+            }
+        }));
 
     }
 
@@ -169,6 +183,11 @@ namespace xrtc {
             start_time_ = frame.render_time_ms();
         }
         video_frame->ts = static_cast<uint32_t>(frame.render_time_ms() - start_time_);
+        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+            for (auto iter = consumer_list_.begin(); iter != consumer_list_.end(); iter++) {
+                (*iter)->OnFrame(video_frame);
+            }
+        }));
 
 
 
