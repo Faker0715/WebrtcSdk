@@ -11,7 +11,7 @@ namespace xrtc {
         return instance;
     }
 
-    XRTCGlobal::XRTCGlobal() : api_thread_(rtc::Thread::CreateWithSocketServer()),
+    XRTCGlobal::XRTCGlobal() : api_thread_(rtc::Thread::Create()),
                                worker_thread_(rtc::Thread::Create()),
                                network_thread_(rtc::Thread::CreateWithSocketServer()),
                                video_device_info_(webrtc::VideoCaptureFactory::CreateDeviceInfo()){

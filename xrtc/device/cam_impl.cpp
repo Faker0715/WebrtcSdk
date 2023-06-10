@@ -6,7 +6,7 @@
 #include "rtc_base/task_utils/to_queued_task.h"
 #include "modules/video_capture/video_capture_factory.h"
 #include "xrtc/base/xrtc_global.h"
-#include "xrtc/media/base/media_frame.h"
+#include "xrtc/media/media_frame.h"
 #include <rtc_base/logging.h>
 #include <rtc_base/time_utils.h>
 
