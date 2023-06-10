@@ -23,6 +23,8 @@
 
 namespace xrtc {
     class MediaFrame;
+    class XRTCPreview;
+    class XRTCRender;
 
     enum class XRTCError {
         kNoErr = 0,
@@ -73,6 +75,10 @@ namespace xrtc {
                                      std::string &device_id);
 
         static IVideoSource *CreateCamSource(const std::string &cam_id);
+
+        static XRTCRender* CreateRender(void* canvas);
+        static XRTCPreview* CreatePreview(IVideoSource* video_source, XRTCRender* render);
+
 
 
     };

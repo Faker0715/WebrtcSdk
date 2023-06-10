@@ -4,10 +4,8 @@
 
 #include "stdafx.h"
 #include "xrtc/xrtc.h"
+#include "xrtc/media/chain/xrtc_preview.h"
 
-//#include "xrtc/media/chain/xrtc_preview.h"
-//#include "xrtc/media/base/xrtc_pusher.h"
-//
 class MainThread;
 
 class BasicForm : public ui::WindowImplBase,
@@ -49,9 +47,9 @@ private:
 	void OnBtnDeviceStartClick();
 	bool StartDevice();
 	bool StopDevice();
-//	void OnBtnPreviewClick();
-//	bool StartPreview();
-//	bool StopPreview();
+	void OnBtnPreviewClick();
+	bool StartPreview();
+	bool StopPreview();
 //	void OnBtnPushClick();
 //	bool StartPush();
 //	bool StopPush();
@@ -81,8 +79,8 @@ private:
 	ui::Label* label_network_tips_ = nullptr;
 	xrtc::IVideoSource* cam_source_ = nullptr;
 	std::atomic<bool> device_init_{ false };
-//	xrtc::XRTCPreview* xrtc_preview_ = nullptr;
-//	xrtc::XRTCRender* xrtc_render_ = nullptr;
+	xrtc::XRTCPreview* xrtc_preview_ = nullptr;
+	xrtc::XRTCRender* xrtc_render_ = nullptr;
 //	xrtc::XRTCPusher* xrtc_pusher_ = nullptr;
 };
 //

@@ -3,7 +3,8 @@
 #include <rtc_base/task_utils/to_queued_task.h>
 #include "xrtc/base/xrtc_global.h"
 #include "xrtc/device/cam_impl.h"
-
+#include "xrtc/device/xrtc_render.h"
+#include "xrtc/media/chain/xrtc_preview.h"
 namespace xrtc {
     void XRTCEngine::Init(XRTCEngineObserver *observer) {
         rtc::LogMessage::LogTimestamps(true);
@@ -39,5 +40,19 @@ namespace xrtc {
         return XRTCGlobal::Instance()->api_thread()->Invoke<IVideoSource*>(RTC_FROM_HERE,[=](){
             return new CamImpl(cam_id);
         });
+    }
+
+    XRTCRender *XRTCEngine::CreateRender(void *canvas) {
+        return XRTCGlobal::Instance()->api_thread()->Invoke<XRTCRender *>(RTC_FROM_HERE, [=]() {
+            return new XRTCRender(canvas);
+        });
+    }
+
+    XRTCPreview* XRTCEngine::CreatePreview(IVideoSource* video_source, XRTCRender* render) {
+
+        return XRTCGlobal::Instance()->api_thread()->Invoke<XRTCPreview*>(RTC_FROM_HERE, [=]() {
+            return new XRTCPreview(video_source, render);
+        });
+
     }
 }

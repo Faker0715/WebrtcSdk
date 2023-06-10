@@ -29,6 +29,7 @@ std::wstring BasicForm::GetWindowClassName() const {
 void BasicForm::InitWindow() {
     btn_device_start_ = dynamic_cast<ui::Button *>(FindControl(L"btn_device_start"));
 
+    btn_prev_ = dynamic_cast<ui::Button *>(FindControl(L"btn_prev"));
     xrtc::XRTCEngine::Init(this);
 
     InitComboCam();
@@ -64,7 +65,7 @@ bool BasicForm::Notify(ui::EventArgs *msg) {
         if (L"btn_device_start" == name) {
             OnBtnDeviceStartClick();
         } else if (L"btn_prev" == name) {
-//			OnBtnPreviewClick();
+			OnBtnPreviewClick();
         } else if (L"btn_push" == name) {
 //			OnBtnPushClick();
         }
@@ -157,60 +158,60 @@ bool BasicForm::StopDevice() {
 	return true;
 }
 
-//void BasicForm::OnBtnPreviewClick() {
-//	btn_prev_->SetEnabled(false);
+void BasicForm::OnBtnPreviewClick() {
+	btn_prev_->SetEnabled(false);
 
-//	if (!xrtc_preview_) {
-//		if (StartPreview()) {
-//			btn_prev_->SetText(L"停止预览");
-//		}
-//	}
-//	else {
-//		if (StopPreview()) {
-//			btn_prev_->SetText(L"本地预览");
-//		}
-//	}
+	if (!xrtc_preview_) {
+		if (StartPreview()) {
+			btn_prev_->SetText(L"停止预览");
+		}
+	}
+	else {
+		if (StopPreview()) {
+			btn_prev_->SetText(L"本地预览");
+		}
+	}
 
-//	btn_prev_->SetEnabled(true);
-//}
-//
-//bool BasicForm::StartPreview() {
-//	if (!cam_source_) {
-//		ShowToast(L"预览失败：没有视频源", true);
-//		return false;
-//	}
+	btn_prev_->SetEnabled(true);
+}
 
-//	HWND hwnd = nullptr;
-//	CWndUI* local_video = dynamic_cast<CWndUI*>(FindControl(L"local"));
-//	if (local_video) {
-//		hwnd = local_video->GetVideoWnd();
-//	}
+bool BasicForm::StartPreview() {
+	if (!cam_source_) {
+		ShowToast(L"预览失败：没有视频源", true);
+		return false;
+	}
 
-//	if (!hwnd) {
-//		ShowToast(L"预览失败：没有显示窗口", true);
-//		return false;
-//	}
+	HWND hwnd = nullptr;
+	CWndUI* local_video = dynamic_cast<CWndUI*>(FindControl(L"local"));
+	if (local_video) {
+		hwnd = local_video->GetVideoWnd();
+	}
 
-//	xrtc_render_ = xrtc::XRTCEngine::CreateRender(hwnd);
-//	xrtc_preview_ = xrtc::XRTCEngine::CreatePreview(cam_source_, xrtc_render_);
-//	xrtc_preview_->Start();
+	if (!hwnd) {
+		ShowToast(L"预览失败：没有显示窗口", true);
+		return false;
+	}
 
-//	return true;
-//}
+	xrtc_render_ = xrtc::XRTCEngine::CreateRender(hwnd);
+	xrtc_preview_ = xrtc::XRTCEngine::CreatePreview(cam_source_, xrtc_render_);
+	xrtc_preview_->Start();
 
-//bool BasicForm::StopPreview() {
-//	if (!xrtc_preview_) {
-//		return false;
-//	}
+	return true;
+}
 
-//	xrtc_preview_->Stop();
+bool BasicForm::StopPreview() {
+	if (!xrtc_preview_) {
+		return false;
+	}
+
+	xrtc_preview_->Stop();
 //	xrtc_preview_->Destroy();
-//	xrtc_preview_ = nullptr;
+	xrtc_preview_ = nullptr;
 
-//	ShowToast(L"停止本地预览成功", false);
+	ShowToast(L"停止本地预览成功", false);
 
-//	return true;
-//}
+	return true;
+}
 
 //void BasicForm::OnBtnPushClick() {
 //	btn_push_->SetEnabled(false);
