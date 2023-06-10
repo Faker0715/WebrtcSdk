@@ -7,21 +7,24 @@
 #include <vector>
 #include <string>
 
+#include "xrtc/xrtc.h"
 namespace xrtc{
     class MediaObject{
     public:
+        virtual ~MediaObject() {};
+
         virtual bool Start() = 0;
         // 并不是都要有参数 有参数的实现
         virtual void SetUp(const std::string& json_config){};
         virtual void Stop() = 0;
     };
-    class MediaChain {
+    class XRTC_API MediaChain {
     public:
         MediaChain() = default;
         virtual ~MediaChain();
 
         virtual void Start() = 0;
-        virtual void Stop(const std::string &) = 0;
+        virtual void Stop() = 0;
         void AddMediaObject(MediaObject* media_object);
     private:
         // 所有节点集合
