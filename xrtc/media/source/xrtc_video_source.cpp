@@ -16,4 +16,11 @@ namespace xrtc{
     XRTCVideoSource::~XRTCVideoSource() {
 
     }
+
+    bool XRTCVideoSource::Start() {
+    }
+
+    void XRTCVideoSource::Stop() {
+
+    }
 }
