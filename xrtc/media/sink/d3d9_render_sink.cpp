@@ -14,7 +14,7 @@ namespace xrtc{
     }
 
     bool D3D9RenderSink::Start() {
-
+        return false;
     }
 
     void D3D9RenderSink::Stop() {
