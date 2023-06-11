@@ -4,6 +4,7 @@
 
 #include "in_pin.h"
 #include "out_pin.h"
+#include "xrtc/media/base/media_chain.h"
 namespace xrtc {
 
     InPin::InPin(MediaObject *obj) : BasePin(obj) {

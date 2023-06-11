@@ -8,7 +8,10 @@
 #include <string>
 
 #include "xrtc/xrtc.h"
+
 namespace xrtc{
+    class InPin;
+    class OutPin;
     class MediaObject{
     public:
         virtual ~MediaObject() {};
@@ -18,6 +21,8 @@ namespace xrtc{
         virtual void SetUp(const std::string& json_config){};
         virtual void Stop() = 0;
         virtual void OnNewMediaFrame(std::shared_ptr<MediaFrame> frame){};
+        virtual std::vector<InPin*> GetAllInPins() = 0;
+        virtual std::vector<OutPin*> GetAllOutPins() = 0;
     };
     class XRTC_API MediaChain {
     public:

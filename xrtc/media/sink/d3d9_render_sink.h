@@ -8,6 +8,9 @@
 #include "xrtc/media/base/media_chain.h"
 
 namespace xrtc{
+
+    class InPin;
+    class OutPin;
     class D3D9RenderSink : public MediaObject{
     public:
         D3D9RenderSink();
@@ -15,6 +18,14 @@ namespace xrtc{
 
         bool Start() override;
         void Stop() override;
+        virtual std::vector<InPin*> GetAllInPins() override{
+            return std::vector<InPin*>({in_pin_.get()});
+        }
+        virtual std::vector<OutPin*> GetAllOutPins() override{
+            return std::vector<OutPin*>();
+        }
+    private:
+        std::unique_ptr<InPin> in_pin_;
     };
 
 

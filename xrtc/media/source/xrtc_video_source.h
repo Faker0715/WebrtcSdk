@@ -7,8 +7,10 @@
 
 #include "xrtc/xrtc.h"
 #include "xrtc/media/base/media_chain.h"
+#include <memory>
 
 namespace xrtc {
+    class OutPin;
     class XRTCVideoSource : public IXRTCConsumer, public MediaObject {
     public:
         XRTCVideoSource();
@@ -20,6 +22,17 @@ namespace xrtc {
         void Stop() override;
 
         void OnFrame(std::shared_ptr<MediaFrame> frame) override;
+
+        std::vector<InPin*> GetAllInPins() override{
+            return std::vector<InPin*>();
+        }
+
+        std::vector<OutPin*> GetAllOutPins() override{
+            return std::vector<OutPin*>({out_pin_.get()});
+        }
+
+    private:
+        std::unique_ptr<OutPin> out_pin_;
 
 
     };
