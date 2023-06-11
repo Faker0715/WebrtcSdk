@@ -32,6 +32,7 @@ namespace xrtc {
         kVideoNoCapabilitiesErr,
         kVideoNoBestCapabilitiesErr,
         kVideoStartCaptureErr,
+        kPreviewNoVideoSource
     };
 
     class IXRTCConsumer {

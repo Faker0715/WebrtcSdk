@@ -25,6 +25,7 @@ namespace xrtc{
 
         virtual void Start() = 0;
         virtual void Stop() = 0;
+    protected:
         void AddMediaObject(MediaObject* media_object);
     private:
         // 所有节点集合

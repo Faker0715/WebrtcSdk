@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.8)
 project(windemo)
 include_directories(
         ${XRTC_DIR}
+        ${XRTC_THIRD_PARTY_DIR}/include
         ${XRTC_DIR}/../xrtc-third_party/NIM_Duilib_Framework)
 link_directories(
         ${XRTC_DIR}/../xrtc-third_party/out/build/x64-Debug/Windows/lib

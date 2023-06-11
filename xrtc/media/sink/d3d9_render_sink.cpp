@@ -13,7 +13,7 @@ namespace xrtc{
 
     }
 
-    void D3D9RenderSink::Start() {
+    bool D3D9RenderSink::Start() {
 
     }
 

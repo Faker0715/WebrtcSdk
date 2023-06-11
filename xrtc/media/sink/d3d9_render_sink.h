@@ -8,14 +8,15 @@
 #include "xrtc/media/base/media_chain.h"
 
 namespace xrtc{
-    class D3D9RenderSink : public MediaChain {
+    class D3D9RenderSink : public MediaObject{
     public:
         D3D9RenderSink();
         ~D3D9RenderSink() override;
 
-        void Start() override;
+        bool Start() override;
         void Stop() override;
-    }
+    };
+
 
 }
 

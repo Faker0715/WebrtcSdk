@@ -18,6 +18,7 @@ namespace xrtc{
     }
 
     bool XRTCVideoSource::Start() {
+        return true;
     }
 
     void XRTCVideoSource::Stop() {
