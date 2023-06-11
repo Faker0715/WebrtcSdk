@@ -18,17 +18,17 @@ namespace xrtc{
             return obj_;
         }
         void set_format(const MediaFormat& format){
-            fmt = format;
+            fmt_ = format;
         }
         MediaFormat format() const{
-            return fmt;
+            return fmt_;
         }
 
         virtual void PushMediaFrame(std::shared_ptr<MediaFrame> frame) = 0;
 
-    private:
+    protected:
         MediaObject* obj_;
-        MediaFormat fmt;
+        MediaFormat fmt_;
     };
 
 }

@@ -3,13 +3,16 @@
 //
 
 #include "out_pin.h"
+#include "in_pin.h"
 namespace xrtc{
 
     OutPin::OutPin(MediaObject *obj) : BasePin(obj) {
 
     }
     void OutPin::PushMediaFrame(std::shared_ptr<MediaFrame> frame) {
-
+        if(in_pin_){
+            in_pin_->PushMediaFrame(frame);
+        }
     }
 
     OutPin::~OutPin() {
@@ -17,6 +20,10 @@ namespace xrtc{
     }
 
     bool OutPin::ConnectTo(InPin *in_pin) {
-        return false;
+        if(!in_pin || !in_pin->Accept(this)){
+            return false;
+        }
+        in_pin_ = in_pin;
+        return true;
     }
 }

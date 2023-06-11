@@ -17,6 +17,7 @@ namespace xrtc{
         // 并不是都要有参数 有参数的实现
         virtual void SetUp(const std::string& json_config){};
         virtual void Stop() = 0;
+        virtual void OnNewMediaFrame(std::shared_ptr<MediaFrame> frame){};
     };
     class XRTC_API MediaChain {
     public:
