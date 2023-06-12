@@ -288,25 +288,25 @@ void BasicForm::OnVideoSourceFailed(xrtc::IVideoSource* video_source,
 	ShowToast(wstr, true);
 }
 
-//void BasicForm::OnPreviewSuccess(xrtc::XRTCPreview*) {
-//	ShowToast(L"本地预览成功", false);
-//}
+void BasicForm::OnPreviewSuccess(xrtc::XRTCPreview*) {
+	ShowToast(L"本地预览成功", false);
+}
 
-//void BasicForm::OnPreviewFailed(xrtc::XRTCPreview*, xrtc::XRTCError err) {
-//	std::wstring msg = nbase::StringPrintf(L"本地预览失败, err: %d", err);
-//	ShowToast(msg, true);
+void BasicForm::OnPreviewFailed(xrtc::XRTCPreview*, xrtc::XRTCError err) {
+	std::wstring msg = nbase::StringPrintf(L"本地预览失败, err: %d", err);
+	ShowToast(msg, true);
 
-//	if (xrtc_preview_) {
-//		xrtc_preview_->Stop();
-//		xrtc_preview_->Destroy();
-//		xrtc_preview_ = nullptr;
-//	}
-
-//	CallOnUIThread([=] {
-//		btn_prev_->SetText(L"本地预览");
-//	});
-//}
-
+	if (xrtc_preview_) {
+		xrtc_preview_->Stop();
+		xrtc_preview_->Destroy();
+		xrtc_preview_ = nullptr;
+	}
+    // 因为这个方法是在api thread中被调用的
+	CallOnUIThread([=] {
+		btn_prev_->SetText(L"本地预览");
+	});
+}
+//
 //void BasicForm::OnPushSuccess(xrtc::XRTCPusher*) {
 //	ShowToast(L"xrtc推流成功", false);
 //}

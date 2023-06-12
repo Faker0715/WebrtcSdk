@@ -31,8 +31,13 @@ namespace xrtc{
 
         virtual void Start() = 0;
         virtual void Stop() = 0;
+        virtual void Destroy() = 0;
     protected:
         void AddMediaObject(MediaObject* media_object);
+        bool ConnectMediaObject(MediaObject* from, MediaObject* to);
+        void SetupChain(const std::string& json_config);
+        bool StartChain();
+
     private:
         // 所有节点集合
         std::vector<MediaObject*> media_objects_;

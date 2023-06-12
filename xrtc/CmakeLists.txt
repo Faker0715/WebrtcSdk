@@ -17,7 +17,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_definitions( -DXRTC_API_EXPORT -DWEBRTC_WIN -DNOMINMAX)
 endif ()
 
-add_library(xrtc SHARED ${all_src} base/xrtc_global.cpp device/cam_impl.cpp device/cam_impl.h media/media_frame.h media/media_frame.h media/base/media_chain.cpp media/base/media_chain.h media/chain/xrtc_preview.cpp media/chain/xrtc_preview.h device/xrtc_render.h media/source/xrtc_video_source.cpp media/source/xrtc_video_source.h media/sink/d3d9_render_sink.cpp media/sink/d3d9_render_sink.h media/base/base_pin.cpp media/base/base_pin.h media/base/in_pin.cpp media/base/in_pin.h media/base/out_pin.h media/base/out_pin.cpp)
+add_library(xrtc SHARED ${all_src} base/xrtc_global.cpp device/cam_impl.cpp device/cam_impl.h media/media_frame.h media/media_frame.h media/base/media_chain.cpp media/base/media_chain.h media/chain/xrtc_preview.cpp media/chain/xrtc_preview.h device/xrtc_render.h media/source/xrtc_video_source.cpp media/source/xrtc_video_source.h media/sink/d3d9_render_sink.cpp media/sink/d3d9_render_sink.h media/base/base_pin.cpp media/base/base_pin.h media/base/in_pin.cpp media/base/in_pin.h media/base/out_pin.h media/base/out_pin.cpp base/xrtc_json.cpp )
 #add_library(xrtc STATIC ${all_src} base/xrtc_global.cpp)
 
 target_link_libraries(xrtc
@@ -30,6 +30,7 @@ target_link_libraries(xrtc
         Strmiids
         jpeg-static
         yuv
+        jsoncpp_static
         libwebrtc)
 
 

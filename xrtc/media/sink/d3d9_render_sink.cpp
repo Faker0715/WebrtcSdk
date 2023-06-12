@@ -19,10 +19,23 @@ namespace xrtc{
     }
 
     bool D3D9RenderSink::Start() {
-        return false;
+        return true;
     }
 
     void D3D9RenderSink::Stop() {
+
+    }
+
+    void D3D9RenderSink::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {
+
+    }
+
+    void D3D9RenderSink::SetUp(const std::string &json_config) {
+        JsonValue value;
+        value.FromJson(json_config);
+        JsonObject jobject = value.ToObject();
+        JsonObject jd3d9 = jobject["d3d9_render_sink"].ToObject();
+        hwnd_ = (HWND)jd3d9["hwnd"].ToInt();
 
     }
 }

@@ -32,6 +32,7 @@ namespace xrtc {
                 }else if(out_fmt.sub_fmt.audio_fmt.type != fmt_.sub_fmt.audio_fmt.type){
                     return false;
                 }
+                break;
             }
             case MainMediaType::kMainTypeVideo: {
                 if (out_fmt.sub_fmt.video_fmt.type == SubMediaType::kSubTypeCommon ||
@@ -41,6 +42,7 @@ namespace xrtc {
                 }else if(out_fmt.sub_fmt.video_fmt.type != fmt_.sub_fmt.video_fmt.type){
                     return false;
                 }
+                break;
             }
             default:
                 return false;

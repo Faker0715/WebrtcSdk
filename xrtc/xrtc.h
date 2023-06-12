@@ -32,7 +32,9 @@ namespace xrtc {
         kVideoNoCapabilitiesErr,
         kVideoNoBestCapabilitiesErr,
         kVideoStartCaptureErr,
-        kPreviewNoVideoSource
+        kPreviewNoVideoSourceErr,
+        kChainConnectErr,
+        kChainStartErr
     };
 
     class IXRTCConsumer {
@@ -63,6 +65,10 @@ namespace xrtc {
     public:
         virtual void OnVideoSourceSuccess(IVideoSource* source) {};
         virtual void OnVideoSourceFailed(IVideoSource* source, XRTCError error) {};
+
+        virtual void OnPreviewSuccess(XRTCPreview* preview) {};
+        virtual void OnPreviewFailed(XRTCPreview* preview, XRTCError error) {};
+
     };
 
 

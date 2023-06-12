@@ -6,8 +6,9 @@
 #include "xrtc/media/base/out_pin.h"
 namespace xrtc{
     void XRTCVideoSource::OnFrame(std::shared_ptr<MediaFrame> frame) {
-
-
+        if(out_pin_){
+            out_pin_->PushMediaFrame(frame);
+        }
     }
 
     XRTCVideoSource::XRTCVideoSource() : out_pin_(std::make_unique<OutPin>(this)){

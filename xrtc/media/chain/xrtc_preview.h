@@ -21,6 +21,7 @@ namespace xrtc{
         ~XRTCPreview();
         void Start() override;
         void Stop() override;
+        void Destroy() override;;
 
 
     private:
