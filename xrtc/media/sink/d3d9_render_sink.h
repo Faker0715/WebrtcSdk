@@ -34,6 +34,7 @@ namespace xrtc{
         void OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) override;
     private:
         bool TryInit(std::shared_ptr<MediaFrame> frame);
+        void DoRender(std::shared_ptr<MediaFrame> frame);
     private:
         std::unique_ptr<InPin> in_pin_;
         HWND hwnd_;
@@ -42,6 +43,8 @@ namespace xrtc{
         IDirect3DSurface9* d3d9_surface_ = nullptr;
         int width_ = 640;
         int height_ = 480;
+        char* rgb_buffer_ = nullptr;
+        int rgb_buffer_size_ = 0;
     };
 
 

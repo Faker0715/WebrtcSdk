@@ -161,6 +161,7 @@ namespace xrtc {
         int size = stridey * src_height + (strideu + stridev) * (src_height + 1) / 2;
         std::shared_ptr<MediaFrame> video_frame = std::make_shared<MediaFrame>(size);
         video_frame->fmt.media_type = MainMediaType::kMainTypeVideo;
+        video_frame->fmt.sub_fmt.video_fmt.type = SubMediaType::kSubTypeI420;
         video_frame->fmt.sub_fmt.video_fmt.width = src_width;
         video_frame->fmt.sub_fmt.video_fmt.height = src_height;
 
