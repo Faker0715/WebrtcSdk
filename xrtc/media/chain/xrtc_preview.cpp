@@ -82,6 +82,13 @@ namespace xrtc {
         RTC_LOG(LS_INFO) << "XRTCPreview Stop call";
         current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
             RTC_LOG(LS_INFO) << "XRTCPreview Stop PostTask";
+            if(!has_start_){
+                return;
+            }
+            // 如果先停止了设备，再停止预览，此处会crash
+            video_source_->RemoveConsumer(xrtc_video_source_.get());
+            StopChain();
+            has_start_ = false;
         }));
     }
 

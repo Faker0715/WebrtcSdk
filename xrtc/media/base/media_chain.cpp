@@ -48,4 +48,11 @@ namespace xrtc {
         }
 
     }
+
+    void MediaChain::StopChain() {
+        for(auto media_object : media_objects_){
+            media_object->Stop();
+        }
+
+    }
 }

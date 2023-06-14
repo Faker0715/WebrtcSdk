@@ -4,6 +4,8 @@
 
 #include "xrtc_video_source.h"
 #include "xrtc/media/base/out_pin.h"
+#include "rtc_base/logging.h"
+
 namespace xrtc{
     void XRTCVideoSource::OnFrame(std::shared_ptr<MediaFrame> frame) {
         if(out_pin_){
@@ -27,6 +29,6 @@ namespace xrtc{
     }
 
     void XRTCVideoSource::Stop() {
-
+        RTC_LOG(LS_INFO) << "XRTCVideoSource::Stop";
     }
 }

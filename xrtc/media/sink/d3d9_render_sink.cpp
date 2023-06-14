@@ -30,7 +30,26 @@ namespace xrtc {
     }
 
     void D3D9RenderSink::Stop() {
+        RTC_LOG(LS_INFO) << "D3D9RenderSink::Stop";
+        if(d3d9_surface_){
+            d3d9_surface_->Release();
+            d3d9_surface_ = nullptr;
+        }
+        if(d3d9_device_){
+            d3d9_device_->Release();
+            d3d9_device_ = nullptr;
+        }
 
+        if(d3d9_){
+            d3d9_->Release();
+            d3d9_ = nullptr;
+        }
+
+        if(rgb_buffer_){
+            delete[] rgb_buffer_;
+            rgb_buffer_ = nullptr;
+            rgb_buffer_size_ = 0;
+        }
     }
 
     void D3D9RenderSink::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {

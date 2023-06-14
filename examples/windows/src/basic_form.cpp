@@ -205,7 +205,7 @@ bool BasicForm::StopPreview() {
 	}
 
 	xrtc_preview_->Stop();
-//	xrtc_preview_->Destroy();
+	xrtc_preview_->Destroy();
 	xrtc_preview_ = nullptr;
 
 	ShowToast(L"停止本地预览成功", false);

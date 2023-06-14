@@ -37,6 +37,7 @@ namespace xrtc{
         bool ConnectMediaObject(MediaObject* from, MediaObject* to);
         void SetupChain(const std::string& json_config);
         bool StartChain();
+        void StopChain();
 
     private:
         // 所有节点集合
