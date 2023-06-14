@@ -73,6 +73,12 @@ namespace xrtc {
             RTC_LOG(LS_WARNING) << "D3D9RenderSink::TryInit hwnd is invalid";
             return false;
         }
+
+        if(!GetClientRect(hwnd_,&rt_viewport_)){
+            RTC_LOG(LS_WARNING) << "D3D9RenderSink::TryInit GetClientRect failed" << hwnd_;
+            return false;
+        }
+
         if (!d3d9_) {
             d3d9_ = Direct3DCreate9(D3D_SDK_VERSION);
             if (!d3d9_) {
@@ -202,10 +208,33 @@ namespace xrtc {
                                           D3DBACKBUFFER_TYPE_MONO, // 用于指定要获取的表面的类型，如果只有一个后台缓冲区，则为D3DBACKBUFFER_TYPE_MONO
                                           &pback_buffer // 用于接收指向后台缓冲区的指针
         );
+        // 显示区域的宽高
+        float w1 = rt_viewport_.right - rt_viewport_.left;
+        float h1 = rt_viewport_.bottom - rt_viewport_.top;
+        // 图像的宽高
+        float w2 = (float)width_;
+        float h2 = (float)height_;
+
+        // 计算目标区域的大小
+        int dst_w = 0;
+        int dst_h = 0;
+        int x,y = 0;
+        if(w1 > (w2*h1) / h2){ // 原始的显示区域 宽度更宽一些
+            dst_w = (w2*h1) / h2;
+            dst_h = h1;
+            x = (w1 - dst_w)/2;
+            y = 0;
+        }else{
+            dst_w = w1;
+            dst_h = (w1*h2) / w2;
+            x = 0;
+            y = (h1 - dst_h)/2;
+        }
+        RECT dest_rect{x,y,x + dst_w,y+dst_h};
         d3d9_device_->StretchRect(d3d9_surface_, // 指向源表面的指针
                                   NULL, // 指向源矩形区域的指针，如果为NULL，则表示整个表面
                                   pback_buffer, // 指向目标表面的指针
-                                  NULL, // 指向目标矩形区域的指针，如果为NULL，则表示整个表面
+                                  &dest_rect, // 指向目标矩形区域的指针，如果为NULL，则表示整个表面
                                   D3DTEXF_LINEAR// 指定纹理过滤器 线性插值 两个区域大小不一样 还有临近算法 但是效果不好
         );
         d3d9_device_->EndScene();

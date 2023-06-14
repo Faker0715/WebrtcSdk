@@ -45,6 +45,9 @@ namespace xrtc{
         int height_ = 480;
         char* rgb_buffer_ = nullptr;
         int rgb_buffer_size_ = 0;
+
+        RECT rt_viewport_;
+
     };
 
 
