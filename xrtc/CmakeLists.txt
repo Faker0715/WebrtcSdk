@@ -31,6 +31,7 @@ target_link_libraries(xrtc
         jpeg-static
         yuv
         jsoncpp_static
+        d3d9
         libwebrtc)
 
 

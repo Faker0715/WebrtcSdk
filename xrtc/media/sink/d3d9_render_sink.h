@@ -9,6 +9,10 @@
 #include "xrtc/media/base/media_chain.h"
 #include "xrtc/base/xrtc_json.h"
 
+struct IDirect3D9;
+struct IDirect3DDevice9;
+struct IDirect3DSurface9;
+
 namespace xrtc{
 
     class InPin;
@@ -29,8 +33,15 @@ namespace xrtc{
         }
         void OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) override;
     private:
+        bool TryInit(std::shared_ptr<MediaFrame> frame);
+    private:
         std::unique_ptr<InPin> in_pin_;
         HWND hwnd_;
+        IDirect3D9* d3d9_ = nullptr;
+        IDirect3DDevice9* d3d9_device_ = nullptr;
+        IDirect3DSurface9* d3d9_surface_ = nullptr;
+        int width_ = 640;
+        int height_ = 480;
     };
 
 
