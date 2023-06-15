@@ -57,7 +57,7 @@ namespace xrtc {
 
     }
 
-    XRTCPusher *XRTCEngine::CreatePusher(IVideoSource *video_source) {
+    XRTCPusher* XRTCEngine::CreatePusher(IVideoSource *video_source) {
         return XRTCGlobal::Instance()->api_thread()->Invoke<XRTCPusher *>(RTC_FROM_HERE, [=]() {
             return new XRTCPusher(video_source);
         });
