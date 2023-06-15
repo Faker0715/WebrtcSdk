@@ -25,6 +25,7 @@ namespace xrtc {
     class MediaFrame;
     class XRTCPreview;
     class XRTCRender;
+    class XRTCPusher;
 
     enum class XRTCError {
         kNoErr = 0,
@@ -44,9 +45,9 @@ namespace xrtc {
         virtual void OnFrame(std::shared_ptr<MediaFrame>) = 0;
     };
 
-    class IVideoSource {
+    class IMediaSource {
     public:
-        virtual ~IVideoSource() {};
+        virtual ~IMediaSource() {};
 
         virtual void Setup(const std::string& json_config) = 0;
         virtual void Start() = 0;
@@ -58,6 +59,8 @@ namespace xrtc {
         virtual void AddConsumer(IXRTCConsumer *consumer) = 0;
 
         virtual void RemoveConsumer(IXRTCConsumer *consumer) = 0;
+    };
+    class IVideoSource : public IMediaSource {
     };
 
 
@@ -85,6 +88,7 @@ namespace xrtc {
 
         static XRTCRender* CreateRender(void* canvas);
         static XRTCPreview* CreatePreview(IVideoSource* video_source, XRTCRender* render);
+        static XRTCPusher* CreatePusher(IVideoSource *video_source);
 
 
 
