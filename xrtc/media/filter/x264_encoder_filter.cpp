@@ -15,6 +15,11 @@ namespace xrtc{
         fmt_in.sub_fmt.video_fmt.type = SubMediaType::kSubTypeI420;
         in_pin_->set_format(fmt_in);
 
+        MediaFormat fmt_out;
+        fmt_out.media_type = MainMediaType::kMainTypeVideo;
+        fmt_out.sub_fmt.video_fmt.type = SubMediaType::kSubTypeH264;
+
+
 
     }
 
@@ -31,6 +36,8 @@ namespace xrtc{
     }
 
     void X264EncoderFilter::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {
-        return ;
+        std::unique_lock<std::mutex> auto_lock(frame_queue_mutex_);
+        frame_queue_.push(frame);
+
     }
 }

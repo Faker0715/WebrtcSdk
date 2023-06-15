@@ -4,7 +4,8 @@
 
 #ifndef XRTCSDK_X264_ENCODER_FILTER_H
 #define XRTCSDK_X264_ENCODER_FILTER_H
-
+#include <queue>
+#include <mutex>
 #include "xrtc/media/base/media_chain.h"
 namespace xrtc{
 
@@ -25,6 +26,8 @@ namespace xrtc{
     private:
         std::unique_ptr<InPin> in_pin_;
         std::unique_ptr<OutPin> out_pin_;
+        std::queue<std::shared_ptr<MediaFrame>> frame_queue_;
+        std::mutex frame_queue_mutex_;
     };
 }
 

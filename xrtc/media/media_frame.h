@@ -18,7 +18,8 @@ namespace xrtc {
     };
     enum class SubMediaType {
         kSubTypeCommon,
-        kSubTypeI420
+        kSubTypeI420,
+        kSubTypeH264
     };
     struct AudioFormat {
         SubMediaType type;
