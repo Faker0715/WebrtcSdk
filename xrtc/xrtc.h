@@ -35,7 +35,8 @@ namespace xrtc {
         kVideoStartCaptureErr,
         kPreviewNoVideoSourceErr,
         kChainConnectErr,
-        kChainStartErr
+        kChainStartErr,
+        kPushNoVideoSourceErr
     };
 
     class IXRTCConsumer {
