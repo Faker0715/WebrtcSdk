@@ -28,7 +28,11 @@ namespace xrtc{
         std::unique_ptr<OutPin> out_pin_;
         std::queue<std::shared_ptr<MediaFrame>> frame_queue_;
         std::mutex frame_queue_mutex_;
+        std::atomic<bool> running_{false};
+        std::thread* encoder_thread_ = nullptr;
+        std::condition_variable cond_var_;
     };
+
 }
 
 
