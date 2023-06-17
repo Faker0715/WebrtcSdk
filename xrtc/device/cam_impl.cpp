@@ -15,7 +15,7 @@ namespace xrtc {
     void CamImpl::Start() {
         RTC_LOG(LS_INFO) << "CamImpl::Start call";
 
-        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+        current_thread_->PostTask(webrtc::ToQueuedTask([=] {
 
             RTC_LOG(LS_INFO) << "CamImpl::Start PostTask";
             XRTCError err = XRTCError::kNoErr;
@@ -79,7 +79,7 @@ namespace xrtc {
     void CamImpl::Stop() {
 
         RTC_LOG(LS_INFO) << "CamImpl Stop call";
-        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+        current_thread_->PostTask(webrtc::ToQueuedTask([=] {
             RTC_LOG(LS_INFO) << "CamImpl Stop PostTask";
             if (!has_start_) {
                 return;
@@ -116,7 +116,7 @@ namespace xrtc {
     }
 
     void CamImpl::RemoveConsumer(IXRTCConsumer *consumer) {
-        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+        current_thread_->PostTask(webrtc::ToQueuedTask([=] {
             RTC_LOG(LS_INFO) << "CamImpl RemoveConsumer PostTask" << consumer;
             auto iter = consumer_list_.begin();
             for (; iter != consumer_list_.end(); iter++) {
@@ -171,9 +171,8 @@ namespace xrtc {
 
         video_frame->data_len[0] = stridey * src_height;
 
-        video_frame->data_len[1] = strideu * (src_height + 1) / 2;
-        video_frame->data_len[2] = stridev * (src_height + 1) / 2;
-
+        video_frame->data_len[1] = strideu * ((src_height + 1) / 2);
+        video_frame->data_len[2] = stridev * ((src_height + 1) / 2);
         video_frame->data[1] = video_frame->data[0] + video_frame->data_len[0];
         video_frame->data[2] = video_frame->data[1] + video_frame->data_len[1];
         memcpy(video_frame->data[0],frame.video_frame_buffer()->GetI420()->DataY(),video_frame->data_len[0]);
@@ -184,7 +183,7 @@ namespace xrtc {
             start_time_ = frame.render_time_ms();
         }
         video_frame->ts = static_cast<uint32_t>(frame.render_time_ms() - start_time_);
-        current_thread_->PostTask(webrtc::ToQueuedTask([=]() {
+        current_thread_->PostTask(webrtc::ToQueuedTask([=] {
             for (auto iter = consumer_list_.begin(); iter != consumer_list_.end(); iter++) {
                 (*iter)->OnFrame(video_frame);
             }
