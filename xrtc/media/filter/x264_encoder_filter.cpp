@@ -115,7 +115,7 @@ namespace xrtc {
         }
                 va_end(args2);
 
-        RTC_LOG(LS_INFO) << "x264 log, level: " << level << ", msg: " << buf;
+//        RTC_LOG(LS_INFO) << "x264 log, level: " << level << ", msg: " << buf;
     }
 
     bool X264EncoderFilter::InitEncoder() {

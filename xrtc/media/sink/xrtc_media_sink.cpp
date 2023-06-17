@@ -60,6 +60,9 @@ namespace xrtc {
 
             std::string type;
             std::string sdp;
+            if (!ParseReply(reply, type, sdp)) {
+                return;
+            }
 
 
         }, this);
@@ -80,6 +83,37 @@ namespace xrtc {
     void XRTCMediaSink::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {
     }
 
+    bool XRTCMediaSink::ParseReply(const HttpReply &reply, std::string &type, std::string &sdp) {
+        if (reply.get_status_code() != 200 || reply.get_errno() != 0) {
+            RTC_LOG(LS_WARNING) << "signaling response error";
+            return false;
+        }
+
+        JsonValue value;
+        if (!value.FromJson(reply.get_resp())) {
+            RTC_LOG(LS_WARNING) << "invalid json response";
+            return false;
+        }
+
+        JsonObject jobj = value.ToObject();
+        int err_no = jobj["errNo"].ToInt();
+        if (err_no != 0) {
+            RTC_LOG(LS_WARNING) << "response errNo is not 0, err_no: " << err_no;
+            return false;
+        }
+
+        JsonObject data = jobj["data"].ToObject();
+        type = data["type"].ToString();
+        sdp = data["sdp"].ToString();
+
+        if (sdp.empty()) {
+            RTC_LOG(LS_WARNING) << "sdp is empty";
+            return false;
+        }
+
+        return true;
+
+    }
 
 
 } // namespace xrtc

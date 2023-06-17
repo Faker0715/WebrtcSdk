@@ -239,7 +239,6 @@ bool BasicForm::StartPush() {
 		return false;
 	}
 
-//	 xrtc://https://faker.ink:8081/webrtcclient/push?uid=xxx&streamName=xxx
 	std::string url = "xrtc://" + nbase::UTF16ToUTF8(edit_host_->GetText())
 		+ "/push?uid=" + nbase::UTF16ToUTF8(edit_uid_->GetText())
 		+ "&streamName=" + nbase::UTF16ToUTF8(edit_stream_name_->GetText());
