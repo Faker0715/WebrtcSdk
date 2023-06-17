@@ -44,7 +44,7 @@ namespace xrtc {
 
     void MediaChain::SetupChain(const std::string &json_config) {
         for(auto obj: media_objects_){
-            obj->SetUp(json_config);
+            obj->Setup(json_config);
         }
 
     }

@@ -11,7 +11,9 @@ namespace xrtc{
             pusher_(pusher),
             video_source_(video_source),
             xrtc_video_source_(std::make_unique<XRTCVideoSource>()),
-            x264_encoder_filter_(std::make_unique<X264EncoderFilter>()){
+            x264_encoder_filter_(std::make_unique<X264EncoderFilter>()),
+            xrtc_media_sink_(std::make_unique<XRTCMediaSink>(this))
+    {
 
     }
 
@@ -32,9 +34,16 @@ namespace xrtc{
             video_source_->AddConsumer(xrtc_video_source_.get());
             AddMediaObject(xrtc_video_source_.get());
             AddMediaObject(x264_encoder_filter_.get());
+            AddMediaObject(xrtc_media_sink_.get());
             if(!ConnectMediaObject(xrtc_video_source_.get(), x264_encoder_filter_.get())){
                 err = XRTCError::kChainConnectErr;
                 RTC_LOG(LS_WARNING) << "xrtc_video_source connect to x264_encoder_filter failed";
+                break;
+            }
+
+            if(!ConnectMediaObject(x264_encoder_filter_.get(), xrtc_media_sink_.get())){
+                err = XRTCError::kChainConnectErr;
+                RTC_LOG(LS_WARNING) << "x264_encoder_filter connect to xrtc_media_sink failed";
                 break;
             }
             if(!StartChain()){

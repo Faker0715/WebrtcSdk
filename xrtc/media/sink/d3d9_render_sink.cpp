@@ -67,7 +67,7 @@ namespace xrtc {
 
     }
 
-    void D3D9RenderSink::SetUp(const std::string &json_config) {
+    void D3D9RenderSink::Setup(const std::string &json_config) {
         JsonValue value;
         value.FromJson(json_config);
         JsonObject jobject = value.ToObject();

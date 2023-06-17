@@ -24,7 +24,7 @@ namespace xrtc{
 
         bool Start() override;
         void Stop() override;
-        void SetUp(const std::string& json_config) override;
+        void Setup(const std::string& json_config) override;
         virtual std::vector<InPin*> GetAllInPins() override{
             return std::vector<InPin*>({in_pin_.get()});
         }

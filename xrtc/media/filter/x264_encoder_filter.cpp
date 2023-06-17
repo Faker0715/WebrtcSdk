@@ -21,8 +21,7 @@ namespace xrtc {
         MediaFormat fmt_out;
         fmt_out.media_type = MainMediaType::kMainTypeVideo;
         fmt_out.sub_fmt.video_fmt.type = SubMediaType::kSubTypeH264;
-
-
+        out_pin_->set_format(fmt_out);
     }
 
     X264EncoderFilter::~X264EncoderFilter() {
