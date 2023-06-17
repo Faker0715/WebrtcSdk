@@ -47,7 +47,22 @@ namespace xrtc {
              << "&streamName=" << request_params_["streamName"]
              << "&audio=1&video=1&isDtls=0";
         std::string url = "https://" + host_ + "/signaling/push";
+        HttpRequest request(url, body.str());
 
+        // 发送请求
+        XRTCGlobal::Instance()->http_manager()->Post(request, [=](HttpReply reply) {
+            RTC_LOG(LS_INFO) << "signaling push response, url: " << reply.get_url()
+                             << ", body: " << reply.get_body()
+                             << ", status: " << reply.get_status_code()
+                             << ", err_no: " << reply.get_errno()
+                             << ", err_msg: " << reply.get_err_msg()
+                             << ", response: " << reply.get_resp();
+
+            std::string type;
+            std::string sdp;
+
+
+        }, this);
         return true;
     }
 
