@@ -56,17 +56,20 @@ namespace xrtc {
     private:
         bool InitEncoder();
         void ReleaseEncoder();
-
+        bool Encode(std::shared_ptr<MediaFrame> frame,
+                    std::shared_ptr<MediaFrame>& out_frame);
     private:
         std::unique_ptr<InPin> in_pin_;
         std::unique_ptr<OutPin> out_pin_;
         std::queue<std::shared_ptr<MediaFrame>> frame_queue_;
         std::mutex frame_queue_mutex_;
         std::atomic<bool> running_{false};
-        std::thread *encoder_thread_ = nullptr;
+        std::thread *encode_thread_ = nullptr;
         std::condition_variable cond_var_;
         X264EncoderPararm encoder_param_;
         x264_param_t* x264_param_ = nullptr;
+        x264_t* x264_ = nullptr;
+        x264_picture_t* x264_picture_ = nullptr;
     };
 
 
