@@ -8,6 +8,7 @@
 #include <modules/video_capture/video_capture.h>
 namespace xrtc {
     class XRTCEngineObserver;
+    class HttpManager;
     class XRTCGlobal {
     public:
         static XRTCGlobal* Instance();
@@ -21,6 +22,7 @@ namespace xrtc {
         rtc::Thread* worker_thread() const { return worker_thread_.get(); }
         rtc::Thread* network_thread() const { return network_thread_.get(); }
         webrtc::VideoCaptureModule::DeviceInfo* video_device_info() const { return video_device_info_.get(); }
+        HttpManager* http_manager() { return http_manager_; }
 
     private:
         XRTCGlobal();
@@ -31,6 +33,7 @@ namespace xrtc {
         std::unique_ptr<rtc::Thread> network_thread_;
         std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> video_device_info_;
         XRTCEngineObserver* engine_observer_;
+        HttpManager* http_manager_ = nullptr;
 
 
     };

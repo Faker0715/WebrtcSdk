@@ -6,7 +6,7 @@
 
 #include <rtc_base/logging.h>
 #include <rtc_base/task_utils/to_queued_task.h>
-
+#include "xrtc/base/xrtc_http.h"
 #include "xrtc/base/xrtc_global.h"
 #include "xrtc/base/xrtc_json.h"
 #include "xrtc/media/base/in_pin.h"
@@ -23,10 +23,11 @@ namespace xrtc {
         video_fmt.media_type = MainMediaType::kMainTypeVideo;
         video_fmt.sub_fmt.video_fmt.type = SubMediaType::kSubTypeH264;
         video_in_pin_->set_format(video_fmt);
-
+        XRTCGlobal::Instance()->http_manager()->AddObject(this);
     }
 
     XRTCMediaSink::~XRTCMediaSink() {
+        XRTCGlobal::Instance()->http_manager()->RemoveObject(this);
     }
 
     bool XRTCMediaSink::Start() {
