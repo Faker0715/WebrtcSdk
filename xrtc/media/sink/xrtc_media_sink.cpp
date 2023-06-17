@@ -16,9 +16,8 @@ namespace xrtc {
 
     XRTCMediaSink::XRTCMediaSink(MediaChain* media_chain) :
             media_chain_(media_chain),
-            video_in_pin_(std::make_unique<InPin>(this))
-
-    {
+            video_in_pin_(std::make_unique<InPin>(this)),
+            pc_(std::make_unique<PeerConnection>()){
         MediaFormat video_fmt;
         video_fmt.media_type = MainMediaType::kMainTypeVideo;
         video_fmt.sub_fmt.video_fmt.type = SubMediaType::kSubTypeH264;
@@ -61,9 +60,21 @@ namespace xrtc {
             std::string type;
             std::string sdp;
             if (!ParseReply(reply, type, sdp)) {
+//                if (media_chain_) {
+//                    media_chain_->OnChainFailed(this, XRTCError::kPushRequestOfferErr);
+//                }
                 return;
             }
 
+            if (pc_->SetRemoteSDP(sdp) != 0) {
+                return;
+            }
+
+            RTCOfferAnswerOptions options;
+            options.recv_audio = false;
+            options.recv_video = false;
+            std::string answer = pc_->CreateAnswer(options, request_params_["uid"]);
+//            SendAnswer(answer);
 
         }, this);
         return true;
@@ -112,6 +123,10 @@ namespace xrtc {
         }
 
         return true;
+
+    }
+
+    void XRTCMediaSink::SendAnswer(const std::string &answer) {
 
     }
 

@@ -10,6 +10,7 @@
 #include <map>
 
 #include "xrtc/media/base/media_chain.h"
+#include "xrtc/rtc/pc/peer_connection.h"
 
 namespace xrtc {
 
@@ -49,6 +50,7 @@ namespace xrtc {
         std::string host_;
         std::string action_;
         std::map<std::string, std::string> request_params_;
+        std::unique_ptr<PeerConnection> pc_;
     };
 
 } // namespace xrtc
