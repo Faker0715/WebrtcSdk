@@ -10,6 +10,7 @@
 #include "xrtc/base/xrtc_global.h"
 #include "xrtc/base/xrtc_json.h"
 #include "xrtc/media/base/in_pin.h"
+#include "xrtc/base/xrtc_utils.h"
 
 namespace xrtc {
 
@@ -30,14 +31,15 @@ namespace xrtc {
 
     bool XRTCMediaSink::Start() {
         // 解析Url
-
+        if (!ParseUrl(url_, protocol_, host_, action_, request_params_)) {
+            return false;
+        }
         if (action_ != "push" || request_params_["uid"].empty() || request_params_["streamName"].empty()) {
             RTC_LOG(LS_WARNING) << "invalid url: " << url_;
             return false;
         }
 
         // 发送信令请求
-        // https://www.str2num.com/signaling/push?uid=xxx&streamName=xxx&audio=1&video=1&isDtls=0
         // 构造body
         std::stringstream body;
         body << "uid=" << request_params_["uid"]

@@ -13,6 +13,8 @@ namespace xrtc{
     class XRTC_API XRTCPusher{
     public:
         void StartPush(const std::string& url);
+        std::string Url()   const { return url_; }
+
 
     private:
         XRTCPusher(IVideoSource* video_source);

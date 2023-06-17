@@ -4,6 +4,8 @@
 
 #include "xrtc_push_stream.h"
 #include "rtc_base/logging.h"
+#include "xrtc/base/xrtc_json.h"
+#include "xrtc/media/base/xrtc_pusher.h"
 
 namespace xrtc{
 
@@ -46,6 +48,15 @@ namespace xrtc{
                 RTC_LOG(LS_WARNING) << "x264_encoder_filter connect to xrtc_media_sink failed";
                 break;
             }
+
+
+            // 安装参数
+            JsonObject jobj;
+            JsonObject j_xrtc_media_sink;
+            j_xrtc_media_sink["url"] = pusher_->Url();
+            jobj["xrtc_media_sink"] = j_xrtc_media_sink;
+            SetupChain(JsonValue(jobj).ToJson());
+
             if(!StartChain()){
                 err = XRTCError::kChainStartErr;
                 RTC_LOG(LS_WARNING) << "XRTCPushStream Start failed, chain start failed";
