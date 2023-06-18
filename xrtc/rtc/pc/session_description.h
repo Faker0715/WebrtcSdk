@@ -128,7 +128,7 @@ namespace xrtc {
 
         std::shared_ptr<TransportDescription> GetTransportInfo(const std::string transport_name);
         void AddTransportInfo(std::shared_ptr<TransportDescription> td);
-//        void AddTransportInfo(const std::string& mid, const ice::IceParameters& ice_param);
+        void AddTransportInfo(const std::string& mid, const ice::IceParameters& ice_param);
 
         bool IsBundle(const std::string& mid);
         std::string GetFirstBundleId();

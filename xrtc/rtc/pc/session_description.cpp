@@ -57,6 +57,7 @@ namespace xrtc {
         codec->feedback_param.push_back(FeedbackParam("nack", "pli"));
 
 //         添加codec param
+        // 支持不同的编码等级
         codec->codec_param["level-asymmetry-allowed"] = "1";
         codec->codec_param["packetization-mode"] = "1";
         codec->codec_param["profile-level-id"] = "42e01f";
@@ -69,6 +70,7 @@ namespace xrtc {
         codec_rtx->name = "rtx";
         codec_rtx->clockrate = 90000;
 
+        // 视频id
         codec_rtx->codec_param["apt"] = std::to_string(codec->id);
 
         codecs_.push_back(codec_rtx);
@@ -107,16 +109,16 @@ namespace xrtc {
         transport_info_.push_back(td);
     }
 
-//    void SessionDescription::AddTransportInfo(const std::string& mid,
-//                                              const ice::IceParameters& ice_param)
-//    {
-//        auto td = std::make_shared<TransportDescription>();
-//        td->mid = mid;
-//        td->ice_ufrag = ice_param.ice_ufrag;
-//        td->ice_pwd = ice_param.ice_pwd;
+    void SessionDescription::AddTransportInfo(const std::string& mid,
+                                              const ice::IceParameters& ice_param)
+    {
+        auto td = std::make_shared<TransportDescription>();
+        td->mid = mid;
+        td->ice_ufrag = ice_param.ice_ufrag;
+        td->ice_pwd = ice_param.ice_pwd;
 
-//        transport_info_.push_back(td);
-//    }
+        transport_info_.push_back(td);
+    }
 
     bool SessionDescription::IsBundle(const std::string& mid) {
         auto content_group = GetGroupByName("BUNDLE");
@@ -158,6 +160,8 @@ namespace xrtc {
                             std::stringstream& ss)
     {
         if (!codec->codec_param.empty()) {
+            // a=fmtp:107            level-asymmetry-allowed=1;packetization-
+            // mode=1;profile-level-id=42e01f
             ss << "a=fmtp:" << codec->id << " ";
             std::string data = "";
             for (auto param : codec->codec_param) {
@@ -182,6 +186,7 @@ namespace xrtc {
             }
             ss << "\r\n";
 
+            // 添加编解码参数
             AddRtcpFbLine(codec, ss);
             AddFmtpLine(codec, ss);
         }

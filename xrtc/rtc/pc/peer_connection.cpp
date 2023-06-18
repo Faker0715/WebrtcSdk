@@ -180,7 +180,17 @@ namespace xrtc{
         return 0;
 
     }
-
+    static RtpDirection GetDirection(bool send, bool recv) {
+        if (send && recv) {
+            return RtpDirection::kSendRecv;
+        } else if (send && !recv) {
+            return RtpDirection::kSendOnly;
+        } else if (!send && recv) {
+            return RtpDirection::kRecvOnly;
+        }else {
+            return RtpDirection::kInactive;
+        }
+    }
     std::string PeerConnection::CreateAnswer(const RTCOfferAnswerOptions &options, const std::string &stream_id) {
         local_desc_ = std::make_unique<SessionDescription>(SdpType::kAnswer);
 
