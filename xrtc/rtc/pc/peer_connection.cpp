@@ -275,6 +275,7 @@ namespace xrtc{
             }
         }
 
+        // 可以进行协商
         transport_controller_->SetLocalSDP(local_desc_.get());
 
         return local_desc_->ToString();

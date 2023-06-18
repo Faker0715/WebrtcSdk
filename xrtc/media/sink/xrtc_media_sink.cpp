@@ -127,7 +127,48 @@ namespace xrtc {
     }
 
     void XRTCMediaSink::SendAnswer(const std::string &answer) {
+        if (request_params_["uid"].empty() || request_params_["streamName"].empty()) {
+            RTC_LOG(LS_WARNING) << "send answer failed, invalid url: " << url_;
+            return;
+        }
 
+        // 构造body
+        std::stringstream body;
+        body << "uid=" << request_params_["uid"]
+             << "&streamName=" << request_params_["streamName"]
+             << "&type=push"
+             << "&answer=" << HttpManager::UrlEncode(answer);
+
+        std::string url = "https://" + host_ + "/signaling/sendanswer";
+        HttpRequest request(url, body.str());
+        // 发送请求
+        XRTCGlobal::Instance()->http_manager()->Post(request, [=](HttpReply reply) {
+            RTC_LOG(LS_INFO) << "signaling sendanswer response, url: " << reply.get_url()
+                             << ", body: " << reply.get_body()
+                             << ", status: " << reply.get_status_code()
+                             << ", err_no: " << reply.get_errno()
+                             << ", err_msg: " << reply.get_err_msg()
+                             << ", response: " << reply.get_resp();
+
+            if (reply.get_status_code() != 200 || reply.get_errno() != 0) {
+                RTC_LOG(LS_WARNING) << "signaling sendanswer response error";
+                return;
+            }
+
+            JsonValue value;
+            if (!value.FromJson(reply.get_resp())) {
+                RTC_LOG(LS_WARNING) << "invalid json response";
+                return;
+            }
+
+            JsonObject jobj = value.ToObject();
+            int err_no = jobj["errNo"].ToInt();
+            if (err_no != 0) {
+                RTC_LOG(LS_WARNING) << "response errNo is not 0, err_no: " << err_no;
+                return;
+            }
+
+        }, this);
     }
 
 
