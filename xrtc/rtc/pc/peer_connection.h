@@ -12,7 +12,7 @@
 #include <system_wrappers/include/clock.h>
 
 //#include "xrtc/media/base/media_frame.h"
-//#include "xrtc/rtc/pc/session_description.h"
+#include "xrtc/rtc/pc/session_description.h"
 //#include "xrtc/rtc/pc/transport_controller.h"
 //#include "xrtc/rtc/pc/peer_connection_def.h"
 //#include "xrtc/rtc/video/video_send_stream.h"
@@ -39,7 +39,9 @@ namespace xrtc {
                                  const std::string& stream_id);
 
     private:
-
+        std::unique_ptr<SessionDescription> remote_desc_;
+        std::unique_ptr<SessionDescription> local_desc_;
+//        std::unique_ptr<TransportController> transport_controller_;
         uint32_t local_audio_ssrc_ = 0;
         uint32_t local_video_ssrc_ = 0;
         uint32_t local_video_rtx_ssrc_ = 0;
