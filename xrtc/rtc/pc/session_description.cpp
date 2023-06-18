@@ -205,32 +205,32 @@ namespace xrtc {
         }
     }
 
-//    static void BuildSsrc(MediaContentDescription* media_content,
-//                          std::stringstream& ss)
-//    {
-//        for (auto stream : media_content->streams()) {
+    static void BuildSsrc(MediaContentDescription* media_content,
+                          std::stringstream& ss)
+    {
+        for (auto stream : media_content->streams()) {
 //             生成ssrc group
-//            for (auto group : stream.ssrc_groups) {
-//                if (group.ssrcs.empty()) {
-//                    continue;
-//                }
+            for (auto group : stream.ssrc_groups) {
+                if (group.ssrcs.empty()) {
+                    continue;
+                }
 
-//                ss << "a=ssrc-group:FID";
-//                for (auto ssrc : group.ssrcs) {
-//                    ss << " " << ssrc;
-//                }
-//                ss << "\r\n";
-//            }
+                ss << "a=ssrc-group:FID";
+                for (auto ssrc : group.ssrcs) {
+                    ss << " " << ssrc;
+                }
+                ss << "\r\n";
+            }
 
-            // 生成ssrc
-//            for (auto ssrc : stream.ssrcs) {
-//                ss << "a=ssrc:" << ssrc << " cname:" << stream.cname << "\r\n";
-//                ss << "a=ssrc:" << ssrc << " msid:" << stream.stream_id
-//                   << " " << stream.id << "\r\n";
-//            }
-//        }
+//             生成ssrc
+            for (auto ssrc : stream.ssrcs) {
+                ss << "a=ssrc:" << ssrc << " cname:" << stream.cname << "\r\n";
+                ss << "a=ssrc:" << ssrc << " msid:" << stream.stream_id
+                   << " " << stream.id << "\r\n";
+            }
+        }
 
-//    }
+    }
 
     std::string SessionDescription::ToString() {
         std::stringstream ss;
@@ -285,7 +285,7 @@ namespace xrtc {
             }
 
             BuildRtpMap(content.get(), ss);
-//            BuildSsrc(content.get(), ss);
+            BuildSsrc(content.get(), ss);
         }
 
         return ss.str();

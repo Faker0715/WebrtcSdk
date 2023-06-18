@@ -14,7 +14,7 @@
 //#include "xrtc/media/base/media_frame.h"
 #include "xrtc/rtc/pc/session_description.h"
 #include "transport_controller.h"
-//#include "xrtc/rtc/pc/transport_controller.h"
+#include "xrtc/rtc/pc/transport_controller.h"
 //#include "xrtc/rtc/pc/peer_connection_def.h"
 //#include "xrtc/rtc/video/video_send_stream.h"
 //#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
@@ -43,6 +43,7 @@ namespace xrtc {
         std::unique_ptr<SessionDescription> remote_desc_;
         std::unique_ptr<SessionDescription> local_desc_;
         std::unique_ptr<TransportController> transport_controller_;
+
         uint32_t local_audio_ssrc_ = 0;
         uint32_t local_video_ssrc_ = 0;
         uint32_t local_video_rtx_ssrc_ = 0;

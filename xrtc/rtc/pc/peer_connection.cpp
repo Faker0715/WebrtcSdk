@@ -2,12 +2,19 @@
 // Created by faker on 2023/6/18.
 //
 
-#include "peer_connection.h"
-#include "rtc_base/string_encode.h"
-#include "rtc_base/logging.h"
-#include <string>
+#include "xrtc/rtc/pc/peer_connection.h"
+
 #include <vector>
+
+#include <rtc_base/logging.h>
+#include <rtc_base/string_encode.h>
+#include <rtc_base/helpers.h>
 #include <ice/candidate.h>
+
+//#include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
+//#include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
+#include "xrtc/base/xrtc_global.h"
+
 
 namespace xrtc{
 
@@ -235,7 +242,7 @@ namespace xrtc{
                 video_stream.ssrcs.push_back(local_video_ssrc_);
                 video_stream.ssrcs.push_back(local_video_rtx_ssrc_);
 
-                // 分组
+                // 分组 videossrc 和 rtx重传 要分组
                 SsrcGroup sg;
                 sg.semantics = "FID";
                 sg.ssrcs.push_back(local_video_ssrc_);
@@ -252,7 +259,7 @@ namespace xrtc{
                 video_rtx_stream.ssrcs.push_back(local_video_rtx_ssrc_);
                 video_content->AddStream(video_rtx_stream);
 
-                CreateVideoSendStream(video_content.get());
+//                CreateVideoSendStream(video_content.get());
             }
         }
 

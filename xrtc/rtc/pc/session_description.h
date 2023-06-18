@@ -14,6 +14,7 @@
 #include <ice/candidate.h>
 #include <ice/ice_credentials.h>
 #include "code_info.h"
+#include "stream_params.h"
 
 //#include "xrtc/rtc/pc/codec_info.h"
 //#include "xrtc/rtc/pc/stream_params.h"
@@ -79,17 +80,17 @@ namespace xrtc {
         bool rtcp_mux() { return rtcp_mux_; }
         void set_rtcp_mux(bool value) { rtcp_mux_ = value; }
 
-//        const std::vector<StreamParams>& streams() { return send_streams_; }
-//        void AddStream(const StreamParams& stream) {
-//            send_streams_.push_back(stream);
-//        }
+        const std::vector<StreamParams>& streams() { return send_streams_; }
+        void AddStream(const StreamParams& stream) {
+            send_streams_.push_back(stream);
+        }
 
     protected:
         std::vector<ice::Candidate> candidates_;
         std::vector<std::shared_ptr<CodecInfo>> codecs_;
         RtpDirection direction_ = RtpDirection::kInactive;
         bool rtcp_mux_ = true;
-//        std::vector<StreamParams> send_streams_;
+        std::vector<StreamParams> send_streams_;
     };
 
     class AudioContentDescription : public MediaContentDescription {
