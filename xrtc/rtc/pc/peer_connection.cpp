@@ -11,7 +11,8 @@
 
 namespace xrtc{
 
-    PeerConnection::PeerConnection() {
+    PeerConnection::PeerConnection() : transport_controller_(std::make_unique<TransportController>())
+    {
 
     }
 
@@ -174,7 +175,7 @@ namespace xrtc{
 //            }
         }
 
-//        transport_controller_->SetRemoteSDP(remote_desc_.get());
+        transport_controller_->SetRemoteSDP(remote_desc_.get());
 
         return 0;
 

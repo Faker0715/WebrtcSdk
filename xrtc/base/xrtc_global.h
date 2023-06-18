@@ -6,6 +6,7 @@
 #define XRTCSDK_XRTC_GLOBAL_H
 #include <rtc_base/thread.h>
 #include <modules/video_capture/video_capture.h>
+#include <ice/port_allocator.h>
 namespace xrtc {
     class XRTCEngineObserver;
     class HttpManager;
@@ -23,6 +24,7 @@ namespace xrtc {
         rtc::Thread* network_thread() const { return network_thread_.get(); }
         webrtc::VideoCaptureModule::DeviceInfo* video_device_info() const { return video_device_info_.get(); }
         HttpManager* http_manager() { return http_manager_; }
+        ice::PortAllocator* port_allocator() { return port_allocator_.get(); }
 
     private:
         XRTCGlobal();
@@ -34,6 +36,7 @@ namespace xrtc {
         std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> video_device_info_;
         XRTCEngineObserver* engine_observer_;
         HttpManager* http_manager_ = nullptr;
+        std::unique_ptr<ice::PortAllocator> port_allocator_;
 
 
     };

@@ -25,6 +25,8 @@ namespace xrtc {
 
         http_manager_ = new HttpManager();
         http_manager_->Start();
+        ice::NetworkConfig config;
+        port_allocator_ = std::make_unique<ice::PortAllocator>(config);
 
     }
 
