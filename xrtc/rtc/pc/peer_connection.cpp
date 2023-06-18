@@ -7,6 +7,7 @@
 #include "rtc_base/logging.h"
 #include <string>
 #include <vector>
+#include <ice/candidate.h>
 
 namespace xrtc{
 
@@ -17,7 +18,47 @@ namespace xrtc{
     PeerConnection::~PeerConnection() {
 
     }
+    // a=attr_name:attr_value
+    static std::string GetAttribute(const std::string& line) {
+        std::vector<std::string> fields;
+        size_t size = rtc::tokenize(line, ':', &fields);
+        if (size != 2) {
+            RTC_LOG(LS_WARNING) << "get attribute failed: " << line;
+            return "";
+        }
 
+        return fields[1];
+    }
+    static bool ParseCandidates(MediaContentDescription* media_content,
+                                const std::string& line)
+    {
+        if (line.find("a=candidate:") == std::string::npos) {
+            return true;
+        }
+
+        std::string attr_value = GetAttribute(line);
+        if (attr_value.empty()) {
+            return false;
+        }
+
+        std::vector<std::string> fields;
+        size_t size = rtc::tokenize(attr_value, ' ', &fields);
+        if (size < 8) {
+            return false;
+        }
+
+        ice::Candidate c;
+        c.foundation = fields[0];
+        c.component = std::atoi(fields[1].c_str());
+        c.protocol = fields[2];
+        c.priority = std::atoi(fields[3].c_str());
+        c.port = std::atoi(fields[5].c_str());
+        c.address = rtc::SocketAddress(fields[4], c.port);
+        c.type = fields[7];
+
+        media_content->AddCandidate(c);
+        return true;
+    }
     int PeerConnection::SetRemoteSDP(const std::string &sdp) {
         std::vector<std::string> fields;
         // SDP用\n, \r\n来换行的
@@ -79,22 +120,22 @@ namespace xrtc{
             }
 
             if ("audio" == mid) {
-//                if (!ParseCandidates(audio_content.get(), field)) {
-//                    RTC_LOG(LS_WARNING) << "parse candidate failed: " << field;
-//                    return -1;
-//                }
-//
+                if (!ParseCandidates(audio_content.get(), field)) {
+                    RTC_LOG(LS_WARNING) << "parse candidate failed: " << field;
+                    return -1;
+                }
+
 //                if (!ParseTransportInfo(audio_td.get(), field)) {
 //                    RTC_LOG(LS_WARNING) << "parse transport info failed: " << field;
 //                    return -1;
 //                }
             }
             else if ("video" == mid) {
-//                if (!ParseCandidates(video_content.get(), field)) {
-//                    RTC_LOG(LS_WARNING) << "parse candidate failed: " << field;
-//                    return -1;
-//                }
-//
+                if (!ParseCandidates(video_content.get(), field)) {
+                    RTC_LOG(LS_WARNING) << "parse candidate failed: " << field;
+                    return -1;
+                }
+
 //                if (!ParseTransportInfo(video_td.get(), field)) {
 //                    RTC_LOG(LS_WARNING) << "parse transport info failed: " << field;
 //                    return -1;
@@ -126,4 +167,5 @@ namespace xrtc{
         return nullptr;
 
     }
+
 }

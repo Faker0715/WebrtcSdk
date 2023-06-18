@@ -39,7 +39,8 @@ target_link_libraries(xrtc
         iphlpapi
         libssl
         libcrypto
-        libcurl)
+        libcurl
+        libice)
 
 
 

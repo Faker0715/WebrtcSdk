@@ -11,8 +11,8 @@
 #include <memory>
 
 #include <api/media_types.h>
-//#include <ice/candidate.h>
-//#include <ice/ice_credentials.h>
+#include <ice/candidate.h>
+#include <ice/ice_credentials.h>
 
 //#include "xrtc/rtc/pc/codec_info.h"
 //#include "xrtc/rtc/pc/stream_params.h"
@@ -64,13 +64,13 @@ namespace xrtc {
 //            return codecs_;
 //        }
 
-//        const std::vector<ice::Candidate>& candidates() {
-//            return candidates_;
-//        }
+        const std::vector<ice::Candidate>& candidates() {
+            return candidates_;
+        }
 
-//        void AddCandidate(const ice::Candidate& c) {
-//            candidates_.push_back(c);
-//        }
+        void AddCandidate(const ice::Candidate& c) {
+            candidates_.push_back(c);
+        }
 
         RtpDirection direction() { return direction_; }
         void set_direction(RtpDirection direction) { direction_ = direction; }
@@ -84,7 +84,7 @@ namespace xrtc {
 //        }
 
     protected:
-//        std::vector<ice::Candidate> candidates_;
+        std::vector<ice::Candidate> candidates_;
 //        std::vector<std::shared_ptr<CodecInfo>> codecs_;
         RtpDirection direction_ = RtpDirection::kInactive;
         bool rtcp_mux_ = true;
