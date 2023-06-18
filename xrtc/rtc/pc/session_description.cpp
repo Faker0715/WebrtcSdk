@@ -27,51 +27,51 @@ namespace xrtc {
     }
 
     AudioContentDescription::AudioContentDescription() {
-//        auto codec = std::make_shared<AudioCodecInfo>();
-//        codec->id = 111;
-//        codec->name = "opus";
-//        codec->clockrate = 48000;
-//        codec->channels = 2;
+        auto codec = std::make_shared<AudioCodecInfo>();
+        codec->id = 111;
+        codec->name = "opus";
+        codec->clockrate = 48000;
+        codec->channels = 2;
 
 //         添加feedback param
-//        codec->feedback_param.push_back(FeedbackParam("transport-cc"));
+        codec->feedback_param.push_back(FeedbackParam("transport-cc"));
 
 //         添加codec param
-//        codec->codec_param["minptime"] = "10";
-//        codec->codec_param["useinbandfec"] = "1";
+        codec->codec_param["minptime"] = "10";
+        codec->codec_param["useinbandfec"] = "1";
 
-//        codecs_.push_back(codec);
+        codecs_.push_back(codec);
     }
 
     VideoContentDescription::VideoContentDescription() {
-//        auto codec = std::make_shared<VideoCodecInfo>();
-//        codec->id = 107;
-//        codec->name = "H264";
-//        codec->clockrate = 90000;
+        auto codec = std::make_shared<VideoCodecInfo>();
+        codec->id = 107;
+        codec->name = "H264";
+        codec->clockrate = 90000;
 
 //         添加feedback param
-//        codec->feedback_param.push_back(FeedbackParam("goog-remb"));
-//        codec->feedback_param.push_back(FeedbackParam("transport-cc"));
-//        codec->feedback_param.push_back(FeedbackParam("ccm", "fir"));
-//        codec->feedback_param.push_back(FeedbackParam("nack"));
-//        codec->feedback_param.push_back(FeedbackParam("nack", "pli"));
+        codec->feedback_param.push_back(FeedbackParam("goog-remb"));
+        codec->feedback_param.push_back(FeedbackParam("transport-cc"));
+        codec->feedback_param.push_back(FeedbackParam("ccm", "fir"));
+        codec->feedback_param.push_back(FeedbackParam("nack"));
+        codec->feedback_param.push_back(FeedbackParam("nack", "pli"));
 
 //         添加codec param
-//        codec->codec_param["level-asymmetry-allowed"] = "1";
-//        codec->codec_param["packetization-mode"] = "1";
-//        codec->codec_param["profile-level-id"] = "42e01f";
+        codec->codec_param["level-asymmetry-allowed"] = "1";
+        codec->codec_param["packetization-mode"] = "1";
+        codec->codec_param["profile-level-id"] = "42e01f";
 
-//        codecs_.push_back(codec);
+        codecs_.push_back(codec);
 
-        // 重传的codec
-//        auto codec_rtx = std::make_shared<VideoCodecInfo>();
-//        codec_rtx->id = 99;
-//        codec_rtx->name = "rtx";
-//        codec_rtx->clockrate = 90000;
+//         重传的codec
+        auto codec_rtx = std::make_shared<VideoCodecInfo>();
+        codec_rtx->id = 99;
+        codec_rtx->name = "rtx";
+        codec_rtx->clockrate = 90000;
 
-//        codec_rtx->codec_param["apt"] = std::to_string(codec->id);
+        codec_rtx->codec_param["apt"] = std::to_string(codec->id);
 
-//        codecs_.push_back(codec_rtx);
+        codecs_.push_back(codec_rtx);
     }
 
 
@@ -142,50 +142,50 @@ namespace xrtc {
         return group->content_names()[0];
     }
 
-//    static void AddRtcpFbLine(std::shared_ptr<CodecInfo> codec,
-//                              std::stringstream& ss)
-//    {
-//        for (auto param : codec->feedback_param) {
-//            ss << "a=rtcp-fb:" << codec->id << " " << param.id();
-//            if (!param.param().empty()) {
-//                ss << " " << param.param();
-//            }
-//            ss << "\r\n";
-//        }
-//    }
+    static void AddRtcpFbLine(std::shared_ptr<CodecInfo> codec,
+                              std::stringstream& ss)
+    {
+        for (auto param : codec->feedback_param) {
+            ss << "a=rtcp-fb:" << codec->id << " " << param.id();
+            if (!param.param().empty()) {
+                ss << " " << param.param();
+            }
+            ss << "\r\n";
+        }
+    }
 
-//    static void AddFmtpLine(std::shared_ptr<CodecInfo> codec,
-//                            std::stringstream& ss)
-//    {
-//        if (!codec->codec_param.empty()) {
-//            ss << "a=fmtp:" << codec->id << " ";
-//            std::string data = "";
-//            for (auto param : codec->codec_param) {
-//                data += (";" + param.first + "=" + param.second);
-//            }
+    static void AddFmtpLine(std::shared_ptr<CodecInfo> codec,
+                            std::stringstream& ss)
+    {
+        if (!codec->codec_param.empty()) {
+            ss << "a=fmtp:" << codec->id << " ";
+            std::string data = "";
+            for (auto param : codec->codec_param) {
+                data += (";" + param.first + "=" + param.second);
+            }
 
 //            ;key1=value1;key2=values
-//            data = data.substr(1);
-//            ss << data << "\r\n";
-//        }
-//    }
+            data = data.substr(1);
+            ss << data << "\r\n";
+        }
+    }
 
-//    static void BuildRtpMap(MediaContentDescription* media_content,
-//                            std::stringstream& ss)
-//    {
-//        for (auto codec : media_content->codecs()) {
-//            ss << "a=rtpmap:" << codec->id << " " << codec->name << "/"
-//               << codec->clockrate;
-//            if (media_content->type() == webrtc::MediaType::AUDIO) {
-//                auto audio_codec = codec->AsAudio();
-//                ss << "/" << audio_codec->channels;
-//            }
-//            ss << "\r\n";
+    static void BuildRtpMap(MediaContentDescription* media_content,
+                            std::stringstream& ss)
+    {
+        for (auto codec : media_content->codecs()) {
+            ss << "a=rtpmap:" << codec->id << " " << codec->name << "/"
+               << codec->clockrate;
+            if (media_content->type() == webrtc::MediaType::AUDIO) {
+                auto audio_codec = codec->AsAudio();
+                ss << "/" << audio_codec->channels;
+            }
+            ss << "\r\n";
 
-//            AddRtcpFbLine(codec, ss);
-//            AddFmtpLine(codec, ss);
-//        }
-//    }
+            AddRtcpFbLine(codec, ss);
+            AddFmtpLine(codec, ss);
+        }
+    }
 
     static std::string GetDirection(RtpDirection direction) {
         switch (direction) {
@@ -280,7 +280,7 @@ namespace xrtc {
             }
 
             BuildRtpMap(content.get(), ss);
-            BuildSsrc(content.get(), ss);
+//            BuildSsrc(content.get(), ss);
         }
 
         return ss.str();

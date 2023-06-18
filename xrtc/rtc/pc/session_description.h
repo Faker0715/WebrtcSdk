@@ -13,6 +13,7 @@
 #include <api/media_types.h>
 #include <ice/candidate.h>
 #include <ice/ice_credentials.h>
+#include "code_info.h"
 
 //#include "xrtc/rtc/pc/codec_info.h"
 //#include "xrtc/rtc/pc/stream_params.h"
@@ -60,9 +61,9 @@ namespace xrtc {
         virtual webrtc::MediaType type() = 0;
         virtual std::string mid() = 0;
 
-//        const std::vector<std::shared_ptr<CodecInfo>>& codecs() {
-//            return codecs_;
-//        }
+        const std::vector<std::shared_ptr<CodecInfo>>& codecs() {
+            return codecs_;
+        }
 
         const std::vector<ice::Candidate>& candidates() {
             return candidates_;
@@ -85,7 +86,7 @@ namespace xrtc {
 
     protected:
         std::vector<ice::Candidate> candidates_;
-//        std::vector<std::shared_ptr<CodecInfo>> codecs_;
+        std::vector<std::shared_ptr<CodecInfo>> codecs_;
         RtpDirection direction_ = RtpDirection::kInactive;
         bool rtcp_mux_ = true;
 //        std::vector<StreamParams> send_streams_;
