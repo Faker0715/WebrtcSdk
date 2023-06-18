@@ -69,12 +69,12 @@ namespace xrtc {
             if (pc_->SetRemoteSDP(sdp) != 0) {
                 return;
             }
-
+            // 推流是不接收音视频的
             RTCOfferAnswerOptions options;
             options.recv_audio = false;
             options.recv_video = false;
             std::string answer = pc_->CreateAnswer(options, request_params_["uid"]);
-//            SendAnswer(answer);
+            SendAnswer(answer);
 
         }, this);
         return true;

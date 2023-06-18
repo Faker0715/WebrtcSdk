@@ -227,64 +227,64 @@ namespace xrtc {
 
 //    }
 
-//    std::string SessionDescription::ToString() {
-//        std::stringstream ss;
-//        // version
-//        ss << "v=0\r\n";
-//        // session origin
-//        // RFC 4566
-//        // o=<username> <sess-id> <sess-version> <nettype> <addrtype> <unicast-address>
-//        ss << "o=- 0 2 IN IP4 127.0.0.1\r\n";
-//        // session name
-//        ss << "s=-\r\n";
-//        // time description
-//        ss << "t=0 0\r\n";
-//
-//        // 生成BUNDLE信息
-//        auto answer_bundle = GetGroupByName("BUNDLE");
-//        if (answer_bundle && !(answer_bundle->content_names().empty())) {
-//            ss << "a=group:BUNDLE";
-//            for (auto content_name : answer_bundle->content_names()) {
-//                ss << " " << content_name;
-//            }
-//            ss << "\r\n";
-//        }
-//
-//        ss << "a=msid-semantic: WMS\r\n";
-//
-//        for (auto content : contents_) {
-//            // 生成m行
-//            // RFC 4566
-//            // m=<media> <port> <proto> <fmt>
-//            std::string fmt;
-//            for (auto codec : content->codecs()) {
-//                fmt.append(" ");
-//                fmt.append(std::to_string(codec->id));
-//            }
-//
-//            ss << "m=" << content->mid() << " 9 " << kMediaProtocolSavpf
-//               << fmt << "\r\n";
-//            ss << "c=IN IP4 0.0.0.0\r\n";
-//            ss << "a=rtcp:9 IN IP4 0.0.0.0\r\n";
-//
-//            auto td = GetTransportInfo(content->mid());
-//            if (td) {
-//                ss << "a=ice-ufrag:" << td->ice_ufrag << "\r\n";
-//                ss << "a=ice-pwd:" << td->ice_pwd << "\r\n";
-//            }
-//
-//            ss << "a=mid:" << content->mid() << "\r\n";
-//            ss << "a=" << GetDirection(content->direction()) << "\r\n";
-//            if (content->rtcp_mux()) {
-//                ss << "a=rtcp-mux" << "\r\n";
-//            }
-//
-//            BuildRtpMap(content.get(), ss);
-//            BuildSsrc(content.get(), ss);
-//        }
-//
-//        return ss.str();
-//    }
+    std::string SessionDescription::ToString() {
+        std::stringstream ss;
+        // version
+        ss << "v=0\r\n";
+        // session origin
+        // RFC 4566
+        // o=<username> <sess-id> <sess-version> <nettype> <addrtype> <unicast-address>
+        ss << "o=- 0 2 IN IP4 127.0.0.1\r\n";
+        // session name
+        ss << "s=-\r\n";
+        // time description
+        ss << "t=0 0\r\n";
+
+        // 生成BUNDLE信息
+        auto answer_bundle = GetGroupByName("BUNDLE");
+        if (answer_bundle && !(answer_bundle->content_names().empty())) {
+            ss << "a=group:BUNDLE";
+            for (auto content_name : answer_bundle->content_names()) {
+                ss << " " << content_name;
+            }
+            ss << "\r\n";
+        }
+
+        ss << "a=msid-semantic: WMS\r\n";
+
+        for (auto content : contents_) {
+            // 生成m行
+            // RFC 4566
+            // m=<media> <port> <proto> <fmt>
+            std::string fmt;
+            for (auto codec : content->codecs()) {
+                fmt.append(" ");
+                fmt.append(std::to_string(codec->id));
+            }
+
+            ss << "m=" << content->mid() << " 9 " << kMediaProtocolSavpf
+               << fmt << "\r\n";
+            ss << "c=IN IP4 0.0.0.0\r\n";
+            ss << "a=rtcp:9 IN IP4 0.0.0.0\r\n";
+
+            auto td = GetTransportInfo(content->mid());
+            if (td) {
+                ss << "a=ice-ufrag:" << td->ice_ufrag << "\r\n";
+                ss << "a=ice-pwd:" << td->ice_pwd << "\r\n";
+            }
+
+            ss << "a=mid:" << content->mid() << "\r\n";
+            ss << "a=" << GetDirection(content->direction()) << "\r\n";
+            if (content->rtcp_mux()) {
+                ss << "a=rtcp-mux" << "\r\n";
+            }
+
+            BuildRtpMap(content.get(), ss);
+            BuildSsrc(content.get(), ss);
+        }
+
+        return ss.str();
+    }
 
 } // namespace xrtc
 
