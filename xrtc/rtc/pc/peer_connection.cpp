@@ -18,9 +18,13 @@
 
 namespace xrtc{
 
-    PeerConnection::PeerConnection() : transport_controller_(std::make_unique<TransportController>())
+    PeerConnection::PeerConnection() :
+            transport_controller_(std::make_unique<TransportController>())
     {
-
+        transport_controller_->SignalIceState.connect(this,
+                                                      &PeerConnection::OnIceState);
+        transport_controller_->SignalRtcpPacketReceived.connect(this,
+                                                                &PeerConnection::OnRtcpPacketReceived);
     }
 
     PeerConnection::~PeerConnection() {
@@ -279,8 +283,181 @@ namespace xrtc{
         transport_controller_->SetLocalSDP(local_desc_.get());
 
         return local_desc_->ToString();
-
-
     }
+
+    bool PeerConnection::SendEncodedImage(std::shared_ptr<MediaFrame> frame) {
+        if (pc_state_ != PeerConnectionState::kConnected) {
+            return true;
+        }
+
+        // 视频的频率90000, 1s中90000份 1ms => 90
+        uint32_t rtp_timestamp = frame->ts * 90;
+
+//        if (video_send_stream_) {
+//            video_send_stream_->OnSendingRtpFrame(rtp_timestamp,
+//                                                  frame->capture_time_ms,
+//                                                  frame->fmt.sub_fmt.video_fmt.idr);
+//        }
+//
+//        RtpPacketizer::Config config;
+//        auto packetizer = RtpPacketizer::Create(webrtc::kVideoCodecH264,
+//                                                rtc::ArrayView<const uint8_t>((uint8_t*)frame->data[0], frame->data_len[0]),
+//                                                config);
+//
+//        while (true) {
+//            auto single_packet = std::make_shared<RtpPacketToSend>();
+//            single_packet->SetPayloadType(video_pt_);
+//            single_packet->SetTimestamp(rtp_timestamp);
+//            single_packet->SetSsrc(local_video_ssrc_);
+//
+//            if (!packetizer->NextPacket(single_packet.get())) {
+//                break;
+//            }
+//
+//            single_packet->SetSequenceNumber(video_seq_++);
+//
+//            if (video_send_stream_) {
+//                video_send_stream_->UpdateRtpStats(single_packet, false, false);
+//            }
+//
+//            AddVideoCache(single_packet);
+//            // 发送数据包
+//            // TODO, transport_name此处写死，后面可以换成变量
+//            transport_controller_->SendPacket("audio", (const char*)single_packet->data(),
+//                                              single_packet->size());
+//        }
+
+        return true;
+    }
+
+//    void PeerConnection::OnLocalRtcpPacket(webrtc::MediaType media_type,
+//                                           const uint8_t* data,
+//                                           size_t len)
+//    {
+//        // 发送RTCP复合包到网络
+//        if (pc_state_ != PeerConnectionState::kConnected) {
+//            return;
+//        }
+//
+//        transport_controller_->SendPacket("audio", (const char*)data, len);
+//    }
+
+//    void PeerConnection::OnNetworkInfo(int64_t rtt_ms,
+//                                       int32_t packets_lost,
+//                                       uint8_t fraction_lost,
+//                                       uint32_t jitter)
+//    {
+//        SignalNetworkInfo(this, rtt_ms, packets_lost, fraction_lost, jitter);
+//    }
+
+//    void PeerConnection::OnNackReceived(webrtc::MediaType media_type,
+//                                        const std::vector<uint16_t>& nack_list)
+//    {
+//        for (auto nack_id : nack_list) {
+//            auto packet = FindVideoCache(nack_id);
+//            if (packet) {
+//                // 重传数据
+//                if (video_send_stream_) {
+//                    auto rtx_packet = video_send_stream_->BuildRtxPacket(packet);
+//                    transport_controller_->SendPacket("audio", (const char*)rtx_packet->data(),
+//                                                      rtx_packet->size());
+//                }
+//            }
+//        }
+//    }
+
+    void PeerConnection::OnIceState(TransportController*,
+                                    ice::IceTransportState ice_state)
+    {
+        PeerConnectionState pc_state = PeerConnectionState::kNew;
+        switch (ice_state) {
+            case ice::IceTransportState::kNew:
+                pc_state = PeerConnectionState::kNew;
+                break;
+            case ice::IceTransportState::kChecking:
+                pc_state = PeerConnectionState::kConnecting;
+                break;
+            case ice::IceTransportState::kConnected:
+            case ice::IceTransportState::kCompleted:
+                pc_state = PeerConnectionState::kConnected;
+                break;
+            case ice::IceTransportState::kDisconnected:
+                pc_state = PeerConnectionState::kDisconnected;
+                break;
+            case ice::IceTransportState::kFailed:
+                pc_state = PeerConnectionState::kFailed;
+                break;
+            case ice::IceTransportState::kClosed:
+                pc_state = PeerConnectionState::kClosed;
+                break;
+            default:
+                break;
+        }
+
+        if (pc_state != pc_state_) {
+            RTC_LOG(LS_INFO) << "peerconnection state change, from " << pc_state_
+                             << "=>" << pc_state;
+            pc_state_ = pc_state;
+            SignalConnectionState(this, pc_state);
+        }
+    }
+
+    void PeerConnection::OnRtcpPacketReceived(TransportController*,
+                                              const char* data, size_t len, int64_t)
+    {
+//        if (video_send_stream_) {
+//            video_send_stream_->DeliverRtcp((const uint8_t*)data, len);
+//        }
+    }
+//
+//    void PeerConnection::CreateVideoSendStream(VideoContentDescription* video_content) {
+//        if (!video_content) {
+//            return;
+//        }
+//
+//        // 暂时只考虑推送一路视频
+//        for (auto stream : video_content->streams()) {
+//            if (!stream.ssrcs.empty()) {
+//                VideoSendStreamConfig config;
+//                config.rtp.ssrc = stream.ssrcs[0];
+//                config.rtp.payload_type = video_pt_;
+//                config.rtp_rtcp_module_observer = this;
+//                if (stream.ssrcs.size() > 1) {
+//                    config.rtp.rtx.ssrc = stream.ssrcs[1];
+//                    config.rtp.rtx.payload_type = video_rtx_pt_;
+//                }
+//
+//                // 用网络线程创建
+//                XRTCGlobal::Instance()->network_thread()->Invoke<void>(RTC_FROM_HERE,
+//                                                                       [=]() {
+//                                                                           video_send_stream_ = new VideoSendStream(clock_, config);
+//                                                                       });
+//            }
+//
+//            break;
+//        }
+//    }
+//
+//    void PeerConnection::AddVideoCache(std::shared_ptr<RtpPacketToSend> packet) {
+//        uint16_t seq = packet->sequence_number();
+//        size_t index = seq % RTC_PACKET_CACHE_SIZE;
+//
+//        if (video_cache_[index] && video_cache_[index]->sequence_number() == seq) {
+//            return;
+//        }
+//
+//        video_cache_[index] = packet;
+//    }
+//
+//    std::shared_ptr<RtpPacketToSend> PeerConnection::FindVideoCache(uint16_t seq) {
+//        size_t index = seq % RTC_PACKET_CACHE_SIZE;
+//        if (video_cache_[index] && video_cache_[index]->sequence_number() == seq) {
+//            return video_cache_[index];
+//        }
+//
+//        return nullptr;
+//    }
+
+
 
 }

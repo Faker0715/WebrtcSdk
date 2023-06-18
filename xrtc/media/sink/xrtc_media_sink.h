@@ -41,7 +41,7 @@ namespace xrtc {
     private:
         bool ParseReply(const HttpReply& reply, std::string& type, std::string& sdp);
         void SendAnswer(const std::string& answer);
-
+        void PacketAndSendVideo(std::shared_ptr<MediaFrame> frame);
     private:
         MediaChain* media_chain_;
         std::unique_ptr<InPin> video_in_pin_;

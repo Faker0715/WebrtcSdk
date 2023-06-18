@@ -6,7 +6,7 @@
 #define XRTCSDK_BASE_PIN_H
 
 #include <memory>
-#include "xrtc/media/media_frame.h"
+#include "media_frame.h"
 
 namespace xrtc{
     class MediaObject;

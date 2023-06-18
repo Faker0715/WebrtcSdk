@@ -92,6 +92,13 @@ namespace xrtc {
     }
 
     void XRTCMediaSink::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {
+        // 通过网络线程，将x264压缩后的数据发送到服务器
+        XRTCGlobal::Instance()->network_thread()->PostTask(webrtc::ToQueuedTask([=]() {
+            if (MainMediaType::kMainTypeVideo == frame->fmt.media_type) {
+                PacketAndSendVideo(frame);
+            }
+        }));
+
     }
 
     bool XRTCMediaSink::ParseReply(const HttpReply &reply, std::string &type, std::string &sdp) {
@@ -170,6 +177,8 @@ namespace xrtc {
 
         }, this);
     }
-
+    void XRTCMediaSink::PacketAndSendVideo(std::shared_ptr<MediaFrame> frame) {
+        pc_->SendEncodedImage(frame);
+    }
 
 } // namespace xrtc
