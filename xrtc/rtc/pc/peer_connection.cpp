@@ -59,6 +59,23 @@ namespace xrtc{
         media_content->AddCandidate(c);
         return true;
     }
+    static bool ParseTransportInfo(TransportDescription* td,
+                                   const std::string& line)
+    {
+        if (line.find("a=ice-ufrag") != std::string::npos) {
+            td->ice_ufrag = GetAttribute(line);
+            if (td->ice_ufrag.empty()) {
+                return false;
+            }
+        } else if (line.find("a=ice-pwd") != std::string::npos) {
+            td->ice_pwd = GetAttribute(line);
+            if (td->ice_pwd.empty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
     int PeerConnection::SetRemoteSDP(const std::string &sdp) {
         std::vector<std::string> fields;
         // SDP用\n, \r\n来换行的
@@ -125,10 +142,10 @@ namespace xrtc{
                     return -1;
                 }
 
-//                if (!ParseTransportInfo(audio_td.get(), field)) {
-//                    RTC_LOG(LS_WARNING) << "parse transport info failed: " << field;
-//                    return -1;
-//                }
+                if (!ParseTransportInfo(audio_td.get(), field)) {
+                    RTC_LOG(LS_WARNING) << "parse transport info failed: " << field;
+                    return -1;
+                }
             }
             else if ("video" == mid) {
                 if (!ParseCandidates(video_content.get(), field)) {
@@ -136,10 +153,10 @@ namespace xrtc{
                     return -1;
                 }
 
-//                if (!ParseTransportInfo(video_td.get(), field)) {
-//                    RTC_LOG(LS_WARNING) << "parse transport info failed: " << field;
-//                    return -1;
-//                }
+                if (!ParseTransportInfo(video_td.get(), field)) {
+                    RTC_LOG(LS_WARNING) << "parse transport info failed: " << field;
+                    return -1;
+                }
             }
         }
 
