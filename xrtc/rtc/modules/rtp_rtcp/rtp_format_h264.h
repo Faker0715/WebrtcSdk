@@ -59,7 +59,6 @@ namespace xrtc {
             bool aggregated;
             uint8_t header;
         };
-
         std::vector<NaluIndex> FindNaluIndices(const uint8_t* buffer,
                                                size_t buffer_size);
         bool GeneratePackets();
