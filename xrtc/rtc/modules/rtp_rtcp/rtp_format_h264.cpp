@@ -6,7 +6,7 @@
 
 #include <modules/rtp_rtcp/source/byte_io.h>
 
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
 
 namespace xrtc {
 
@@ -300,6 +300,7 @@ namespace xrtc {
             is_last_fragment = packet->last_fragment;
         }
 
+        // index指向哪里就是负载的大小
         rtp_packet->SetPayloadSize(index);
     }
 

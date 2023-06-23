@@ -71,7 +71,7 @@ namespace xrtc {
         RtpPacketizer::Config config_;
         std::deque<rtc::ArrayView<const uint8_t>> input_fragments_;
         std::queue<PacketUnit> packets_;
-        size_t num_packets_left_ = 0;
+        size_t num_packets_left_ = 0; // 一段buffer有多少个packet
     };
 
 } // namespace xrtc
