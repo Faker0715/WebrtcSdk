@@ -9,7 +9,7 @@
 #include <system_wrappers/include/clock.h>
 
 #include "xrtc/rtc/video/video_send_stream_config.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_impl.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_impl.h"
 
 namespace xrtc {
 
@@ -29,7 +29,7 @@ namespace xrtc {
 
     private:
         VideoSendStreamConfig config_;
-//        std::unique_ptr<ModuleRtpRtcpImpl> rtp_rtcp_;
+        std::unique_ptr<ModuleRtpRtcpImpl> rtp_rtcp_;
         uint16_t rtx_seq_ = 1000;
     };
 

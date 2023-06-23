@@ -10,27 +10,27 @@ namespace xrtc {
 
     const int16_t kRtxHeaderSize = 2;
 
-//    std::unique_ptr<ModuleRtpRtcpImpl> CreateRtpRtcpModule(webrtc::Clock* clock,
-//                                                           const VideoSendStreamConfig& vsconfig)
-//    {
-//        RtpRtcpInterface::Configuration config;
-//        config.audio = false;
-//        config.receiver_only = false;
-//        config.clock = clock;
-//        config.local_media_ssrc = vsconfig.rtp.ssrc;
-//        config.payload_type = vsconfig.rtp.payload_type;
-//        config.rtcp_report_interval_ms = vsconfig.rtcp_report_interval_ms;
-//        config.clock_rate = vsconfig.rtp.clock_rate;
-//        config.rtp_rtcp_module_observer = vsconfig.rtp_rtcp_module_observer;
-//
-//        auto rtp_rtcp = std::make_unique<ModuleRtpRtcpImpl>(config);
-//        return std::move(rtp_rtcp);
-//    }
+    std::unique_ptr<ModuleRtpRtcpImpl> CreateRtpRtcpModule(webrtc::Clock* clock,
+                                                           const VideoSendStreamConfig& vsconfig)
+    {
+        RtpRtcpInterface::Configuration config;
+        config.audio = false;
+        config.receiver_only = false;
+        config.clock = clock;
+        config.local_media_ssrc = vsconfig.rtp.ssrc;
+        config.payload_type = vsconfig.rtp.payload_type;
+        config.rtcp_report_interval_ms = vsconfig.rtcp_report_interval_ms;
+        config.clock_rate = vsconfig.rtp.clock_rate;
+        config.rtp_rtcp_module_observer = vsconfig.rtp_rtcp_module_observer;
+
+        auto rtp_rtcp = std::make_unique<ModuleRtpRtcpImpl>(config);
+        return std::move(rtp_rtcp);
+    }
 
     VideoSendStream::VideoSendStream(webrtc::Clock* clock,
                                      const VideoSendStreamConfig& config) :
-            config_(config)
-//            rtp_rtcp_(CreateRtpRtcpModule(clock, config))
+            config_(config),
+            rtp_rtcp_(CreateRtpRtcpModule(clock, config))
     {
 //        rtp_rtcp_->SetRTCPStatus(webrtc::RtcpMode::kCompound);
 //        rtp_rtcp_->SetSendingStatus(true);
