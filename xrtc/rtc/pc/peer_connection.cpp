@@ -11,15 +11,16 @@
 #include <rtc_base/helpers.h>
 #include <ice/candidate.h>
 
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
 #include "xrtc/base/xrtc_global.h"
 
 
 namespace xrtc{
 
     PeerConnection::PeerConnection() :
-            transport_controller_(std::make_unique<TransportController>())
+            transport_controller_(std::make_unique<TransportController>()),
+            clock_(webrtc::Clock::GetRealTimeClock())
     {
         transport_controller_->SignalIceState.connect(this,
                                                       &PeerConnection::OnIceState);
@@ -28,7 +29,14 @@ namespace xrtc{
     }
 
     PeerConnection::~PeerConnection() {
-
+        XRTCGlobal::Instance()->network_thread()->Invoke<void>(
+                RTC_FROM_HERE,
+                [=](){
+                    if(video_send_stream_){
+                        delete video_send_stream_;
+                        video_send_stream_ = nullptr;
+                    }
+                });
     }
     // a=attr_name:attr_value
     static std::string GetAttribute(const std::string& line) {
@@ -176,14 +184,15 @@ namespace xrtc{
         remote_desc_->AddTransportInfo(video_td);
 
         if (video_content) {
-//            auto video_codecs = video_content->codecs();
-//            if (!video_codecs.empty()) {
-//                video_pt_ = video_codecs[0]->id;
-//            }
+            auto video_codecs = video_content->codecs();
+            if (!video_codecs.empty()) {
+                // 第一个编码器作为编码器
+                video_pt_ = video_codecs[0]->id;
+            }
 
-//            if (video_codecs.size() > 1) {
-//                video_rtx_pt_ = video_codecs[1]->id;
-//            }
+            if (video_codecs.size() > 1) {
+                video_rtx_pt_ = video_codecs[1]->id;
+            }
         }
 
         transport_controller_->SetRemoteSDP(remote_desc_.get());
@@ -263,7 +272,7 @@ namespace xrtc{
                 video_rtx_stream.ssrcs.push_back(local_video_rtx_ssrc_);
                 video_content->AddStream(video_rtx_stream);
 
-//                CreateVideoSendStream(video_content.get());
+                CreateVideoSendStream(video_content.get());
             }
         }
 
@@ -298,34 +307,34 @@ namespace xrtc{
 //                                                  frame->capture_time_ms,
 //                                                  frame->fmt.sub_fmt.video_fmt.idr);
 //        }
-//
-//        RtpPacketizer::Config config;
-//        auto packetizer = RtpPacketizer::Create(webrtc::kVideoCodecH264,
-//                                                rtc::ArrayView<const uint8_t>((uint8_t*)frame->data[0], frame->data_len[0]),
-//                                                config);
-//
-//        while (true) {
-//            auto single_packet = std::make_shared<RtpPacketToSend>();
-//            single_packet->SetPayloadType(video_pt_);
-//            single_packet->SetTimestamp(rtp_timestamp);
-//            single_packet->SetSsrc(local_video_ssrc_);
-//
-//            if (!packetizer->NextPacket(single_packet.get())) {
-//                break;
-//            }
-//
-//            single_packet->SetSequenceNumber(video_seq_++);
-//
+
+        RtpPacketizer::Config config;
+        auto packetizer = RtpPacketizer::Create(webrtc::kVideoCodecH264,
+                                                rtc::ArrayView<const uint8_t>((uint8_t*)frame->data[0], frame->data_len[0]),
+                                                config);
+
+        while (true) {
+            auto single_packet = std::make_shared<RtpPacketToSend>();
+            single_packet->SetPayloadType(video_pt_);
+            single_packet->SetTimestamp(rtp_timestamp);
+            single_packet->SetSsrc(local_video_ssrc_);
+
+            if (!packetizer->NextPacket(single_packet.get())) {
+                break;
+            }
+
+            single_packet->SetSequenceNumber(video_seq_++);
+
 //            if (video_send_stream_) {
 //                video_send_stream_->UpdateRtpStats(single_packet, false, false);
 //            }
 //
 //            AddVideoCache(single_packet);
-//            // 发送数据包
-//            // TODO, transport_name此处写死，后面可以换成变量
-//            transport_controller_->SendPacket("audio", (const char*)single_packet->data(),
-//                                              single_packet->size());
-//        }
+            // 发送数据包
+            // TODO, transport_name此处写死，后面可以换成变量
+            transport_controller_->SendPacket("audio", (const char*)single_packet->data(),
+                                              single_packet->size());
+        }
 
         return true;
     }
@@ -410,33 +419,33 @@ namespace xrtc{
 //        }
     }
 //
-//    void PeerConnection::CreateVideoSendStream(VideoContentDescription* video_content) {
-//        if (!video_content) {
-//            return;
-//        }
-//
-//        // 暂时只考虑推送一路视频
-//        for (auto stream : video_content->streams()) {
-//            if (!stream.ssrcs.empty()) {
-//                VideoSendStreamConfig config;
-//                config.rtp.ssrc = stream.ssrcs[0];
-//                config.rtp.payload_type = video_pt_;
+    void PeerConnection::CreateVideoSendStream(VideoContentDescription* video_content) {
+        if (!video_content) {
+            return;
+        }
+
+        // 暂时只考虑推送一路视频
+        for (auto stream : video_content->streams()) {
+            if (!stream.ssrcs.empty()) {
+                VideoSendStreamConfig config;
+                config.rtp.ssrc = stream.ssrcs[0];
+                config.rtp.payload_type = video_pt_;
 //                config.rtp_rtcp_module_observer = this;
-//                if (stream.ssrcs.size() > 1) {
-//                    config.rtp.rtx.ssrc = stream.ssrcs[1];
-//                    config.rtp.rtx.payload_type = video_rtx_pt_;
-//                }
-//
-//                // 用网络线程创建
-//                XRTCGlobal::Instance()->network_thread()->Invoke<void>(RTC_FROM_HERE,
-//                                                                       [=]() {
-//                                                                           video_send_stream_ = new VideoSendStream(clock_, config);
-//                                                                       });
-//            }
-//
-//            break;
-//        }
-//    }
+                if (stream.ssrcs.size() > 1) {
+                    config.rtp.rtx.ssrc = stream.ssrcs[1];
+                    config.rtp.rtx.payload_type = video_rtx_pt_;
+                }
+
+                // 用网络线程创建
+                XRTCGlobal::Instance()->network_thread()->Invoke<void>(RTC_FROM_HERE,
+                                                                       [=]() {
+                                                                           video_send_stream_ = new VideoSendStream(clock_, config);
+                                                                       });
+            }
+
+            break;
+        }
+    }
 //
 //    void PeerConnection::AddVideoCache(std::shared_ptr<RtpPacketToSend> packet) {
 //        uint16_t seq = packet->sequence_number();

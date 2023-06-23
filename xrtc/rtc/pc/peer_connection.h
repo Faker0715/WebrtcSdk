@@ -16,8 +16,8 @@
 #include "transport_controller.h"
 #include "xrtc/rtc/pc/transport_controller.h"
 #include "peer_connection_def.h"
-//#include "xrtc/rtc/pc/peer_connection_def.h"
-//#include "xrtc/rtc/video/video_send_stream.h"
+#include "xrtc/rtc/pc/peer_connection_def.h"
+#include "xrtc/rtc/video/video_send_stream.h"
 //#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
 
 namespace xrtc {
@@ -74,12 +74,12 @@ namespace xrtc {
         uint8_t video_pt_ = 0;
         uint8_t video_rtx_pt_ = 0;
 
-        // 按照规范该值的初始值需要随机
+        // 规范是随机 这里先不随机
         uint16_t video_seq_ = 1000;
 
         PeerConnectionState pc_state_ = PeerConnectionState::kNew;
         webrtc::Clock* clock_;
-//        VideoSendStream* video_send_stream_ = nullptr;
+        VideoSendStream* video_send_stream_ = nullptr;
 //        std::vector<std::shared_ptr<RtpPacketToSend>> video_cache_;
     };
 
