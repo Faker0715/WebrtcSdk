@@ -10,7 +10,7 @@
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_defines.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_defines.h"
 //#include "xrtc/rtc/modules/rtp_rtcp/rtcp_sender.h"
 //#include "xrtc/rtc/modules/rtp_rtcp/rtcp_receiver.h"
 
@@ -20,9 +20,16 @@ namespace xrtc {
     public:
         ModuleRtpRtcpImpl(const RtpRtcpInterface::Configuration& config);
         ~ModuleRtpRtcpImpl();
-//
-//        void UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
-//                            bool is_rtx, bool is_retransmit);
+
+        /**
+         * @brief 发送rtp包
+         * @param packet
+         * @param is_rtx 是不是重传包 避免对拥塞控制有干扰
+         * @param is_retransmit 重传不一定是rtx 音频包就不是
+         */
+        void UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
+                            bool is_rtx,
+                            bool is_retransmit);
 //        void SetRTCPStatus(webrtc::RtcpMode mode);
 //        void SetSendingStatus(bool sending);
 //        void OnSendingRtpFrame(uint32_t rtp_timestamp,
@@ -43,8 +50,8 @@ namespace xrtc {
 
     private:
         RtpRtcpInterface::Configuration config_;
-//        StreamDataCounter rtp_stats_;
-//        StreamDataCounter rtx_rtp_stats_;
+        StreamDataCounter rtp_stats_;
+        StreamDataCounter rtx_rtp_stats_;
 
 //        RTCPSender rtcp_sender_;
 //        RTCPReceiver rtcp_receiver_;

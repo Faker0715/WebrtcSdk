@@ -39,11 +39,11 @@ namespace xrtc {
     VideoSendStream::~VideoSendStream() {
     }
 
-//    void VideoSendStream::UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
-//                                         bool is_rtx, bool is_retransmit)
-//    {
-//        rtp_rtcp_->UpdateRtpStats(packet, is_rtx, is_retransmit);
-//    }
+    void VideoSendStream::UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
+                                         bool is_rtx, bool is_retransmit)
+    {
+        rtp_rtcp_->UpdateRtpStats(packet, is_rtx, is_retransmit);
+    }
 
     void VideoSendStream::OnSendingRtpFrame(uint32_t rtp_timestamp,
                                             int64_t capture_time_ms,

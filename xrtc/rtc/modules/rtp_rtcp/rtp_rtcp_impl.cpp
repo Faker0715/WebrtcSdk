@@ -23,18 +23,18 @@ namespace xrtc {
     ModuleRtpRtcpImpl::~ModuleRtpRtcpImpl() {
     }
 
-//    void ModuleRtpRtcpImpl::UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
-//                                           bool is_rtx, bool is_retransmit)
-//    {
-//        StreamDataCounter* stream_counter = is_rtx ? &rtx_rtp_stats_ : &rtp_stats_;
-//
-//        RtpPacketCounter counter(*packet);
-//        if (is_retransmit) {
-//            stream_counter->retransmitted.Add(counter);
-//        }
-//
-//        stream_counter->transmmited.Add(counter);
-//    }
+    void ModuleRtpRtcpImpl::UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
+                                           bool is_rtx, bool is_retransmit)
+    {
+        StreamDataCounter* stream_counter = is_rtx ? &rtx_rtp_stats_ : &rtp_stats_;
+
+        RtpPacketCounter counter(*packet);
+        if (is_retransmit) {
+            stream_counter->retransmitted.Add(counter);
+        }
+
+        stream_counter->transmmited.Add(counter);
+    }
 
 //    void ModuleRtpRtcpImpl::SetRTCPStatus(webrtc::RtcpMode mode) {
 //        rtcp_sender_.SetRTCPStatus(mode);

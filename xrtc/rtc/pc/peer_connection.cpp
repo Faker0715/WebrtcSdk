@@ -325,10 +325,10 @@ namespace xrtc{
 
             single_packet->SetSequenceNumber(video_seq_++);
 
-//            if (video_send_stream_) {
-//                video_send_stream_->UpdateRtpStats(single_packet, false, false);
-//            }
-//
+            if (video_send_stream_) {
+                video_send_stream_->UpdateRtpStats(single_packet, false, false);
+            }
+
 //            AddVideoCache(single_packet);
             // 发送数据包
             // TODO, transport_name此处写死，后面可以换成变量

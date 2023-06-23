@@ -18,8 +18,8 @@ namespace xrtc {
         VideoSendStream(webrtc::Clock* clock, const VideoSendStreamConfig& config);
         ~VideoSendStream();
 
-//        void UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
-//                            bool is_rtx, bool is_retransmit);
+        void UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
+                            bool is_rtx, bool is_retransmit);
         void OnSendingRtpFrame(uint32_t rtp_timestamp,
                                int64_t capture_time_ms,
                                bool forced_report);
