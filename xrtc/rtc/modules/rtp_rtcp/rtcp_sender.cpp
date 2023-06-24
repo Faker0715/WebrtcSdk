@@ -11,6 +11,7 @@
 namespace xrtc {
     namespace {
 
+        // 音视频默认间隔
         const int kDefaultAudioRtcpIntervalMs = 5000;
         const int kDefaultVideoRtcpIntervalMs = 1000;
         constexpr webrtc::TimeDelta RTCP_BEFORE_KEY_FRAME = webrtc::TimeDelta::Millis(100);

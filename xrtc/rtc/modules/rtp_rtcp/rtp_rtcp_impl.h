@@ -30,15 +30,15 @@ namespace xrtc {
         void UpdateRtpStats(std::shared_ptr<RtpPacketToSend> packet,
                             bool is_rtx,
                             bool is_retransmit);
-//        void SetRTCPStatus(webrtc::RtcpMode mode);
-//        void SetSendingStatus(bool sending);
-//        void OnSendingRtpFrame(uint32_t rtp_timestamp,
-//                               int64_t capture_time_ms,
-//                               bool forced_report);
+        void SetRTCPStatus(webrtc::RtcpMode mode);
+        void SetSendingStatus(bool sending);
+        void OnSendingRtpFrame(uint32_t rtp_timestamp,
+                               int64_t capture_time_ms,
+                               bool forced_report);
 //        void IncomingRtcpPacket(const uint8_t* packet, size_t length) {
 //            IncomingRtcpPacket(rtc::MakeArrayView(packet, length));
 //        }
-//        void IncomingRtcpPacket(rtc::ArrayView<const uint8_t> packet);
+        void IncomingRtcpPacket(rtc::ArrayView<const uint8_t> packet);
 
     private:
         void ScheduleNextRtcpSend(webrtc::TimeDelta duration);

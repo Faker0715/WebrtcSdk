@@ -32,8 +32,8 @@ namespace xrtc {
             config_(config),
             rtp_rtcp_(CreateRtpRtcpModule(clock, config))
     {
-//        rtp_rtcp_->SetRTCPStatus(webrtc::RtcpMode::kCompound);
-//        rtp_rtcp_->SetSendingStatus(true);
+        rtp_rtcp_->SetRTCPStatus(webrtc::RtcpMode::kCompound);
+        rtp_rtcp_->SetSendingStatus(true);
     }
 
     VideoSendStream::~VideoSendStream() {

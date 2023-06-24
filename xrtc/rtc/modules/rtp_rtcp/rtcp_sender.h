@@ -64,6 +64,15 @@ namespace xrtc {
         };
 
         void SetNextRtcpSendEvaluationDuration(webrtc::TimeDelta duration);
+        /**
+         * @brief 用来计算RTCP包的大小
+         * @param feedback_state
+         * @param packet_type
+         * @param nack_size
+         * @param nack_list
+         * @param sender
+         * @return
+         */
         int ComputeCompoundRTCPPacket(const FeedbackState& feedback_state,
                                       RTCPPacketType packet_type,
                                       size_t nack_size,

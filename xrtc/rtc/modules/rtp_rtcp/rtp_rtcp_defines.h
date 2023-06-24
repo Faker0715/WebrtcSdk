@@ -15,7 +15,7 @@ namespace xrtc {
 #define IP_PACKET_SIZE 1500
 
     enum RTCPPacketType : uint32_t {
-        kRtcpReport = 0x0001,
+        kRtcpReport = 0x0001, // sr rr 合成
         kRtcpSr = 0x0002,
         kRtcpRr = 0x0004,
     };

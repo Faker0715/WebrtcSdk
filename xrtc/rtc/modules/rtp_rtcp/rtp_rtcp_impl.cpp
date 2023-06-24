@@ -36,29 +36,29 @@ namespace xrtc {
         stream_counter->transmmited.Add(counter);
     }
 
-//    void ModuleRtpRtcpImpl::SetRTCPStatus(webrtc::RtcpMode mode) {
-//        rtcp_sender_.SetRTCPStatus(mode);
-//    }
+    void ModuleRtpRtcpImpl::SetRTCPStatus(webrtc::RtcpMode mode) {
+        rtcp_sender_.SetRTCPStatus(mode);
+    }
 
-//    void ModuleRtpRtcpImpl::SetSendingStatus(bool sending) {
-//        rtcp_sender_.SetSendingStatus(sending);
-//    }
+    void ModuleRtpRtcpImpl::SetSendingStatus(bool sending) {
+        rtcp_sender_.SetSendingStatus(sending);
+    }
 
-//    void ModuleRtpRtcpImpl::OnSendingRtpFrame(uint32_t rtp_timestamp,
-//                                              int64_t capture_time_ms,
-//                                              bool forced_report)
-//    {
-//        absl::optional<webrtc::Timestamp> capture_time;
-//        if (capture_time_ms > 0) {
-//            capture_time = webrtc::Timestamp::Millis(capture_time_ms);
-//        }
-//
-//        rtcp_sender_.SetLastRtpTimestamp(rtp_timestamp, capture_time);
-//
-//        if (rtcp_sender_.TimeToSendRTCPPacket(forced_report)) {
-//            rtcp_sender_.SendRTCP(GetFeedbackState(), kRtcpReport);
-//        }
-//    }
+    void ModuleRtpRtcpImpl::OnSendingRtpFrame(uint32_t rtp_timestamp,
+                                              int64_t capture_time_ms,
+                                              bool forced_report)
+    {
+        absl::optional<webrtc::Timestamp> capture_time;
+        if (capture_time_ms > 0) {
+            capture_time = webrtc::Timestamp::Millis(capture_time_ms);
+        }
+
+        rtcp_sender_.SetLastRtpTimestamp(rtp_timestamp, capture_time);
+
+        if (rtcp_sender_.TimeToSendRTCPPacket(forced_report)) {
+            rtcp_sender_.SendRTCP(GetFeedbackState(), kRtcpReport);
+        }
+    }
 
 //    void ModuleRtpRtcpImpl::IncomingRtcpPacket(rtc::ArrayView<const uint8_t> packet) {
 //        rtcp_receiver_.IncomingRtcpPacket(packet);
