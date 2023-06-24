@@ -24,7 +24,7 @@
                 <HBox height="30" childmargin="10">
                     <Label font="system_12" text="XRTC服务:"  width="60" height="auto" valign="center" margin="5,0,0,0"/>
                     <Box bordersize="1" bordercolor="splitline_level1" width="180" >
-                        <RichEdit name="edit_xrtc_host" text="faker.ink" margin="10,0,10,0"  font="system_12" width="stretch" height="auto" valign="center" normaltextcolor="black" multiline="false" promptmode="true" prompttext="XRTC服务地址" promptcolor="splitline_level1" autohscroll="true"  />
+                        <RichEdit name="edit_xrtc_host" text="www.str2num.com" margin="10,0,10,0"  font="system_12" width="stretch" height="auto" valign="center" normaltextcolor="black" multiline="false" promptmode="true" prompttext="XRTC服务地址" promptcolor="splitline_level1" autohscroll="true"  />
                     </Box>
                 </HBox>
 

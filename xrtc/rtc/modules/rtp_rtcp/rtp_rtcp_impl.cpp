@@ -12,12 +12,12 @@ namespace xrtc {
 
     ModuleRtpRtcpImpl::ModuleRtpRtcpImpl(
             const RtpRtcpInterface::Configuration& config) :
-            config_(config){
-//            rtcp_sender_(config, [=](webrtc::TimeDelta duration) {
-//                ScheduleNextRtcpSend(duration);
-//            }),
+            config_(config),
+            rtcp_sender_(config, [=](webrtc::TimeDelta duration) {
+                ScheduleNextRtcpSend(duration);
+            })
 //            rtcp_receiver_(config)
-//    {
+    {
     }
 
     ModuleRtpRtcpImpl::~ModuleRtpRtcpImpl() {
@@ -64,53 +64,53 @@ namespace xrtc {
 //        rtcp_receiver_.IncomingRtcpPacket(packet);
 //    }
 
-//    void ModuleRtpRtcpImpl::ScheduleNextRtcpSend(webrtc::TimeDelta duration) {
-//        if (duration.IsZero()) {
-//            MaybeSendRTCP();
-//        }
-//        else {
-//            webrtc::Timestamp execute_time = config_.clock->CurrentTime() + duration;
-//            ScheduleMaybeSendRtcpAtOrAfterTimestamp(execute_time, duration);
-//        }
-//    }
+    void ModuleRtpRtcpImpl::ScheduleNextRtcpSend(webrtc::TimeDelta duration) {
+        if (duration.IsZero()) {
+            MaybeSendRTCP();
+        }
+        else {
+            webrtc::Timestamp execute_time = config_.clock->CurrentTime() + duration;
+            ScheduleMaybeSendRtcpAtOrAfterTimestamp(execute_time, duration);
+        }
+    }
 
-//    void ModuleRtpRtcpImpl::MaybeSendRTCP() {
-//        if (rtcp_sender_.TimeToSendRTCPPacket()) {
-//            rtcp_sender_.SendRTCP(GetFeedbackState(), RTCPPacketType::kRtcpReport);
-//        }
-//    }
+    void ModuleRtpRtcpImpl::MaybeSendRTCP() {
+        if (rtcp_sender_.TimeToSendRTCPPacket()) {
+            rtcp_sender_.SendRTCP(GetFeedbackState(), RTCPPacketType::kRtcpReport);
+        }
+    }
 
-//    static int DelayMillisForDuration(webrtc::TimeDelta duration) {
-//        return (duration.us() + rtc::kNumMillisecsPerSec - 1) / rtc::kNumMicrosecsPerMillisec;
-//    }
-//
-//    void ModuleRtpRtcpImpl::ScheduleMaybeSendRtcpAtOrAfterTimestamp(
-//            webrtc::Timestamp execute_time,
-//            webrtc::TimeDelta duration)
-//    {
-//        rtc::Thread::Current()->PostDelayedTask(webrtc::ToQueuedTask(task_safety_, [=]() {
-//            webrtc::Timestamp now = config_.clock->CurrentTime();
-//            if (now >= execute_time) {
-//                MaybeSendRTCP();
-//                return;
-//            }
-//
-//            ScheduleMaybeSendRtcpAtOrAfterTimestamp(execute_time, execute_time - now);
-//
-//        }), DelayMillisForDuration(duration));
-//    }
+    static int DelayMillisForDuration(webrtc::TimeDelta duration) {
+        return (duration.us() + rtc::kNumMillisecsPerSec - 1) / rtc::kNumMicrosecsPerMillisec;
+    }
 
-//    RTCPSender::FeedbackState ModuleRtpRtcpImpl::GetFeedbackState() {
-//        RTCPSender::FeedbackState feedback_state;
-//        if (!config_.receiver_only) {
-//            feedback_state.packets_sent = rtp_stats_.transmmited.packets +
-//                                          rtx_rtp_stats_.transmmited.packets;
-//            feedback_state.media_bytes_sent = rtp_stats_.transmmited.payload_bytes
-//                                              + rtx_rtp_stats_.transmmited.payload_bytes;
-//        }
-//
-//        return feedback_state;
-//    }
+    void ModuleRtpRtcpImpl::ScheduleMaybeSendRtcpAtOrAfterTimestamp(
+            webrtc::Timestamp execute_time,
+            webrtc::TimeDelta duration)
+    {
+        rtc::Thread::Current()->PostDelayedTask(webrtc::ToQueuedTask(task_safety_, [=]() {
+            webrtc::Timestamp now = config_.clock->CurrentTime();
+            if (now >= execute_time) {
+                MaybeSendRTCP();
+                return;
+            }
+
+            ScheduleMaybeSendRtcpAtOrAfterTimestamp(execute_time, execute_time - now);
+
+        }), DelayMillisForDuration(duration));
+    }
+
+    RTCPSender::FeedbackState ModuleRtpRtcpImpl::GetFeedbackState() {
+        RTCPSender::FeedbackState feedback_state;
+        if (!config_.receiver_only) {
+            feedback_state.packets_sent = rtp_stats_.transmmited.packets +
+                                          rtx_rtp_stats_.transmmited.packets;
+            feedback_state.media_bytes_sent = rtp_stats_.transmmited.payload_bytes
+                                              + rtx_rtp_stats_.transmmited.payload_bytes;
+        }
+
+        return feedback_state;
+    }
 
 } // namespace xrtc
 

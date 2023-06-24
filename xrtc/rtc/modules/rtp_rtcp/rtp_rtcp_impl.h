@@ -11,7 +11,7 @@
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_defines.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtcp_sender.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtcp_sender.h"
 //#include "xrtc/rtc/modules/rtp_rtcp/rtcp_receiver.h"
 
 namespace xrtc {
@@ -41,19 +41,19 @@ namespace xrtc {
 //        void IncomingRtcpPacket(rtc::ArrayView<const uint8_t> packet);
 
     private:
-//        void ScheduleNextRtcpSend(webrtc::TimeDelta duration);
-//        void MaybeSendRTCP();
-//        void ScheduleMaybeSendRtcpAtOrAfterTimestamp(
-//                webrtc::Timestamp execute_time,
-//                webrtc::TimeDelta duration);
-//        RTCPSender::FeedbackState GetFeedbackState();
+        void ScheduleNextRtcpSend(webrtc::TimeDelta duration);
+        void MaybeSendRTCP();
+        void ScheduleMaybeSendRtcpAtOrAfterTimestamp(
+                webrtc::Timestamp execute_time,
+                webrtc::TimeDelta duration);
+        RTCPSender::FeedbackState GetFeedbackState();
 
     private:
         RtpRtcpInterface::Configuration config_;
         StreamDataCounter rtp_stats_;
         StreamDataCounter rtx_rtp_stats_;
 
-//        RTCPSender rtcp_sender_;
+        RTCPSender rtcp_sender_;
 //        RTCPReceiver rtcp_receiver_;
 
         webrtc::ScopedTaskSafety task_safety_;

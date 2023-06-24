@@ -4,7 +4,7 @@
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_format.h"
 
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
 
 namespace xrtc {
 
@@ -14,7 +14,7 @@ namespace xrtc {
     {
         switch (type) {
             case webrtc::kVideoCodecH264:
-//                return std::make_unique<RtpPacketizerH264>(payload, config);
+                return std::make_unique<RtpPacketizerH264>(payload, config);
             default:
                 return nullptr;
         }
