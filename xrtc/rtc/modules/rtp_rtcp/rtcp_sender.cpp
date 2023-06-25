@@ -6,7 +6,7 @@
 
 #include <rtc_base/logging.h>
 
-//#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/sender_report.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/sender_report.h"
 
 namespace xrtc {
     namespace {

@@ -64,6 +64,7 @@ namespace xrtc {
         int data_len[4];
         int stride[4];
         uint32_t ts = 0;
+        int64_t capture_time_ms = 0;
     };
 }
 

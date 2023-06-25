@@ -302,11 +302,11 @@ namespace xrtc{
         // 视频的频率90000, 1s中90000份 1ms => 90
         uint32_t rtp_timestamp = frame->ts * 90;
 
-//        if (video_send_stream_) {
-//            video_send_stream_->OnSendingRtpFrame(rtp_timestamp,
-//                                                  frame->capture_time_ms,
-//                                                  frame->fmt.sub_fmt.video_fmt.idr);
-//        }
+        if (video_send_stream_) {
+            video_send_stream_->OnSendingRtpFrame(rtp_timestamp,
+                                                  frame->capture_time_ms,
+                                                  frame->fmt.sub_fmt.video_fmt.idr);
+        }
 
         RtpPacketizer::Config config;
         auto packetizer = RtpPacketizer::Create(webrtc::kVideoCodecH264,
@@ -338,6 +338,7 @@ namespace xrtc{
 
         return true;
     }
+
 
 //    void PeerConnection::OnLocalRtcpPacket(webrtc::MediaType media_type,
 //                                           const uint8_t* data,

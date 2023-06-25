@@ -49,8 +49,8 @@ namespace xrtc {
                                             int64_t capture_time_ms,
                                             bool forced_report)
     {
-//        rtp_rtcp_->OnSendingRtpFrame(rtp_timestamp, capture_time_ms,
-//                                     forced_report);
+        rtp_rtcp_->OnSendingRtpFrame(rtp_timestamp, capture_time_ms,
+                                     forced_report);
     }
 
     void VideoSendStream::DeliverRtcp(const uint8_t* packet, size_t length) {

@@ -183,6 +183,7 @@ namespace xrtc {
             start_time_ = frame.render_time_ms();
         }
         video_frame->ts = static_cast<uint32_t>(frame.render_time_ms() - start_time_);
+        video_frame->capture_time_ms  = frame.render_time_ms();
         current_thread_->PostTask(webrtc::ToQueuedTask([=] {
             for (auto iter = consumer_list_.begin(); iter != consumer_list_.end(); iter++) {
                 (*iter)->OnFrame(video_frame);

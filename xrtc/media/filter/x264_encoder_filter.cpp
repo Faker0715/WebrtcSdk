@@ -286,7 +286,7 @@ namespace xrtc {
         out_frame->fmt.sub_fmt.video_fmt.idr = idr;
         out_frame->ts = pic_out.i_pts;
         out_frame->data_len[0] = data_size;
-//        out_frame->capture_time_ms = frame->capture_time_ms;
+        out_frame->capture_time_ms = frame->capture_time_ms;
 
         int data_index = 0;
         for (size_t i = 0; i < nals.size(); ++i) {
