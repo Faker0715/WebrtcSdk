@@ -57,30 +57,30 @@ namespace xrtc {
         rtp_rtcp_->IncomingRtcpPacket(packet, length);
     }
 
-//    std::unique_ptr<RtpPacketToSend> VideoSendStream::BuildRtxPacket(
-//            std::shared_ptr<RtpPacketToSend> packet)
-//    {
-//        auto rtx_packet = std::make_unique<RtpPacketToSend>();
-//        rtx_packet->SetPayloadType(config_.rtp.rtx.payload_type);
-//        rtx_packet->SetSsrc(config_.rtp.rtx.ssrc);
-//        rtx_packet->SetSequenceNumber(rtx_seq_++);
-//        rtx_packet->SetMarker(packet->marker());
-//        rtx_packet->SetTimestamp(packet->timestamp());
+    std::unique_ptr<RtpPacketToSend> VideoSendStream::BuildRtxPacket(
+            std::shared_ptr<RtpPacketToSend> packet)
+    {
+        auto rtx_packet = std::make_unique<RtpPacketToSend>();
+        rtx_packet->SetPayloadType(config_.rtp.rtx.payload_type);
+        rtx_packet->SetSsrc(config_.rtp.rtx.ssrc);
+        rtx_packet->SetSequenceNumber(rtx_seq_++);
+        rtx_packet->SetMarker(packet->marker());
+        rtx_packet->SetTimestamp(packet->timestamp());
 
 //         分配负载的内存
-//        auto rtx_payload = rtx_packet->AllocatePayload(packet->payload_size()
-//                                                       + kRtxHeaderSize);
-//        if (!rtx_payload) {
-//            return nullptr;
-//        }
+        auto rtx_payload = rtx_packet->AllocatePayload(packet->payload_size()
+                                                       + kRtxHeaderSize);
+        if (!rtx_payload) {
+            return nullptr;
+        }
 
 //         写入原始的sequence_number
-//        webrtc::ByteWriter<uint16_t>::WriteBigEndian(rtx_payload, packet->sequence_number());
+        webrtc::ByteWriter<uint16_t>::WriteBigEndian(rtx_payload, packet->sequence_number());
 //         写入原始的负载数据
-//        auto payload = packet->payload();
-//        memcpy(rtx_payload + kRtxHeaderSize, payload.data(), payload.size());
+        auto payload = packet->payload();
+        memcpy(rtx_payload + kRtxHeaderSize, payload.data(), payload.size());
 
-//        return rtx_packet;
-//    }
+        return rtx_packet;
+    }
 
 } // namespace xrtc

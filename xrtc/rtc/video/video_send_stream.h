@@ -24,8 +24,8 @@ namespace xrtc {
                                int64_t capture_time_ms,
                                bool forced_report);
         void DeliverRtcp(const uint8_t* packet, size_t length);
-//        std::unique_ptr<RtpPacketToSend> BuildRtxPacket(
-//                std::shared_ptr<RtpPacketToSend> packet);
+        std::unique_ptr<RtpPacketToSend> BuildRtxPacket(
+                std::shared_ptr<RtpPacketToSend> packet);
 
     private:
         VideoSendStreamConfig config_;
