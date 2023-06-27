@@ -12,7 +12,7 @@
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_defines.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_sender.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtcp_receiver.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtcp_receiver.h"
 
 namespace xrtc {
 
@@ -35,9 +35,9 @@ namespace xrtc {
         void OnSendingRtpFrame(uint32_t rtp_timestamp,
                                int64_t capture_time_ms,
                                bool forced_report);
-//        void IncomingRtcpPacket(const uint8_t* packet, size_t length) {
-//            IncomingRtcpPacket(rtc::MakeArrayView(packet, length));
-//        }
+        void IncomingRtcpPacket(const uint8_t* packet, size_t length) {
+            IncomingRtcpPacket(rtc::MakeArrayView(packet, length));
+        }
         void IncomingRtcpPacket(rtc::ArrayView<const uint8_t> packet);
 
     private:
@@ -54,7 +54,7 @@ namespace xrtc {
         StreamDataCounter rtx_rtp_stats_;
 
         RTCPSender rtcp_sender_;
-//        RTCPReceiver rtcp_receiver_;
+        RTCPReceiver rtcp_receiver_;
 
         webrtc::ScopedTaskSafety task_safety_;
     };

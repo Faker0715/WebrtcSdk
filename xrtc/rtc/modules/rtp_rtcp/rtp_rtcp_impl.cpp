@@ -15,8 +15,8 @@ namespace xrtc {
             config_(config),
             rtcp_sender_(config, [=](webrtc::TimeDelta duration) {
                 ScheduleNextRtcpSend(duration);
-            })
-//            rtcp_receiver_(config)
+            }),
+            rtcp_receiver_(config)
     {
     }
 
@@ -60,9 +60,9 @@ namespace xrtc {
         }
     }
 
-//    void ModuleRtpRtcpImpl::IncomingRtcpPacket(rtc::ArrayView<const uint8_t> packet) {
-//        rtcp_receiver_.IncomingRtcpPacket(packet);
-//    }
+    void ModuleRtpRtcpImpl::IncomingRtcpPacket(rtc::ArrayView<const uint8_t> packet) {
+        rtcp_receiver_.IncomingRtcpPacket(packet);
+    }
 
     void ModuleRtpRtcpImpl::ScheduleNextRtcpSend(webrtc::TimeDelta duration) {
         if (duration.IsZero()) {

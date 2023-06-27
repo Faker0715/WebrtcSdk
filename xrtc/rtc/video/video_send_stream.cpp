@@ -54,7 +54,7 @@ namespace xrtc {
     }
 
     void VideoSendStream::DeliverRtcp(const uint8_t* packet, size_t length) {
-//        rtp_rtcp_->IncomingRtcpPacket(packet, length);
+        rtp_rtcp_->IncomingRtcpPacket(packet, length);
     }
 
 //    std::unique_ptr<RtpPacketToSend> VideoSendStream::BuildRtxPacket(
