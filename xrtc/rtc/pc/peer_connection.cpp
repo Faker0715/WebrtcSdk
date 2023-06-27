@@ -415,11 +415,11 @@ namespace xrtc{
     void PeerConnection::OnRtcpPacketReceived(TransportController*,
                                               const char* data, size_t len, int64_t)
     {
-//        if (video_send_stream_) {
-//            video_send_stream_->DeliverRtcp((const uint8_t*)data, len);
-//        }
+        if (video_send_stream_) {
+            video_send_stream_->DeliverRtcp((const uint8_t*)data, len);
+        }
     }
-//
+
     void PeerConnection::CreateVideoSendStream(VideoContentDescription* video_content) {
         if (!video_content) {
             return;
