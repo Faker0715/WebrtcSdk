@@ -6,7 +6,7 @@
 
 #include "xrtc/base/xrtc_global.h"
 #include "xrtc/rtc/pc/session_description.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_utils.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_utils.h"
 
 namespace xrtc {
 
@@ -96,18 +96,18 @@ namespace xrtc {
     void TransportController::OnReadPacket(ice::IceAgent*, const std::string&, int,
                                            const char* data, size_t len, int64_t ts)
     {
-//        auto array_view = rtc::MakeArrayView<const uint8_t>((const uint8_t*)data, len);
-//        RtpPacketType packet_type = InferRtpPacketType(array_view);
-//        if (RtpPacketType::kUnknown == packet_type) {
-//            return;
-//        }
-//
-//        if (RtpPacketType::kRtcp == packet_type) {
-//            SignalRtcpPacketReceived(this, data, len, ts);
-//        }
-//        else if (RtpPacketType::kRtp == packet_type) {
-//            SignalRtpPacketReceived(this, data, len, ts);
-//        }
+        auto array_view = rtc::MakeArrayView<const uint8_t>((const uint8_t*)data, len);
+        RtpPacketType packet_type = InferRtpPacketType(array_view);
+        if (RtpPacketType::kUnknown == packet_type) {
+            return;
+        }
+
+        if (RtpPacketType::kRtcp == packet_type) {
+            SignalRtcpPacketReceived(this, data, len, ts);
+        }
+        else if (RtpPacketType::kRtp == packet_type) {
+            SignalRtpPacketReceived(this, data, len, ts);
+        }
     }
 
 } // namespace xrtc

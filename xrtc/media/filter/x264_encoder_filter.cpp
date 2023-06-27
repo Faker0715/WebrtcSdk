@@ -237,7 +237,6 @@ namespace xrtc {
             RTC_LOG(LS_WARNING) << "x264_encoder_encode failed: " << size;
             return false;
         }
-
         if (size == 0) {
             return true;
         }
@@ -288,6 +287,7 @@ namespace xrtc {
         out_frame->data_len[0] = data_size;
         out_frame->capture_time_ms = frame->capture_time_ms;
 
+        RTC_LOG(LS_INFO) << "nal_num: " << nal_num << "nals.size() " << nals.size();
         int data_index = 0;
         for (size_t i = 0; i < nals.size(); ++i) {
             x264_nal_t& nal = nals[i];

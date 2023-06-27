@@ -18,7 +18,7 @@
 #include "peer_connection_def.h"
 #include "xrtc/rtc/pc/peer_connection_def.h"
 #include "xrtc/rtc/video/video_send_stream.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
 
 namespace xrtc {
 
@@ -31,8 +31,8 @@ namespace xrtc {
         bool use_rtcp_mux = true;
     };
 
-    class PeerConnection : public sigslot::has_slots<>
-//                           public RtpRtcpModuleObserver
+    class PeerConnection : public sigslot::has_slots<>,
+                           public RtpRtcpModuleObserver
     {
 
     public:
@@ -45,12 +45,12 @@ namespace xrtc {
         bool SendEncodedImage(std::shared_ptr<MediaFrame> frame);
 
         // RtpRtcpModuleObserver
-//        void OnLocalRtcpPacket(webrtc::MediaType media_type,
-//                               const uint8_t* data, size_t len) override;
-//        void OnNetworkInfo(int64_t rtt_ms, int32_t packets_lost,
-//                           uint8_t fraction_lost, uint32_t jitter) override;
-//        void OnNackReceived(webrtc::MediaType media_type,
-//                            const std::vector<uint16_t>& nack_list) override;
+        void OnLocalRtcpPacket(webrtc::MediaType media_type,
+                               const uint8_t* data, size_t len) override;
+        void OnNetworkInfo(int64_t rtt_ms, int32_t packets_lost,
+                           uint8_t fraction_lost, uint32_t jitter) override;
+        void OnNackReceived(webrtc::MediaType media_type,
+                            const std::vector<uint16_t>& nack_list) override;
 
         sigslot::signal2<PeerConnection*, PeerConnectionState> SignalConnectionState;
         sigslot::signal5<PeerConnection*, int64_t, int32_t, uint8_t, uint32_t>

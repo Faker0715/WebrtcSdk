@@ -340,29 +340,29 @@ namespace xrtc{
     }
 
 
-//    void PeerConnection::OnLocalRtcpPacket(webrtc::MediaType media_type,
-//                                           const uint8_t* data,
-//                                           size_t len)
-//    {
-//        // 发送RTCP复合包到网络
-//        if (pc_state_ != PeerConnectionState::kConnected) {
-//            return;
-//        }
-//
-//        transport_controller_->SendPacket("audio", (const char*)data, len);
-//    }
+    void PeerConnection::OnLocalRtcpPacket(webrtc::MediaType media_type,
+                                           const uint8_t* data,
+                                           size_t len)
+    {
+        // 发送RTCP复合包到网络
+        if (pc_state_ != PeerConnectionState::kConnected) {
+            return;
+        }
 
-//    void PeerConnection::OnNetworkInfo(int64_t rtt_ms,
-//                                       int32_t packets_lost,
-//                                       uint8_t fraction_lost,
-//                                       uint32_t jitter)
-//    {
-//        SignalNetworkInfo(this, rtt_ms, packets_lost, fraction_lost, jitter);
-//    }
+        transport_controller_->SendPacket("audio", (const char*)data, len);
+    }
 
-//    void PeerConnection::OnNackReceived(webrtc::MediaType media_type,
-//                                        const std::vector<uint16_t>& nack_list)
-//    {
+    void PeerConnection::OnNetworkInfo(int64_t rtt_ms,
+                                       int32_t packets_lost,
+                                       uint8_t fraction_lost,
+                                       uint32_t jitter)
+    {
+        SignalNetworkInfo(this, rtt_ms, packets_lost, fraction_lost, jitter);
+    }
+
+    void PeerConnection::OnNackReceived(webrtc::MediaType media_type,
+                                        const std::vector<uint16_t>& nack_list)
+    {
 //        for (auto nack_id : nack_list) {
 //            auto packet = FindVideoCache(nack_id);
 //            if (packet) {
@@ -374,7 +374,7 @@ namespace xrtc{
 //                }
 //            }
 //        }
-//    }
+    }
 
     void PeerConnection::OnIceState(TransportController*,
                                     ice::IceTransportState ice_state)
@@ -431,7 +431,7 @@ namespace xrtc{
                 VideoSendStreamConfig config;
                 config.rtp.ssrc = stream.ssrcs[0];
                 config.rtp.payload_type = video_pt_;
-//                config.rtp_rtcp_module_observer = this;
+                config.rtp_rtcp_module_observer = this;
                 if (stream.ssrcs.size() > 1) {
                     config.rtp.rtx.ssrc = stream.ssrcs[1];
                     config.rtp.rtx.payload_type = video_rtx_pt_;
