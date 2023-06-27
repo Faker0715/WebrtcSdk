@@ -416,6 +416,7 @@ namespace xrtc{
                                               const char* data, size_t len, int64_t)
     {
         if (video_send_stream_) {
+            // 音频和视频都传递到下层了
             video_send_stream_->DeliverRtcp((const uint8_t*)data, len);
         }
     }

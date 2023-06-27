@@ -6,7 +6,7 @@
 
 #include <rtc_base/logging.h>
 
-//#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/receiver_report.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/receiver_report.h"
 //#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/nack.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_utils.h"
 
@@ -59,9 +59,9 @@ namespace xrtc {
             }
 
             switch (rtcp_block.packet_type()) {
-//                case rtcp::ReceiverReport::kPacketType: // 201
-//                    HandleReceiverReport(rtcp_block, packet_info);
-//                    break;
+                case rtcp::ReceiverReport::kPacketType: // 201
+                    HandleReceiverReport(rtcp_block, packet_info);
+                    break;
 //                case rtcp::Rtpfb::kPacketType: // 205
 //                    switch (rtcp_block.fmt()) {
 //                        case rtcp::Nack::kFeedbackMessageType: // 1
@@ -85,23 +85,24 @@ namespace xrtc {
     void RTCPReceiver::HandleReceiverReport(const rtcp::CommonHeader& rtcp_block,
                                             PacketInformation& packet_info)
     {
-//        rtcp::ReceiverReport rr;
-//        if (!rr.Parse(rtcp_block)) {
-//            ++num_skipped_packets_;
-//            return;
-//        }
-//
-//        uint32_t remote_ssrc = rr.sender_ssrc();
-//
-//        for (const rtcp::ReportBlock& report_block : rr.report_blocks()) {
-//            HandleReportBlock(report_block, remote_ssrc, packet_info);
-//        }
+        rtcp::ReceiverReport rr;
+        if (!rr.Parse(rtcp_block)) {
+            ++num_skipped_packets_;
+            return;
+        }
+
+        uint32_t remote_ssrc = rr.sender_ssrc();
+
+        for (const rtcp::ReportBlock& report_block : rr.report_blocks()) {
+            HandleReportBlock(report_block, remote_ssrc, packet_info);
+        }
     }
 
     void RTCPReceiver::HandleReportBlock(const rtcp::ReportBlock& report_block,
                                          uint32_t remote_ssrc,
                                          PacketInformation& packet_info)
     {
+        // 过滤掉音频的ssrc
         if (!IsRegisteredSsrc(report_block.source_ssrc())) {
             return;
         }
