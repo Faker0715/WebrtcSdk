@@ -72,6 +72,7 @@ namespace xrtc {
 
         virtual void OnPreviewSuccess(XRTCPreview* preview) {};
         virtual void OnPreviewFailed(XRTCPreview* preview, XRTCError error) {};
+        virtual void OnNetworkInfo(int64_t rtt_ms,int32_t packets_lost,uint8_t fraction_lost,uint32_t jitter) {};
 
     };
 

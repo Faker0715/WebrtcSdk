@@ -15,35 +15,47 @@
 namespace xrtc {
 
     class InPin;
+
     class OutPin;
+
     class HttpReply;
 
-    class XRTCMediaSink : public MediaObject
-    {
+    class XRTCMediaSink : public MediaObject,
+                          public sigslot::has_slots<> {
     public:
-        XRTCMediaSink(MediaChain* media_chain);
+        XRTCMediaSink(MediaChain *media_chain);
+
         ~XRTCMediaSink() override;
 
         // MediaObject
         bool Start() override;
-        void Setup(const std::string& /*json_config*/) override;
+
+        void Setup(const std::string & /*json_config*/) override;
+
         void Stop() override;
+
         void OnNewMediaFrame(std::shared_ptr<MediaFrame>) override;
-        std::vector<InPin*> GetAllInPins() override {
-            return std::vector<InPin*>({ video_in_pin_.get() });
+
+        std::vector<InPin *> GetAllInPins() override {
+            return std::vector<InPin *>({video_in_pin_.get()});
         }
 
-        std::vector<OutPin*> GetAllOutPins() override {
-            return std::vector<OutPin*>();
+        std::vector<OutPin *> GetAllOutPins() override {
+            return std::vector<OutPin *>();
         }
+    private:
+        void OnNetworkInfo(PeerConnection*,int64_t rtt_ms,int32_t packets_lost,uint8_t fraction_lost,uint32_t jitter);
 
 
     private:
-        bool ParseReply(const HttpReply& reply, std::string& type, std::string& sdp);
-        void SendAnswer(const std::string& answer);
+        bool ParseReply(const HttpReply &reply, std::string &type, std::string &sdp);
+
+        void SendAnswer(const std::string &answer);
+
         void PacketAndSendVideo(std::shared_ptr<MediaFrame> frame);
+
     private:
-        MediaChain* media_chain_;
+        MediaChain *media_chain_;
         std::unique_ptr<InPin> video_in_pin_;
         std::string url_;
         std::string protocol_;

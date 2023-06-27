@@ -23,6 +23,7 @@ namespace xrtc {
         video_fmt.sub_fmt.video_fmt.type = SubMediaType::kSubTypeH264;
         video_in_pin_->set_format(video_fmt);
         XRTCGlobal::Instance()->http_manager()->AddObject(this);
+        pc_->SignalNetworkInfo.connect(this, &XRTCMediaSink::OnNetworkInfo);
     }
 
     XRTCMediaSink::~XRTCMediaSink() {
@@ -179,6 +180,15 @@ namespace xrtc {
     }
     void XRTCMediaSink::PacketAndSendVideo(std::shared_ptr<MediaFrame> frame) {
         pc_->SendEncodedImage(frame);
+    }
+
+    void XRTCMediaSink::OnNetworkInfo(PeerConnection *, int64_t rtt_ms, int32_t packets_lost, uint8_t fraction_lost,
+                                      uint32_t jitter) {
+        XRTCGlobal::Instance()->api_thread()->PostTask(webrtc::ToQueuedTask([=]() {
+            XRTCGlobal::Instance()->engine_observer()->OnNetworkInfo(
+                    rtt_ms, packets_lost, fraction_lost, jitter);
+        }));
+
     }
 
 } // namespace xrtc

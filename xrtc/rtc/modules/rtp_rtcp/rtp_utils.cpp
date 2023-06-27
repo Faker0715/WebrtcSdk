@@ -50,6 +50,7 @@ namespace xrtc {
         }
 
         int64_t value = static_cast<int64_t>(compact_ntp_interval);
+        // 就近舍入
         int64_t ms = webrtc::DivideRoundToNearest(value * 1000, 1 << 16);
         return ms < 1 ? 1 : ms;
     }

@@ -34,6 +34,7 @@ void BasicForm::InitWindow() {
     edit_uid_ = dynamic_cast<ui::RichEdit *>(FindControl(L"edit_uid"));
     edit_stream_name_ = dynamic_cast<ui::RichEdit *>(FindControl(L"edit_stream_name"));
 
+    label_network_tips_ = dynamic_cast<ui::Label*>(FindControl(L"network_tips"));
     xrtc::XRTCEngine::Init(this);
 
     InitComboCam();
@@ -320,17 +321,17 @@ void BasicForm::OnPreviewFailed(xrtc::XRTCPreview*, xrtc::XRTCError err) {
 //	ShowToast(err_msg, true);
 //}
 
-//void BasicForm::OnNetworkInfo(int64_t rtt_ms, int32_t packets_lost,
-//	uint8_t fraction_lost, uint32_t jitter)
-//{
-//	std::wstring network_info = nbase::StringPrintf(L"rtt=%lldms 累计丢包数=%d 丢包指数=%u jitter=%u",
-//		rtt_ms, packets_lost, fraction_lost, jitter);
-//	CallOnUIThread([=]() {
-//		if (label_network_tips_) {
-//			label_network_tips_->SetText(network_info);
-//		}
-//	});
-//}
+void BasicForm::OnNetworkInfo(int64_t rtt_ms, int32_t packets_lost,
+	uint8_t fraction_lost, uint32_t jitter)
+{
+	std::wstring network_info = nbase::StringPrintf(L"rtt=%lldms 累计丢包数=%d 丢包指数=%u jitter=%u",
+		rtt_ms, packets_lost, fraction_lost, jitter);
+	CallOnUIThread([=]() {
+		if (label_network_tips_) {
+			label_network_tips_->SetText(network_info);
+		}
+	});
+}
 
 
 
