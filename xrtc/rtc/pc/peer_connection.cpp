@@ -370,9 +370,9 @@ namespace xrtc{
             if (packet) {
                 // 重传数据
                 if (video_send_stream_) {
-//                    auto rtx_packet = video_send_stream_->BuildRtxPacket(packet);
-//                    transport_controller_->SendPacket("audio", (const char*)rtx_packet->data(),
-//                                                      rtx_packet->size());
+                    auto rtx_packet = video_send_stream_->BuildRtxPacket(packet);
+                    transport_controller_->SendPacket("audio", (const char*)rtx_packet->data(),
+                                                      rtx_packet->size());
                 }
             }
         }
