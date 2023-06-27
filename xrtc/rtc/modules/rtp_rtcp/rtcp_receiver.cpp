@@ -7,7 +7,7 @@
 #include <rtc_base/logging.h>
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/receiver_report.h"
-//#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/nack.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/nack.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_utils.h"
 
 namespace xrtc {
@@ -62,16 +62,16 @@ namespace xrtc {
                 case rtcp::ReceiverReport::kPacketType: // 201
                     HandleReceiverReport(rtcp_block, packet_info);
                     break;
-//                case rtcp::Rtpfb::kPacketType: // 205
-//                    switch (rtcp_block.fmt()) {
-//                        case rtcp::Nack::kFeedbackMessageType: // 1
-//                            HandleNack(rtcp_block, packet_info);
-//                            break;
-//                        default:
-//                            ++num_skipped_packets_;
-//                            break;
-//                    }
-//                    break;
+                case rtcp::Rtpfb::kPacketType: // 205
+                    switch (rtcp_block.fmt()) {
+                        case rtcp::Nack::kFeedbackMessageType: // 1
+                            HandleNack(rtcp_block, packet_info);
+                            break;
+                        default:
+                            ++num_skipped_packets_;
+                            break;
+                    }
+                    break;
                 default:
                     RTC_LOG(LS_WARNING) << "rtcp packet not handle, packet_type: " <<
                                         (int)(rtcp_block.packet_type());
@@ -132,17 +132,17 @@ namespace xrtc {
     void RTCPReceiver::HandleNack(const rtcp::CommonHeader& rtcp_block,
                                   PacketInformation& packet_info)
     {
-//        rtcp::Nack nack;
-//        if (!nack.Parse(rtcp_block)) {
-//            ++num_skipped_packets_;
-//            return;
-//        }
-//
-//        if (rtp_rtcp_module_observer_) {
-//            rtp_rtcp_module_observer_->OnNackReceived(
-//                    audio_ ? webrtc::MediaType::AUDIO : webrtc::MediaType::VIDEO,
-//                    nack.packet_ids());
-//        }
+        rtcp::Nack nack;
+        if (!nack.Parse(rtcp_block)) {
+            ++num_skipped_packets_;
+            return;
+        }
+
+        if (rtp_rtcp_module_observer_) {
+            rtp_rtcp_module_observer_->OnNackReceived(
+                    audio_ ? webrtc::MediaType::AUDIO : webrtc::MediaType::VIDEO,
+                    nack.packet_ids());
+        }
     }
 
     bool RTCPReceiver::IsRegisteredSsrc(uint32_t ssrc) {
