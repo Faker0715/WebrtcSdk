@@ -18,9 +18,11 @@
 
 namespace xrtc{
 
+    const size_t RTC_PACKET_CACHE_SIZE = 2048;
     PeerConnection::PeerConnection() :
             transport_controller_(std::make_unique<TransportController>()),
-            clock_(webrtc::Clock::GetRealTimeClock())
+            clock_(webrtc::Clock::GetRealTimeClock()),
+            video_cache_(2048)
     {
         transport_controller_->SignalIceState.connect(this,
                                                       &PeerConnection::OnIceState);
@@ -329,7 +331,7 @@ namespace xrtc{
                 video_send_stream_->UpdateRtpStats(single_packet, false, false);
             }
 
-//            AddVideoCache(single_packet);
+            AddVideoCache(single_packet);
             // 发送数据包
             // TODO, transport_name此处写死，后面可以换成变量
             transport_controller_->SendPacket("audio", (const char*)single_packet->data(),
@@ -363,17 +365,17 @@ namespace xrtc{
     void PeerConnection::OnNackReceived(webrtc::MediaType media_type,
                                         const std::vector<uint16_t>& nack_list)
     {
-//        for (auto nack_id : nack_list) {
-//            auto packet = FindVideoCache(nack_id);
-//            if (packet) {
-//                // 重传数据
-//                if (video_send_stream_) {
+        for (auto nack_id : nack_list) {
+            auto packet = FindVideoCache(nack_id);
+            if (packet) {
+                // 重传数据
+                if (video_send_stream_) {
 //                    auto rtx_packet = video_send_stream_->BuildRtxPacket(packet);
 //                    transport_controller_->SendPacket("audio", (const char*)rtx_packet->data(),
 //                                                      rtx_packet->size());
-//                }
-//            }
-//        }
+                }
+            }
+        }
     }
 
     void PeerConnection::OnIceState(TransportController*,
@@ -448,27 +450,26 @@ namespace xrtc{
             break;
         }
     }
-//
-//    void PeerConnection::AddVideoCache(std::shared_ptr<RtpPacketToSend> packet) {
-//        uint16_t seq = packet->sequence_number();
-//        size_t index = seq % RTC_PACKET_CACHE_SIZE;
-//
-//        if (video_cache_[index] && video_cache_[index]->sequence_number() == seq) {
-//            return;
-//        }
-//
-//        video_cache_[index] = packet;
-//    }
-//
-//    std::shared_ptr<RtpPacketToSend> PeerConnection::FindVideoCache(uint16_t seq) {
-//        size_t index = seq % RTC_PACKET_CACHE_SIZE;
-//        if (video_cache_[index] && video_cache_[index]->sequence_number() == seq) {
-//            return video_cache_[index];
-//        }
-//
-//        return nullptr;
-//    }
 
+    void PeerConnection::AddVideoCache(std::shared_ptr<RtpPacketToSend> packet) {
+        uint16_t seq = packet->sequence_number();
+        size_t index = seq % RTC_PACKET_CACHE_SIZE;
+
+        if (video_cache_[index] && video_cache_[index]->sequence_number() == seq) {
+            return;
+        }
+
+        video_cache_[index] = packet;
+    }
+
+    std::shared_ptr<RtpPacketToSend> PeerConnection::FindVideoCache(uint16_t seq) {
+        size_t index = seq % RTC_PACKET_CACHE_SIZE;
+        if (video_cache_[index] && video_cache_[index]->sequence_number() == seq) {
+            return video_cache_[index];
+        }
+
+        return nullptr;
+    }
 
 
 }

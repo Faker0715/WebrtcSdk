@@ -61,8 +61,8 @@ namespace xrtc {
         void OnRtcpPacketReceived(TransportController*, const char* data,
                                   size_t len, int64_t);
         void CreateVideoSendStream(VideoContentDescription* video_content);
-//        void AddVideoCache(std::shared_ptr<RtpPacketToSend> packet);
-//        std::shared_ptr<RtpPacketToSend> FindVideoCache(uint16_t seq);
+        void AddVideoCache(std::shared_ptr<RtpPacketToSend> packet);
+        std::shared_ptr<RtpPacketToSend> FindVideoCache(uint16_t seq);
     private:
         std::unique_ptr<SessionDescription> remote_desc_;
         std::unique_ptr<SessionDescription> local_desc_;
@@ -80,7 +80,7 @@ namespace xrtc {
         PeerConnectionState pc_state_ = PeerConnectionState::kNew;
         webrtc::Clock* clock_;
         VideoSendStream* video_send_stream_ = nullptr;
-//        std::vector<std::shared_ptr<RtpPacketToSend>> video_cache_;
+        std::vector<std::shared_ptr<RtpPacketToSend>> video_cache_;
     };
 
 }
