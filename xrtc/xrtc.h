@@ -91,6 +91,8 @@ namespace xrtc {
                                      std::string &device_id);
 
         static int16_t GetMicCount();
+        static int32_t GetMicInfo(int index, std::string &mic_name,
+                                  std::string &mic_guid);
         static IVideoSource *CreateCamSource(const std::string &cam_id);
 
         static XRTCRender* CreateRender(void* canvas);

@@ -39,10 +39,15 @@ void BasicForm::InitWindow() {
 
     InitComboCam();
     int cnt = xrtc::XRTCEngine::GetMicCount();
+    for(size_t i = 0;i < cnt;++i){
+        std::string mic_name;
+        std::string mic_guid;
+        xrtc::XRTCEngine::GetMicInfo(i, mic_name, mic_guid);
+    }
+
 
     m_pRoot->AttachBubbledEvent(ui::kEventAll, nbase::Bind(&BasicForm::Notify, this, std::placeholders::_1));
 
-//    uint32_t cnt = xrtc::XRTCEngine::GetCameraCount();
 
 }
 

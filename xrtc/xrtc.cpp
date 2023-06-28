@@ -68,4 +68,16 @@ namespace xrtc {
             return XRTCGlobal::Instance()->audio_device()->RecordingDevices();
         });
     }
+
+    int32_t XRTCEngine::GetMicInfo(int index, std::string &mic_name, std::string &mic_guid) {
+        return XRTCGlobal::Instance()->api_thread()->Invoke<int32_t>(RTC_FROM_HERE, [&]() {
+            char name[128];
+            char guid[128];
+            int32_t ret = XRTCGlobal::Instance()->audio_device()->RecordingDeviceName(
+                    index, name, guid);
+            mic_name = name;
+            mic_guid = guid;
+            return ret;
+        });
+    }
 }
