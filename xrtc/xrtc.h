@@ -39,7 +39,12 @@ namespace xrtc {
         kPushNoVideoSourceErr,
         kPushInvalidUrlErr,
         kPushRequestOfferErr,
-        kPushIceConnectionErr
+        kPushIceConnectionErr,
+        kNoAudioDeviceErr,
+        kAudioNotFoundErr,
+        kAudioSetRecordingDeviceErr,
+        kAudioInitRecordingErr,
+        kAudioStartRecordingErr,
     };
 
     class IXRTCConsumer {
@@ -67,12 +72,15 @@ namespace xrtc {
     class IVideoSource : public IMediaSource {
     };
 
+    class IAudioSource : public IMediaSource {
 
+    };
     class XRTC_API XRTCEngineObserver{
     public:
         virtual void OnVideoSourceSuccess(IVideoSource* source) {};
         virtual void OnVideoSourceFailed(IVideoSource* source, XRTCError error) {};
-
+        virtual void OnAudioSourceSuccess(IAudioSource*) {}
+        virtual void OnAudioSourceFailed(IAudioSource*, XRTCError) {}
         virtual void OnPreviewSuccess(XRTCPreview* preview) {};
         virtual void OnPreviewFailed(XRTCPreview* preview, XRTCError error) {};
         virtual void OnNetworkInfo(int64_t rtt_ms,int32_t packets_lost,uint8_t fraction_lost,uint32_t jitter) {};
@@ -90,6 +98,7 @@ namespace xrtc {
         static int32_t GetCameraInfo(int index, std::string &device_name,
                                      std::string &device_id);
 
+        static IAudioSource* CreateMicSource(const std::string& mic_id);
         static int16_t GetMicCount();
         static int32_t GetMicInfo(int index, std::string &mic_name,
                                   std::string &mic_guid);

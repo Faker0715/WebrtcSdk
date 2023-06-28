@@ -6,6 +6,7 @@
 #include "xrtc/device/xrtc_render.h"
 #include "xrtc/media/chain/xrtc_preview.h"
 #include "xrtc/media/base/xrtc_pusher.h"
+#include "xrtc/device/mic_impl.h"
 namespace xrtc {
     void XRTCEngine::Init(XRTCEngineObserver *observer) {
         rtc::LogMessage::LogTimestamps(true);
@@ -78,6 +79,12 @@ namespace xrtc {
             mic_name = name;
             mic_guid = guid;
             return ret;
+        });
+    }
+
+    IAudioSource *XRTCEngine::CreateMicSource(const std::string &mic_id) {
+        return XRTCGlobal::Instance()->api_thread()->Invoke<IAudioSource*>(RTC_FROM_HERE, [=]() {
+            return new MicImpl(mic_id);
         });
     }
 }
