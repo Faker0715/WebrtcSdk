@@ -24,6 +24,7 @@ namespace xrtc {
     }
 
     void MicImpl::Start() {
+        // ui线程
         RTC_LOG(LS_INFO) << "MicImpl Start call";
         api_thread_->PostTask(webrtc::ToQueuedTask([=]() {
             RTC_LOG(LS_INFO) << "MicImpl Start PostTask call";
@@ -169,13 +170,13 @@ namespace xrtc {
         int len = static_cast<int>(nSamples * nBytesPerSample);
         auto frame = std::make_shared<MediaFrame>(webrtc::AudioFrame::kMaxDataSizeBytes);
         frame->fmt.media_type = MainMediaType::kMainTypeAudio;
-        frame->fmt.sub_fmt.audio_fmt.type = SubMediaType::kSubTypePcm;
-        frame->fmt.sub_fmt.audio_fmt.nbytes_per_sample = nBytesPerSample;
-        frame->fmt.sub_fmt.audio_fmt.samples_per_channel = nSamples;
-        frame->fmt.sub_fmt.audio_fmt.channels = nChannels;
-        frame->fmt.sub_fmt.audio_fmt.samples_per_sec = samplesPerSec;
-        frame->fmt.sub_fmt.audio_fmt.total_delay_ms = totalDelayMS;
-        frame->fmt.sub_fmt.audio_fmt.key_pressed = keyPressed;
+//        frame->fmt.sub_fmt.audio_fmt.type = SubMediaType::kSubTypePcm;
+//        frame->fmt.sub_fmt.audio_fmt.nbytes_per_sample = nBytesPerSample;
+//        frame->fmt.sub_fmt.audio_fmt.samples_per_channel = nSamples;
+//        frame->fmt.sub_fmt.audio_fmt.channels = nChannels;
+//        frame->fmt.sub_fmt.audio_fmt.samples_per_sec = samplesPerSec;
+//        frame->fmt.sub_fmt.audio_fmt.total_delay_ms = totalDelayMS;
+//        frame->fmt.sub_fmt.audio_fmt.key_pressed = keyPressed;
         frame->data_len[0] = len;
         memcpy(frame->data[0], audioSamples, len);
         // 计算时间戳，根据采样频率进行单调递增

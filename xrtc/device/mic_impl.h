@@ -26,6 +26,7 @@ namespace xrtc {
         void AddConsumer(IXRTCConsumer* consumer) override;
         void RemoveConsumer(IXRTCConsumer* consumer) override;
 
+        // 当麦克风获取到数据时 回调此方法
         int32_t RecordedDataIsAvailable(const void* audioSamples,
                                         const size_t nSamples,
                                         const size_t nBytesPerSample,

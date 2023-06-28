@@ -119,7 +119,7 @@ bool BasicForm::OnComboCamItemSelected(ui::EventArgs *msg) {
 
 void BasicForm::OnBtnDeviceStartClick() {
     btn_device_start_->SetEnabled(false);
-    if(!device_init_){
+    if(!audio_init_ || !video_init_){
         if(StartDevice()){
             btn_device_start_->SetText(L"停止音视频设备");
         }
@@ -134,24 +134,35 @@ void BasicForm::OnBtnDeviceStartClick() {
 }
 
 bool BasicForm::StartDevice() {
-	if (!combo_cam_) {
+	if (!combo_cam_ || !combo_mic_) {
 		return false;
 	}
 
-	// 获取device_id
-	int index = combo_cam_->GetCurSel();
-	auto item = combo_cam_->GetItemAt(index);
-	std::wstring w_device_id = item->GetDataID();
-	cam_source_ = xrtc::XRTCEngine::CreateCamSource(
-		nbase::UTF16ToUTF8(w_device_id));
-	cam_source_->Start();
+    // 启动视频设备（摄像头）
+    if (!video_init_) {
+        int index = combo_cam_->GetCurSel();
+        auto item = combo_cam_->GetItemAt(index);
+        std::wstring w_device_id = item->GetDataID();
+        cam_source_ = xrtc::XRTCEngine::CreateCamSource(
+                nbase::UTF16ToUTF8(w_device_id));
+        cam_source_->Start();
+    }
 
-    device_init_ = true;
+    // 启动音频设备（麦克风）
+    if (!audio_init_) {
+        int mic_index = combo_mic_->GetCurSel();
+        auto mic_item = combo_mic_->GetItemAt(mic_index);
+        std::wstring w_mic_id = mic_item->GetDataID();
+        mic_source_ = xrtc::XRTCEngine::CreateMicSource(
+                nbase::UTF16ToUTF8(w_mic_id));
+        mic_source_->Start();
+    }
+
 	return true;
 }
 //
 bool BasicForm::StopDevice() {
-	if (!device_init_ || !cam_source_) {
+	if (!video_init_ || !cam_source_) {
 		return false;
 	}
 
@@ -159,7 +170,7 @@ bool BasicForm::StopDevice() {
 	cam_source_->Destroy();
 	cam_source_ = nullptr;
 
-	device_init_ = false;
+	video_init_ = false;
 
 	return true;
 }
@@ -283,7 +294,7 @@ void BasicForm::CallOnUIThread(const std::function<void(void)> &task) {
 
 void BasicForm::OnVideoSourceSuccess(xrtc::IVideoSource* video_source) {
 //	 api_thread线程回调
-	device_init_ = true;
+	video_init_ = true;
 	ShowToast(L"摄像头启动成功", false);
 }
 
@@ -292,6 +303,9 @@ void BasicForm::OnVideoSourceFailed(xrtc::IVideoSource* video_source,
 {
 	std::wstring wstr = nbase::StringPrintf(L"摄像头启动设备，err_code: %d", err);
 	ShowToast(wstr, true);
+    CallOnUIThread([=]() {
+        btn_device_start_->SetText(L"启动音视频设备");
+    });
 }
 
 void BasicForm::OnPreviewSuccess(xrtc::XRTCPreview*) {
@@ -372,7 +386,15 @@ bool BasicForm::OnComboMicItemSelected(ui::EventArgs *msg) {
     return true;
 }
 
+void BasicForm::OnAudioSourceSuccess(xrtc::IAudioSource *audio_source) {
+    audio_init_ = true;
+    ShowToast(L"麦克风启动成功", false);
+}
 
-
-
-//
+void BasicForm::OnAudioSourceFailed(xrtc::IAudioSource *audio_source, xrtc::XRTCError err) {
+    std::wstring wstr = nbase::StringPrintf(L"麦克风启动失败，err_code: %d", err);
+    ShowToast(wstr, true);
+    CallOnUIThread([=]() {
+        btn_device_start_->SetText(L"启动音视频设备");
+    });
+}

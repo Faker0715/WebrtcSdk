@@ -63,6 +63,8 @@ private:
 
 //
 	// XRTCEngineObserver
+    void OnAudioSourceSuccess(xrtc::IAudioSource* audio_source) override;
+    void OnAudioSourceFailed(xrtc::IAudioSource* audio_source, xrtc::XRTCError err) override;
 	void OnVideoSourceSuccess(xrtc::IVideoSource* video_source) override;
 	void OnVideoSourceFailed(xrtc::IVideoSource* video_source, xrtc::XRTCError err) override;
 	void OnPreviewSuccess(xrtc::XRTCPreview*) override;
@@ -84,7 +86,9 @@ private:
 	ui::RichEdit* edit_stream_name_ = nullptr;
 	ui::Label* label_network_tips_ = nullptr;
 	xrtc::IVideoSource* cam_source_ = nullptr;
-	std::atomic<bool> device_init_{ false };
+    xrtc::IAudioSource* mic_source_ = nullptr;
+	std::atomic<bool> audio_init_{ false };
+    std::atomic<bool> video_init_{ false };
 	xrtc::XRTCPreview* xrtc_preview_ = nullptr;
 	xrtc::XRTCRender* xrtc_render_ = nullptr;
 	xrtc::XRTCPusher* xrtc_pusher_ = nullptr;
