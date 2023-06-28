@@ -53,7 +53,9 @@ namespace xrtc {
 
         void SendAnswer(const std::string &answer);
 
+        void SendStop();
         void PacketAndSendVideo(std::shared_ptr<MediaFrame> frame);
+
 
     private:
         MediaChain *media_chain_;

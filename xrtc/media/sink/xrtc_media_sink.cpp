@@ -93,6 +93,7 @@ namespace xrtc {
     void XRTCMediaSink::Stop() {
         RTC_LOG(LS_INFO) << "XRTCMediaSink Stop";
 
+
     }
 
     void XRTCMediaSink::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {
@@ -204,6 +205,45 @@ namespace xrtc {
                 media_chain_->OnChainFailed(this, XRTCError::kPushIceConnectionErr);
             }
         }
+
+    }
+
+    void XRTCMediaSink::SendStop() {
+        std::stringstream body;
+        body << "uid=" << request_params_["uid"]
+             << "&streamName=" << request_params_["streamName"];
+        std::string url = "https://" + host_ + "/signaling/stoppush";
+        HttpRequest request(url, body.str());
+
+        // 发送请求
+        XRTCGlobal::Instance()->http_manager()->Post(request, [=](HttpReply reply) {
+            RTC_LOG(LS_INFO) << "signaling stoppush response, url: " << reply.get_url()
+                             << ", body: " << reply.get_body()
+                             << ", status: " << reply.get_status_code()
+                             << ", err_no: " << reply.get_errno()
+                             << ", err_msg: " << reply.get_err_msg()
+                             << ", response: " << reply.get_resp();
+
+            if (reply.get_status_code() != 200 || reply.get_errno() != 0) {
+                RTC_LOG(LS_WARNING) << "signaling stoppush response error";
+                return;
+            }
+
+            JsonValue value;
+            if (!value.FromJson(reply.get_resp())) {
+                RTC_LOG(LS_WARNING) << "invalid json response";
+                return;
+            }
+
+            JsonObject jobj = value.ToObject();
+            int err_no = jobj["errNo"].ToInt();
+            if (err_no != 0) {
+                RTC_LOG(LS_WARNING) << "response errNo is not 0, err_no: " << err_no;
+                return;
+            }
+
+        }, this);
+
 
     }
 

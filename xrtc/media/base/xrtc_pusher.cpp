@@ -68,5 +68,12 @@ namespace xrtc{
 
     void XRTCPusher::Destroy() {
 
+        // ui线程
+        RTC_LOG(LS_INFO) << "XRTCPusher::Destroy";
+        current_thread_->PostTask(webrtc::ToQueuedTask([=](){
+            // api线程
+            RTC_LOG(LS_INFO) << "XRTCPusher::Destroy PostTask";
+            delete this;
+        }));
     }
 }
