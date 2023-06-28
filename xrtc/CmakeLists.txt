@@ -37,6 +37,9 @@ target_link_libraries(xrtc
         libwebrtc
         wldap32
         Crypt32
+        msdmo
+        dmoguids
+        wmcodecdspuuid
         iphlpapi
         libssl
         libcrypto

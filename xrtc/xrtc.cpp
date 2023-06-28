@@ -62,4 +62,10 @@ namespace xrtc {
             return new XRTCPusher(video_source);
         });
     }
+
+    int16_t XRTCEngine::GetMicCount() {
+        return XRTCGlobal::Instance()->api_thread()->Invoke<int16_t>(RTC_FROM_HERE, [=]() {
+            return XRTCGlobal::Instance()->audio_device()->RecordingDevices();
+        });
+    }
 }

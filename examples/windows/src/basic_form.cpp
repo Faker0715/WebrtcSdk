@@ -38,6 +38,8 @@ void BasicForm::InitWindow() {
     xrtc::XRTCEngine::Init(this);
 
     InitComboCam();
+    int cnt = xrtc::XRTCEngine::GetMicCount();
+
     m_pRoot->AttachBubbledEvent(ui::kEventAll, nbase::Bind(&BasicForm::Notify, this, std::placeholders::_1));
 
 //    uint32_t cnt = xrtc::XRTCEngine::GetCameraCount();
