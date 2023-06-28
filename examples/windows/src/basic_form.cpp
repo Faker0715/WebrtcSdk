@@ -38,14 +38,8 @@ void BasicForm::InitWindow() {
     xrtc::XRTCEngine::Init(this);
 
     InitComboCam();
-    int cnt = xrtc::XRTCEngine::GetMicCount();
-    for(size_t i = 0;i < cnt;++i){
-        std::string mic_name;
-        std::string mic_guid;
-        xrtc::XRTCEngine::GetMicInfo(i, mic_name, mic_guid);
-    }
 
-
+    InitComboMic();
     m_pRoot->AttachBubbledEvent(ui::kEventAll, nbase::Bind(&BasicForm::Notify, this, std::placeholders::_1));
 
 
@@ -338,6 +332,44 @@ void BasicForm::OnNetworkInfo(int64_t rtt_ms, int32_t packets_lost,
 			label_network_tips_->SetText(network_info);
 		}
 	});
+}
+
+void BasicForm::InitComboMic() {
+    int total = xrtc::XRTCEngine::GetMicCount();
+    if (total <= 0) {
+        return;
+    }
+
+    combo_mic_ = dynamic_cast<ui::Combo*>(FindControl(L"mic_combo"));
+    if (!combo_mic_) {
+        return;
+    }
+
+    for (int i = 0; i < total; ++i) {
+        std::string device_name;
+        std::string device_id;
+        xrtc::XRTCEngine::GetMicInfo(i, device_name, device_id);
+        ui::ListContainerElement* element = new ui::ListContainerElement();
+        element->SetClass(L"listitem");
+        element->SetFixedHeight(30);
+        element->SetText(nbase::UTF8ToUTF16(device_name));
+        element->SetDataID(nbase::UTF8ToUTF16(device_id));
+        element->SetTextPadding({ 6, 0, 6, 0 });
+        combo_mic_->Add(element);
+    }
+
+    // 默认选中第一条数据
+    int count = combo_mic_->GetCount();
+    if (count > 0) {
+        combo_mic_->SelectItem(0);
+    }
+
+    combo_mic_->AttachSelect(nbase::Bind(&BasicForm::OnComboMicItemSelected, this,
+                                         std::placeholders::_1));
+}
+
+bool BasicForm::OnComboMicItemSelected(ui::EventArgs *msg) {
+    return true;
 }
 
 

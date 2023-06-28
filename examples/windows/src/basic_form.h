@@ -44,7 +44,10 @@ public:
 //
 private:
 	void InitComboCam();
+
+    void InitComboMic();
 	bool OnComboCamItemSelected(ui::EventArgs* msg);
+    bool OnComboMicItemSelected(ui::EventArgs* msg);
 	void OnBtnDeviceStartClick();
 	bool StartDevice();
 	bool StopDevice();
@@ -56,7 +59,8 @@ private:
 	bool StopPush();
 
 	void ShowToast(const std::wstring& toast, bool err);
-	void CallOnUIThread(const std::function<void(void)>& task);
+	void CallOnUIThread(const std::function<void(void)>& task);;
+
 //
 	// XRTCEngineObserver
 	void OnVideoSourceSuccess(xrtc::IVideoSource* video_source) override;
@@ -71,6 +75,7 @@ private:
 private:
 	MainThread* ui_thread_;
 	ui::Combo* combo_cam_ = nullptr;
+    ui::Combo* combo_mic_ = nullptr;
 	ui::Button* btn_device_start_ = nullptr;
 	ui::Button* btn_prev_ = nullptr;
 	ui::Button* btn_push_ = nullptr;
