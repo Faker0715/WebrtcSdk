@@ -96,7 +96,20 @@ namespace xrtc {
     }
 
     void X264EncoderFilter::Stop() {
+        RTC_LOG(LS_INFO) << "X264EncoderFilter Stop";
+        if(!running_){
+            return;
+        }
+        running_ = false;
 
+        cond_var_.notify_all();
+
+        if(encode_thread_ && encode_thread_->joinable()){
+            encode_thread_->join();
+            RTC_LOG(LS_INFO) << "X264EncoderFilter encode_thread join success";
+            delete encode_thread_;
+            encode_thread_ = nullptr;
+        }
     }
 
     void X264EncoderFilter::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {

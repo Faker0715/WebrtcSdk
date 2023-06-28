@@ -73,6 +73,10 @@ namespace xrtc{
     }
 
     void XRTCPushStream::Stop() {
+        // TODO: 如果先停止设备 再停止推流 此处crash
+        if(video_source_){
+            video_source_->RemoveConsumer(xrtc_video_source_.get());
+        }
 
     }
 

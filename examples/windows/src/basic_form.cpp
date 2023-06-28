@@ -256,8 +256,8 @@ bool BasicForm::StopPush() {
 		return true;
 	}
 
-//	xrtc_pusher_->StopPush();
-//	xrtc_pusher_->Destroy();
+	xrtc_pusher_->StopPush();
+	xrtc_pusher_->Destroy();
 	xrtc_pusher_ = nullptr;
 
 	return true;

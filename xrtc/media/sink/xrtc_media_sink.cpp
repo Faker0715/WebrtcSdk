@@ -91,6 +91,8 @@ namespace xrtc {
     }
 
     void XRTCMediaSink::Stop() {
+        RTC_LOG(LS_INFO) << "XRTCMediaSink Stop";
+
     }
 
     void XRTCMediaSink::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {

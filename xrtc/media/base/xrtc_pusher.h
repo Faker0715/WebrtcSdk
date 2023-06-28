@@ -13,6 +13,8 @@ namespace xrtc{
     class XRTC_API XRTCPusher{
     public:
         void StartPush(const std::string& url);
+        void StopPush();
+        void Destroy();
         std::string Url()   const { return url_; }
 
 

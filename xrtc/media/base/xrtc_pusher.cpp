@@ -52,4 +52,21 @@ namespace xrtc{
         }));
 
     }
+
+    void XRTCPusher::StopPush() {
+        // ui线程
+        RTC_LOG(LS_INFO) << "XRTCPusher::StopPush";
+        current_thread_->PostTask(webrtc::ToQueuedTask([=](){
+            // api线程
+            RTC_LOG(LS_INFO) << "XRTCPusher::StopPush PostTask";
+            if(media_chain_){
+                media_chain_->Stop();
+            }
+        }));
+
+    }
+
+    void XRTCPusher::Destroy() {
+
+    }
 }
