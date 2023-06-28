@@ -34,6 +34,9 @@ namespace xrtc{
             rtc::tokenize(url_, ':', &fields);
             if(fields.size() < 2){
                 RTC_LOG(LS_WARNING) << "invaild url: " << url;
+                if(XRTCGlobal::Instance()->engine_observer()){
+                    XRTCGlobal::Instance()->engine_observer()->OnPushFailed(this, XRTCError::kPushInvalidUrlErr);
+                }
                 return;
             }
             std::string protocol = fields[0];

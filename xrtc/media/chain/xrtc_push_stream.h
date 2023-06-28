@@ -19,6 +19,8 @@ namespace xrtc {
         void Start() override;
         void Stop() override;
         void Destroy() override;
+        void OnChainSuccess() override;
+        void OnChainFailed(MediaObject*,XRTCError err) override;
     private:
         XRTCPusher* pusher_;
         IVideoSource* video_source_;

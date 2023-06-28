@@ -63,8 +63,8 @@ private:
 	void OnVideoSourceFailed(xrtc::IVideoSource* video_source, xrtc::XRTCError err) override;
 	void OnPreviewSuccess(xrtc::XRTCPreview*) override;
 	void OnPreviewFailed(xrtc::XRTCPreview*, xrtc::XRTCError err) override;
-//	void OnPushSuccess(xrtc::XRTCPusher*) override;
-//	void OnPushFailed(xrtc::XRTCPusher*, xrtc::XRTCError err) override;
+	void OnPushSuccess(xrtc::XRTCPusher*) override;
+	void OnPushFailed(xrtc::XRTCPusher*, xrtc::XRTCError err) override;
 	void OnNetworkInfo(int64_t rtt_ms, int32_t packets_lost, uint8_t fraction_lost,
 		uint32_t jitter) override;
 //

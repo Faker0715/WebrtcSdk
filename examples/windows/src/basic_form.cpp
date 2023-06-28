@@ -311,15 +311,15 @@ void BasicForm::OnPreviewFailed(xrtc::XRTCPreview*, xrtc::XRTCError err) {
 		btn_prev_->SetText(L"本地预览");
 	});
 }
-//
-//void BasicForm::OnPushSuccess(xrtc::XRTCPusher*) {
-//	ShowToast(L"xrtc推流成功", false);
-//}
 
-//void BasicForm::OnPushFailed(xrtc::XRTCPusher*, xrtc::XRTCError err) {
-//	std::wstring err_msg = nbase::StringPrintf(L"xrtc推流失败，err: %d", err);
-//	ShowToast(err_msg, true);
-//}
+void BasicForm::OnPushSuccess(xrtc::XRTCPusher*) {
+	ShowToast(L"xrtc推流成功", false);
+}
+
+void BasicForm::OnPushFailed(xrtc::XRTCPusher*, xrtc::XRTCError err) {
+	std::wstring err_msg = nbase::StringPrintf(L"xrtc推流失败，err: %d", err);
+	ShowToast(err_msg, true);
+}
 
 void BasicForm::OnNetworkInfo(int64_t rtt_ms, int32_t packets_lost,
 	uint8_t fraction_lost, uint32_t jitter)

@@ -45,6 +45,7 @@ namespace xrtc {
         }
     private:
         void OnNetworkInfo(PeerConnection*,int64_t rtt_ms,int32_t packets_lost,uint8_t fraction_lost,uint32_t jitter);
+        void OnConnectionState(PeerConnection*,PeerConnectionState state);
 
 
     private:

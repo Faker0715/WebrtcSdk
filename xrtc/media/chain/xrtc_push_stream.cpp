@@ -6,6 +6,7 @@
 #include "rtc_base/logging.h"
 #include "xrtc/base/xrtc_json.h"
 #include "xrtc/media/base/xrtc_pusher.h"
+#include "xrtc/base/xrtc_global.h"
 
 namespace xrtc{
 
@@ -64,6 +65,11 @@ namespace xrtc{
             }
 
         }while(false);
+
+        if(err != XRTCError::kNoErr){
+            if(XRTCGlobal::Instance()->engine_observer())
+                XRTCGlobal::Instance()->engine_observer()->OnPushFailed(pusher_, err);
+        }
     }
 
     void XRTCPushStream::Stop() {
@@ -72,5 +78,15 @@ namespace xrtc{
 
     void XRTCPushStream::Destroy() {
 
+    }
+
+    void XRTCPushStream::OnChainSuccess() {
+        if(XRTCGlobal::Instance()->engine_observer())
+            XRTCGlobal::Instance()->engine_observer()->OnPushSuccess(pusher_);
+    }
+
+    void XRTCPushStream::OnChainFailed(MediaObject *, XRTCError err) {
+        if(XRTCGlobal::Instance()->engine_observer())
+            XRTCGlobal::Instance()->engine_observer()->OnPushFailed(pusher_, err);
     }
 }

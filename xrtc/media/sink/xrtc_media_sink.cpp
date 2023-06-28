@@ -23,6 +23,7 @@ namespace xrtc {
         video_fmt.sub_fmt.video_fmt.type = SubMediaType::kSubTypeH264;
         video_in_pin_->set_format(video_fmt);
         XRTCGlobal::Instance()->http_manager()->AddObject(this);
+        pc_->SignalConnectionState.connect(this, &XRTCMediaSink::OnConnectionState);
         pc_->SignalNetworkInfo.connect(this, &XRTCMediaSink::OnNetworkInfo);
     }
 
@@ -61,9 +62,9 @@ namespace xrtc {
             std::string type;
             std::string sdp;
             if (!ParseReply(reply, type, sdp)) {
-//                if (media_chain_) {
-//                    media_chain_->OnChainFailed(this, XRTCError::kPushRequestOfferErr);
-//                }
+                if (media_chain_) {
+                    media_chain_->OnChainFailed(this, XRTCError::kPushRequestOfferErr);
+                }
                 return;
             }
 
@@ -188,6 +189,19 @@ namespace xrtc {
             XRTCGlobal::Instance()->engine_observer()->OnNetworkInfo(
                     rtt_ms, packets_lost, fraction_lost, jitter);
         }));
+
+    }
+
+    void XRTCMediaSink::OnConnectionState(PeerConnection *, PeerConnectionState state) {
+        if(PeerConnectionState::kConnected == state){
+            if(media_chain_){
+                media_chain_->OnChainSuccess();
+            }
+        }else if(PeerConnectionState::kFailed == state){
+            if(media_chain_){
+                media_chain_->OnChainFailed(this, XRTCError::kPushIceConnectionErr);
+            }
+        }
 
     }
 
