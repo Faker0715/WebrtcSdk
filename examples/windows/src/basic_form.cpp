@@ -162,17 +162,23 @@ bool BasicForm::StartDevice() {
 }
 //
 bool BasicForm::StopDevice() {
-	if (!video_init_ || !cam_source_) {
-		return false;
-	}
+    // 停止摄像头
+    if (video_init_ && cam_source_) {
+        cam_source_->Stop();
+        cam_source_->Destroy();
+        cam_source_ = nullptr;
+        video_init_ = false;
+    }
 
-	cam_source_->Stop();
-	cam_source_->Destroy();
-	cam_source_ = nullptr;
+    // 停止麦克风
+    if (audio_init_ && mic_source_) {
+        mic_source_->Stop();
+        mic_source_->Destroy();
+        mic_source_ = nullptr;
+        audio_init_ = false;
+    }
 
-	video_init_ = false;
-
-	return true;
+    return true;
 }
 
 void BasicForm::OnBtnPreviewClick() {
