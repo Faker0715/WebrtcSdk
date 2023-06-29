@@ -19,12 +19,13 @@ namespace xrtc{
 
 
     private:
-        XRTCPusher(IVideoSource* video_source);
+        XRTCPusher(IAudioSource* audioSource,IVideoSource* video_source);
         ~XRTCPusher();
 
 
         friend class XRTCEngine;
     private:
+        IAudioSource* audio_source_;
         IVideoSource* video_source_;
         std::string url_;
         rtc::Thread* current_thread_;

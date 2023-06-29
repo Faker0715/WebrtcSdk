@@ -36,7 +36,7 @@ namespace xrtc {
         kPreviewNoVideoSourceErr,
         kChainConnectErr,
         kChainStartErr,
-        kPushNoVideoSourceErr,
+        kPushNoMediaSourceErr,
         kPushInvalidUrlErr,
         kPushRequestOfferErr,
         kPushIceConnectionErr,
@@ -106,7 +106,7 @@ namespace xrtc {
 
         static XRTCRender* CreateRender(void* canvas);
         static XRTCPreview* CreatePreview(IVideoSource* video_source, XRTCRender* render);
-        static XRTCPusher* CreatePusher(IVideoSource *video_source);
+        static XRTCPusher* CreatePusher(IAudioSource* audio_source,IVideoSource *video_source);
 
 
 

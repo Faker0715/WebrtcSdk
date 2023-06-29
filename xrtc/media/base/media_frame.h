@@ -19,10 +19,18 @@ namespace xrtc {
     enum class SubMediaType {
         kSubTypeCommon,
         kSubTypeI420,
-        kSubTypeH264
+        kSubTypeH264,
+        kSubTypePcm,
+        kSubTypeOpus
     };
     struct AudioFormat {
         SubMediaType type;
+        size_t nbytes_per_sample; // 16bit
+        size_t samples_per_channel; // 每个声道的采样数
+        size_t channels;
+        uint32_t samples_per_sec;
+        uint32_t total_delay_ms;
+        bool key_pressed;
     };
     struct VideoFormat {
         SubMediaType type;

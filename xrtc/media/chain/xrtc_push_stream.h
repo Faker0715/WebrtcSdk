@@ -9,12 +9,14 @@
 #include "xrtc/media/source/xrtc_video_source.h"
 #include "xrtc/media/filter/x264_encoder_filter.h"
 #include "xrtc/media/sink/xrtc_media_sink.h"
+#include "xrtc/media/source/xrtc_audio_source.h"
+#include "xrtc/media/filter/audio_processing_filter.h"
 
 namespace xrtc {
     class XRTCPusher;
     class XRTCPushStream : public MediaChain {
     public:
-        XRTCPushStream(XRTCPusher* pusher, IVideoSource* video_source);
+        XRTCPushStream(XRTCPusher* pusher, IAudioSource* audio_source, IVideoSource* video_source);
         ~XRTCPushStream() override;
         void Start() override;
         void Stop() override;
@@ -23,8 +25,11 @@ namespace xrtc {
         void OnChainFailed(MediaObject*,XRTCError err) override;
     private:
         XRTCPusher* pusher_;
+        IAudioSource* audio_source_;
         IVideoSource* video_source_;
+        std::unique_ptr<XRTCAudioSource> xrtc_audio_source_;
         std::unique_ptr<XRTCVideoSource> xrtc_video_source_;
+        std::unique_ptr<AudioProcessingFilter> audio_processing_filter_;
         std::unique_ptr<X264EncoderFilter> x264_encoder_filter_;
         std::unique_ptr<XRTCMediaSink> xrtc_media_sink_;
     };

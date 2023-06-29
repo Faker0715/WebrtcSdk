@@ -253,20 +253,20 @@ void BasicForm::OnBtnPushClick() {
 }
 
 bool BasicForm::StartPush() {
-	if (!cam_source_) {
-		ShowToast(L"推流失败：没有视频源", true);
-		return false;
-	}
+    if (!mic_source_ && !cam_source_) {
+        ShowToast(L"推流失败：没有音视频源", true);
+        return false;
+    }
 
-	std::string url = "xrtc://" + nbase::UTF16ToUTF8(edit_host_->GetText())
-		+ "/push?uid=" + nbase::UTF16ToUTF8(edit_uid_->GetText())
-		+ "&streamName=" + nbase::UTF16ToUTF8(edit_stream_name_->GetText());
+    std::string url = "xrtc://" + nbase::UTF16ToUTF8(edit_host_->GetText())
+                      + "/push?uid=" + nbase::UTF16ToUTF8(edit_uid_->GetText())
+                      + "&streamName=" + nbase::UTF16ToUTF8(edit_stream_name_->GetText());
 
-	xrtc_pusher_ = xrtc::XRTCEngine::CreatePusher(cam_source_);
+    xrtc_pusher_ = xrtc::XRTCEngine::CreatePusher(mic_source_, cam_source_);
+    xrtc_pusher_->StartPush(url);
 
-	xrtc_pusher_->StartPush(url);
+    return true;
 
-	return true;
 }
 
 bool BasicForm::StopPush() {
