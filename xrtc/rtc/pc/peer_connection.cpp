@@ -1,7 +1,6 @@
 //
 // Created by faker on 2023/6/18.
 //
-
 #include "xrtc/rtc/pc/peer_connection.h"
 
 #include <vector>
@@ -15,14 +14,14 @@
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
 #include "xrtc/base/xrtc_global.h"
 
-
-namespace xrtc{
+namespace xrtc {
 
     const size_t RTC_PACKET_CACHE_SIZE = 2048;
+
     PeerConnection::PeerConnection() :
             transport_controller_(std::make_unique<TransportController>()),
             clock_(webrtc::Clock::GetRealTimeClock()),
-            video_cache_(2048)
+            video_cache_(RTC_PACKET_CACHE_SIZE)
     {
         transport_controller_->SignalIceState.connect(this,
                                                       &PeerConnection::OnIceState);
@@ -31,16 +30,20 @@ namespace xrtc{
     }
 
     PeerConnection::~PeerConnection() {
-        XRTCGlobal::Instance()->network_thread()->Invoke<void>(
-                RTC_FROM_HERE,
-                [=](){
-                    if(video_send_stream_){
-                        delete video_send_stream_;
-                        video_send_stream_ = nullptr;
-                    }
-                });
+        XRTCGlobal::Instance()->network_thread()->Invoke<void>(RTC_FROM_HERE, [=]() {
+            if (audio_send_stream_) {
+                delete audio_send_stream_;
+                audio_send_stream_ = nullptr;
+            }
+
+            if (video_send_stream_) {
+                delete video_send_stream_;
+                video_send_stream_ = nullptr;
+            }
+        });
     }
-    // a=attr_name:attr_value
+
+// a=attr_name:attr_value
     static std::string GetAttribute(const std::string& line) {
         std::vector<std::string> fields;
         size_t size = rtc::tokenize(line, ':', &fields);
@@ -51,6 +54,7 @@ namespace xrtc{
 
         return fields[1];
     }
+
     static bool ParseCandidates(MediaContentDescription* media_content,
                                 const std::string& line)
     {
@@ -81,6 +85,7 @@ namespace xrtc{
         media_content->AddCandidate(c);
         return true;
     }
+
     static bool ParseTransportInfo(TransportDescription* td,
                                    const std::string& line)
     {
@@ -98,7 +103,8 @@ namespace xrtc{
 
         return true;
     }
-    int PeerConnection::SetRemoteSDP(const std::string &sdp) {
+
+    int PeerConnection::SetRemoteSDP(const std::string& sdp) {
         std::vector<std::string> fields;
         // SDP用\n, \r\n来换行的
         rtc::tokenize(sdp, '\n', &fields);
@@ -185,10 +191,16 @@ namespace xrtc{
         remote_desc_->AddTransportInfo(audio_td);
         remote_desc_->AddTransportInfo(video_td);
 
+        if (audio_content) {
+            auto audio_codecs = audio_content->codecs();
+            if (!audio_codecs.empty()) {
+                audio_pt_ = audio_codecs[0]->id;
+            }
+        }
+
         if (video_content) {
             auto video_codecs = video_content->codecs();
             if (!video_codecs.empty()) {
-                // 第一个编码器作为编码器
                 video_pt_ = video_codecs[0]->id;
             }
 
@@ -200,8 +212,8 @@ namespace xrtc{
         transport_controller_->SetRemoteSDP(remote_desc_.get());
 
         return 0;
-
     }
+
     static RtpDirection GetDirection(bool send, bool recv) {
         if (send && recv) {
             return RtpDirection::kSendRecv;
@@ -209,11 +221,15 @@ namespace xrtc{
             return RtpDirection::kSendOnly;
         } else if (!send && recv) {
             return RtpDirection::kRecvOnly;
-        }else {
+        }
+        else {
             return RtpDirection::kInactive;
         }
     }
-    std::string PeerConnection::CreateAnswer(const RTCOfferAnswerOptions &options, const std::string &stream_id) {
+
+    std::string PeerConnection::CreateAnswer(const RTCOfferAnswerOptions& options,
+                                             const std::string& stream_id)
+    {
         local_desc_ = std::make_unique<SessionDescription>(SdpType::kAnswer);
 
         ice::IceParameters ice_param = ice::IceCredentials::CreateRandomIceCredentials();
@@ -235,6 +251,8 @@ namespace xrtc{
                 local_audio_ssrc_ = rtc::CreateRandomId();
                 audio_stream.ssrcs.push_back(local_audio_ssrc_);
                 audio_content->AddStream(audio_stream);
+
+                CreateAudioSendStream(audio_content.get());
             }
         }
 
@@ -257,7 +275,7 @@ namespace xrtc{
                 video_stream.ssrcs.push_back(local_video_ssrc_);
                 video_stream.ssrcs.push_back(local_video_rtx_ssrc_);
 
-                // 分组 videossrc 和 rtx重传 要分组
+                // 分组
                 SsrcGroup sg;
                 sg.semantics = "FID";
                 sg.ssrcs.push_back(local_video_ssrc_);
@@ -290,10 +308,40 @@ namespace xrtc{
             }
         }
 
-        // 可以进行协商
         transport_controller_->SetLocalSDP(local_desc_.get());
 
         return local_desc_->ToString();
+    }
+
+    bool PeerConnection::SendEncodedAudio(std::shared_ptr<MediaFrame> frame) {
+        if (pc_state_ != PeerConnectionState::kConnected) {
+            return true;
+        }
+
+        // 音频数据打包成rtp的格式
+        auto packet = std::make_shared<RtpPacketToSend>();
+        packet->SetPayloadType(audio_pt_);
+        packet->SetSequenceNumber(audio_seq_++);
+        packet->SetSsrc(local_audio_ssrc_);
+        packet->SetTimestamp(frame->ts);
+
+        // 设置负载数据
+        size_t payload_size = frame->data_len[0];
+        uint8_t* payload = packet->AllocatePayload(payload_size);
+        memcpy(payload, frame->data[0], payload_size);
+
+        if (audio_send_stream_) {
+            audio_send_stream_->OnSendingRtpFrame(frame->ts,
+                                                  frame->capture_time_ms);
+            audio_send_stream_->UpdateRtpStats(packet, false);
+        }
+
+        // 发送数据包
+        // TODO, transport_name此处写死，后面可以换成变量
+        transport_controller_->SendPacket("audio", (const char*)packet->data(),
+                                          packet->size());
+
+        return true;
     }
 
     bool PeerConnection::SendEncodedImage(std::shared_ptr<MediaFrame> frame) {
@@ -340,7 +388,6 @@ namespace xrtc{
 
         return true;
     }
-
 
     void PeerConnection::OnLocalRtcpPacket(webrtc::MediaType media_type,
                                            const uint8_t* data,
@@ -418,8 +465,31 @@ namespace xrtc{
                                               const char* data, size_t len, int64_t)
     {
         if (video_send_stream_) {
-            // 音频和视频都传递到下层了
             video_send_stream_->DeliverRtcp((const uint8_t*)data, len);
+        }
+    }
+
+    void PeerConnection::CreateAudioSendStream(AudioContentDescription* audio_content) {
+        if (!audio_content) {
+            return;
+        }
+
+        // 暂时只考虑推送一路音频
+        for (auto stream : audio_content->streams()) {
+            if (!stream.ssrcs.empty()) {
+                AudioSendStreamConfig config;
+                config.rtp.ssrc = stream.ssrcs[0];
+                config.rtp.payload_type = video_pt_;
+                config.rtp_rtcp_module_observer = this;
+
+                // 用网络线程创建
+                XRTCGlobal::Instance()->network_thread()->Invoke<void>(RTC_FROM_HERE,
+                                                                       [=]() {
+                                                                           audio_send_stream_ = new AudioSendStream(clock_, config);
+                                                                       });
+            }
+
+            break;
         }
     }
 
@@ -471,5 +541,4 @@ namespace xrtc{
         return nullptr;
     }
 
-
-}
+} // namespace xrtc

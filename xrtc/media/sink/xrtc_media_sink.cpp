@@ -16,15 +16,24 @@ namespace xrtc {
 
     XRTCMediaSink::XRTCMediaSink(MediaChain* media_chain) :
             media_chain_(media_chain),
+            audio_in_pin_(std::make_unique<InPin>(this)),
             video_in_pin_(std::make_unique<InPin>(this)),
             pc_(std::make_unique<PeerConnection>()){
+        MediaFormat audio_fmt;
+        audio_fmt.media_type = MainMediaType::kMainTypeAudio;
+        audio_fmt.sub_fmt.audio_fmt.type = SubMediaType::kSubTypeOpus;
+        audio_in_pin_->set_format(audio_fmt);
+
         MediaFormat video_fmt;
         video_fmt.media_type = MainMediaType::kMainTypeVideo;
         video_fmt.sub_fmt.video_fmt.type = SubMediaType::kSubTypeH264;
         video_in_pin_->set_format(video_fmt);
+
         XRTCGlobal::Instance()->http_manager()->AddObject(this);
+
         pc_->SignalConnectionState.connect(this, &XRTCMediaSink::OnConnectionState);
         pc_->SignalNetworkInfo.connect(this, &XRTCMediaSink::OnNetworkInfo);
+
     }
 
     XRTCMediaSink::~XRTCMediaSink() {
@@ -101,6 +110,9 @@ namespace xrtc {
         XRTCGlobal::Instance()->network_thread()->PostTask(webrtc::ToQueuedTask([=]() {
             if (MainMediaType::kMainTypeVideo == frame->fmt.media_type) {
                 PacketAndSendVideo(frame);
+            }
+            else if (MainMediaType::kMainTypeAudio == frame->fmt.media_type) {
+                PacketAndSendAudio(frame);
             }
         }));
 
@@ -245,6 +257,10 @@ namespace xrtc {
         }, this);
 
 
+    }
+
+    void XRTCMediaSink::PacketAndSendAudio(std::shared_ptr<MediaFrame> frame) {
+        pc_->SendEncodedAudio(frame);
     }
 
 } // namespace xrtc

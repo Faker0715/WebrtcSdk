@@ -13,10 +13,9 @@
 
 #include "xrtc/media/base/media_frame.h"
 #include "xrtc/rtc/pc/session_description.h"
-#include "transport_controller.h"
 #include "xrtc/rtc/pc/transport_controller.h"
-#include "peer_connection_def.h"
 #include "xrtc/rtc/pc/peer_connection_def.h"
+#include "xrtc/rtc/audio/audio_send_stream.h"
 #include "xrtc/rtc/video/video_send_stream.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
 
@@ -34,7 +33,6 @@ namespace xrtc {
     class PeerConnection : public sigslot::has_slots<>,
                            public RtpRtcpModuleObserver
     {
-
     public:
         PeerConnection();
         ~PeerConnection();
@@ -42,6 +40,7 @@ namespace xrtc {
         int SetRemoteSDP(const std::string& sdp);
         std::string CreateAnswer(const RTCOfferAnswerOptions& options,
                                  const std::string& stream_id);
+        bool SendEncodedAudio(std::shared_ptr<MediaFrame> frame);
         bool SendEncodedImage(std::shared_ptr<MediaFrame> frame);
 
         // RtpRtcpModuleObserver
@@ -60,9 +59,11 @@ namespace xrtc {
         void OnIceState(TransportController*, ice::IceTransportState ice_state);
         void OnRtcpPacketReceived(TransportController*, const char* data,
                                   size_t len, int64_t);
+        void CreateAudioSendStream(AudioContentDescription* audio_content);
         void CreateVideoSendStream(VideoContentDescription* video_content);
         void AddVideoCache(std::shared_ptr<RtpPacketToSend> packet);
         std::shared_ptr<RtpPacketToSend> FindVideoCache(uint16_t seq);
+
     private:
         std::unique_ptr<SessionDescription> remote_desc_;
         std::unique_ptr<SessionDescription> local_desc_;
@@ -71,18 +72,22 @@ namespace xrtc {
         uint32_t local_audio_ssrc_ = 0;
         uint32_t local_video_ssrc_ = 0;
         uint32_t local_video_rtx_ssrc_ = 0;
+        uint32_t audio_pt_ = 0;
         uint8_t video_pt_ = 0;
         uint8_t video_rtx_pt_ = 0;
 
-        // 规范是随机 这里先不随机
+        // 按照规范该值的初始值需要随机
+        uint16_t audio_seq_ = 1000;
         uint16_t video_seq_ = 1000;
 
         PeerConnectionState pc_state_ = PeerConnectionState::kNew;
         webrtc::Clock* clock_;
+        AudioSendStream* audio_send_stream_ = nullptr;
         VideoSendStream* video_send_stream_ = nullptr;
         std::vector<std::shared_ptr<RtpPacketToSend>> video_cache_;
     };
 
-}
+} // namespace xrtc
+
 
 #endif //XRTCSDK_PEER_CONNECTION_H

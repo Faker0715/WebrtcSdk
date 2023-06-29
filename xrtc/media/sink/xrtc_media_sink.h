@@ -37,7 +37,7 @@ namespace xrtc {
         void OnNewMediaFrame(std::shared_ptr<MediaFrame>) override;
 
         std::vector<InPin *> GetAllInPins() override {
-            return std::vector<InPin *>({video_in_pin_.get()});
+            return std::vector<InPin *>({audio_in_pin_.get(),video_in_pin_.get()});
         }
 
         std::vector<OutPin *> GetAllOutPins() override {
@@ -55,10 +55,12 @@ namespace xrtc {
 
         void SendStop();
         void PacketAndSendVideo(std::shared_ptr<MediaFrame> frame);
+        void PacketAndSendAudio(std::shared_ptr<MediaFrame> frame);
 
 
     private:
         MediaChain *media_chain_;
+        std::unique_ptr<InPin> audio_in_pin_;
         std::unique_ptr<InPin> video_in_pin_;
         std::string url_;
         std::string protocol_;

@@ -124,6 +124,9 @@ namespace xrtc{
 
     void XRTCPushStream::Stop() {
         // TODO: 如果先停止设备 再停止推流 此处crash
+        if(audio_source_){
+            audio_source_->RemoveConsumer(xrtc_audio_source_.get());
+        }
         if(video_source_){
             video_source_->RemoveConsumer(xrtc_video_source_.get());
         }
