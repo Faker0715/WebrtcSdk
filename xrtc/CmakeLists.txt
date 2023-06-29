@@ -34,6 +34,7 @@ target_link_libraries(xrtc
         jsoncpp_static
         d3d9
         libx264
+        opus
         libwebrtc
         wldap32
         Crypt32
@@ -44,7 +45,8 @@ target_link_libraries(xrtc
         libssl
         libcrypto
         libcurl
-        libice)
+        libice
+        )
 
 
 

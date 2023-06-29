@@ -6,7 +6,7 @@
 
 #include <rtc_base/logging.h>
 #include <rtc_base/thread.h>
-//#include <opus/opus.h>
+#include <opus/opus.h>
 
 #include "xrtc/media/base/in_pin.h"
 #include "xrtc/media/base/out_pin.h"
@@ -21,8 +21,8 @@ namespace xrtc {
 
     OpusEncoderFilter::OpusEncoderFilter() :
             in_pin_(std::make_unique<InPin>(this)),
-            out_pin_(std::make_unique<OutPin>(this))
-//            opus_app_(OPUS_APPLICATION_VOIP)
+            out_pin_(std::make_unique<OutPin>(this)),
+            opus_app_(OPUS_APPLICATION_VOIP)
     {
         MediaFormat fmt_in;
         fmt_in.media_type = MainMediaType::kMainTypeAudio;
@@ -93,7 +93,7 @@ namespace xrtc {
                     if (encoder) {
                         sample_rate_hz_ = frame->fmt.sub_fmt.audio_fmt.samples_per_sec;
                         channels_ = frame->fmt.sub_fmt.audio_fmt.channels;
-//                        opus_encoder_destroy(encoder);
+                        opus_encoder_destroy(encoder);
                         encoder = CreateEncoder();
                     }
                 }
@@ -105,31 +105,31 @@ namespace xrtc {
                 }
 
                 // 开始编码数据
-//                int ret = opus_encode(encoder, (const opus_int16*)frame->data[0],
-//                                      frame->fmt.sub_fmt.audio_fmt.samples_per_channel,
-//                                      encoded_buffer, sizeof(encoded_buffer));
-//                if (ret < 0) {
-//                    RTC_LOG(LS_WARNING) << "opus encode failed: " << ret;
-//                    running_ = false;
-//                    opus_encoder_destroy(encoder);
-//                    return;
-//                }
+                int ret = opus_encode(encoder, (const opus_int16*)frame->data[0],
+                                      frame->fmt.sub_fmt.audio_fmt.samples_per_channel,
+                                      encoded_buffer, sizeof(encoded_buffer));
+                if (ret < 0) {
+                    RTC_LOG(LS_WARNING) << "opus encode failed: " << ret;
+                    running_ = false;
+                    opus_encoder_destroy(encoder);
+                    return;
+                }
 
                 // 创建新的media frame
-//                auto output_frame = std::make_shared<MediaFrame>(ret);
-//                output_frame->fmt.media_type = MainMediaType::kMainTypeAudio;
-//                output_frame->fmt.sub_fmt = frame->fmt.sub_fmt;
-//                output_frame->fmt.sub_fmt.audio_fmt.type = SubMediaType::kSubTypeOpus;
-//                output_frame->data_len[0] = ret;
-//                memcpy(output_frame->data[0], encoded_buffer, ret);
-//                output_frame->ts = frame->ts;
+                auto output_frame = std::make_shared<MediaFrame>(ret);
+                output_frame->fmt.media_type = MainMediaType::kMainTypeAudio;
+                output_frame->fmt.sub_fmt = frame->fmt.sub_fmt;
+                output_frame->fmt.sub_fmt.audio_fmt.type = SubMediaType::kSubTypeOpus;
+                output_frame->data_len[0] = ret;
+                memcpy(output_frame->data[0], encoded_buffer, ret);
+                output_frame->ts = frame->ts;
 
-//                if (out_pin_) {
-//                    out_pin_->PushMediaFrame(output_frame);
-//                }
+                if (out_pin_) {
+                    out_pin_->PushMediaFrame(output_frame);
+                }
             }
 
-//            opus_encoder_destroy(encoder);
+            opus_encoder_destroy(encoder);
         });
 
         return true;
@@ -163,57 +163,57 @@ namespace xrtc {
     }
 
     OpusEncoder* OpusEncoderFilter::CreateEncoder() {
-//        int err = 0;
-//        OpusEncoder* encoder = opus_encoder_create(sample_rate_hz_, channels_,
-//                                                   opus_app_, &err);
-//        if (err != OPUS_OK || !encoder) {
-//            RTC_LOG(LS_WARNING) << "opus_encoder_create failed, err: " << err;
-//            return nullptr;
-//        }
-//
-//        // 设置核心的编码参数
-//        do {
-//            // 设置编码码率
-//            if (opus_encoder_ctl(encoder, OPUS_SET_BITRATE(bitrate_)) != OPUS_OK) {
-//                RTC_LOG(LS_WARNING) << "OPUS_SET_BITRATE failed";
-//                break;
-//            }
-//
-//            // 设置带宽(auto)
-//            if (opus_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_AUTO)) != OPUS_OK) {
-//                RTC_LOG(LS_WARNING) << "OPUS_SET_BANDWIDTH failed";
-//                break;
-//            }
-//
-//            // 设置最大带宽
-//            if (opus_encoder_ctl(encoder, OPUS_SET_MAX_BANDWIDTH(OPUS_BANDWIDTH_FULLBAND)) != OPUS_OK) {
-//                RTC_LOG(LS_WARNING) << "OPUS_SET_MAX_BANDWIDTH failed";
-//                break;
-//            }
-//
-//            // 设置复杂度
-//            if (opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(kDefaultComplexity)) != OPUS_OK) {
-//                RTC_LOG(LS_WARNING) << "OPUS_SET_MAX_BANDWIDTH failed";
-//                break;
-//            }
-//
-//            // 启用FEC
-//            if (opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(1)) != OPUS_OK) {
-//                RTC_LOG(LS_WARNING) << "OPUS_SET_INBAND_FEC failed";
-//                break;
-//            }
-//
-//            // 设置丢包率
-//            if (opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(5)) != OPUS_OK) {
-//                RTC_LOG(LS_WARNING) << "OPUS_SET_PACKET_LOSS_PERC failed";
-//                break;
-//            }
-//
-//            return encoder;
-//
-//        } while (false);
-//
-//        opus_encoder_destroy(encoder);
+        int err = 0;
+        OpusEncoder* encoder = opus_encoder_create(sample_rate_hz_, channels_,
+                                                   opus_app_, &err);
+        if (err != OPUS_OK || !encoder) {
+            RTC_LOG(LS_WARNING) << "opus_encoder_create failed, err: " << err;
+            return nullptr;
+        }
+
+        // 设置核心的编码参数
+        do {
+            // 设置编码码率
+            if (opus_encoder_ctl(encoder, OPUS_SET_BITRATE(bitrate_)) != OPUS_OK) {
+                RTC_LOG(LS_WARNING) << "OPUS_SET_BITRATE failed";
+                break;
+            }
+
+            // 设置带宽(auto)
+            if (opus_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_AUTO)) != OPUS_OK) {
+                RTC_LOG(LS_WARNING) << "OPUS_SET_BANDWIDTH failed";
+                break;
+            }
+
+            // 设置最大带宽
+            if (opus_encoder_ctl(encoder, OPUS_SET_MAX_BANDWIDTH(OPUS_BANDWIDTH_FULLBAND)) != OPUS_OK) {
+                RTC_LOG(LS_WARNING) << "OPUS_SET_MAX_BANDWIDTH failed";
+                break;
+            }
+
+            // 设置复杂度
+            if (opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(kDefaultComplexity)) != OPUS_OK) {
+                RTC_LOG(LS_WARNING) << "OPUS_SET_MAX_BANDWIDTH failed";
+                break;
+            }
+
+            // 启用FEC
+            if (opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(1)) != OPUS_OK) {
+                RTC_LOG(LS_WARNING) << "OPUS_SET_INBAND_FEC failed";
+                break;
+            }
+
+            // 设置丢包率
+            if (opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(5)) != OPUS_OK) {
+                RTC_LOG(LS_WARNING) << "OPUS_SET_PACKET_LOSS_PERC failed";
+                break;
+            }
+
+            return encoder;
+
+        } while (false);
+
+        opus_encoder_destroy(encoder);
         return nullptr;
     }
 
