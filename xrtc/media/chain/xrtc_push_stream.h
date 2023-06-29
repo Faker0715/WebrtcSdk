@@ -11,6 +11,7 @@
 #include "xrtc/media/sink/xrtc_media_sink.h"
 #include "xrtc/media/source/xrtc_audio_source.h"
 #include "xrtc/media/filter/audio_processing_filter.h"
+#include "xrtc/media/filter/opus_encoder_filter.h"
 
 namespace xrtc {
     class XRTCPusher;
@@ -30,6 +31,7 @@ namespace xrtc {
         std::unique_ptr<XRTCAudioSource> xrtc_audio_source_;
         std::unique_ptr<XRTCVideoSource> xrtc_video_source_;
         std::unique_ptr<AudioProcessingFilter> audio_processing_filter_;
+        std::unique_ptr<OpusEncoderFilter> opus_encoder_filter_;
         std::unique_ptr<X264EncoderFilter> x264_encoder_filter_;
         std::unique_ptr<XRTCMediaSink> xrtc_media_sink_;
     };

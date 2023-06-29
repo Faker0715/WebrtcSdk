@@ -16,6 +16,8 @@ namespace xrtc{
             xrtc_audio_source_(std::make_unique<XRTCAudioSource>()),
             xrtc_video_source_(std::make_unique<XRTCVideoSource>()),
             audio_processing_filter_(std::make_unique<AudioProcessingFilter>()),
+            x264_encoder_filter_(std::make_unique<X264EncoderFilter>()),
+            opus_encoder_filter_(std::make_unique<OpusEncoderFilter>()),
             xrtc_media_sink_(std::make_unique<XRTCMediaSink>(this))
     {
     }
@@ -40,7 +42,7 @@ namespace xrtc{
             if (audio_source_) {
                 audio_source_->AddConsumer(xrtc_audio_source_.get());
                 AddMediaObject(audio_processing_filter_.get());
-//                AddMediaObject(opus_encoder_filter_.get());
+                AddMediaObject(opus_encoder_filter_.get());
             }
 
             if (video_source_) {
@@ -58,17 +60,17 @@ namespace xrtc{
                     break;
                 }
 
-//                if (!ConnectMediaObject(audio_processing_filter_.get(), opus_encoder_filter_.get())) {
-//                    err = XRTCError::kChainConnectErr;
-//                    RTC_LOG(LS_WARNING) << "audio_processing_filter_ connect to opus_encoder_filter_ failed";
-//                    break;
-//                }
-//
-//                if (!ConnectMediaObject(opus_encoder_filter_.get(), xrtc_media_sink_.get())) {
-//                    err = XRTCError::kChainConnectErr;
-//                    RTC_LOG(LS_WARNING) << "opus_encoder_filter connect to xrtc_media_sink failed";
-//                    break;
-//                }
+                if (!ConnectMediaObject(audio_processing_filter_.get(), opus_encoder_filter_.get())) {
+                    err = XRTCError::kChainConnectErr;
+                    RTC_LOG(LS_WARNING) << "audio_processing_filter_ connect to opus_encoder_filter_ failed";
+                    break;
+                }
+
+                if (!ConnectMediaObject(opus_encoder_filter_.get(), xrtc_media_sink_.get())) {
+                    err = XRTCError::kChainConnectErr;
+                    RTC_LOG(LS_WARNING) << "opus_encoder_filter connect to xrtc_media_sink failed";
+                    break;
+                }
             }
 
             if (video_source_) {

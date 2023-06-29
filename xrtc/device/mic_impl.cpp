@@ -175,6 +175,7 @@ namespace xrtc {
         frame->fmt.sub_fmt.audio_fmt.samples_per_channel = nSamples;
         frame->fmt.sub_fmt.audio_fmt.channels = nChannels;
         frame->fmt.sub_fmt.audio_fmt.samples_per_sec = samplesPerSec;
+        // 时间对齐
         frame->fmt.sub_fmt.audio_fmt.total_delay_ms = totalDelayMS;
         frame->fmt.sub_fmt.audio_fmt.key_pressed = keyPressed;
         frame->data_len[0] = len;
