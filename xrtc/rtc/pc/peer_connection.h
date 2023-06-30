@@ -10,11 +10,13 @@
 #include <memory>
 
 #include <system_wrappers/include/clock.h>
+#include <api/task_queue/task_queue_factory.h>
 
 #include "xrtc/media/base/media_frame.h"
 #include "xrtc/rtc/pc/session_description.h"
 #include "xrtc/rtc/pc/transport_controller.h"
 #include "xrtc/rtc/pc/peer_connection_def.h"
+#include "xrtc/rtc/pc/rtp_transport_controller_send.h"
 #include "xrtc/rtc/audio/audio_send_stream.h"
 #include "xrtc/rtc/video/video_send_stream.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
@@ -32,6 +34,7 @@ namespace xrtc {
 
     class PeerConnection : public sigslot::has_slots<>,
                            public RtpRtcpModuleObserver
+//                           public PacingController::PacketSender
     {
     public:
         PeerConnection();
@@ -50,6 +53,10 @@ namespace xrtc {
                            uint8_t fraction_lost, uint32_t jitter) override;
         void OnNackReceived(webrtc::MediaType media_type,
                             const std::vector<uint16_t>& nack_list) override;
+
+        // PacingController::PacketSender
+//        void SendPacket(std::unique_ptr<RtpPacketToSend> packet) override;
+        void SendPacket(std::unique_ptr<RtpPacketToSend> packet) ;
 
         sigslot::signal2<PeerConnection*, PeerConnectionState> SignalConnectionState;
         sigslot::signal5<PeerConnection*, int64_t, int32_t, uint8_t, uint32_t>
@@ -85,9 +92,12 @@ namespace xrtc {
         AudioSendStream* audio_send_stream_ = nullptr;
         VideoSendStream* video_send_stream_ = nullptr;
         std::vector<std::shared_ptr<RtpPacketToSend>> video_cache_;
+        std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
+        std::unique_ptr<RtpTransportControllerSend> transport_send_;
     };
 
 } // namespace xrtc
+
 
 
 #endif //XRTCSDK_PEER_CONNECTION_H

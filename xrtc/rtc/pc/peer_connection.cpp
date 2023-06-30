@@ -8,6 +8,7 @@
 #include <rtc_base/logging.h>
 #include <rtc_base/string_encode.h>
 #include <rtc_base/helpers.h>
+#include <api/task_queue/default_task_queue_factory.h>
 #include <ice/candidate.h>
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
@@ -21,7 +22,9 @@ namespace xrtc {
     PeerConnection::PeerConnection() :
             transport_controller_(std::make_unique<TransportController>()),
             clock_(webrtc::Clock::GetRealTimeClock()),
-            video_cache_(RTC_PACKET_CACHE_SIZE)
+            video_cache_(RTC_PACKET_CACHE_SIZE),
+            task_queue_factory_(webrtc::CreateDefaultTaskQueueFactory()),
+            transport_send_(std::make_unique<RtpTransportControllerSend>(clock_))
     {
         transport_controller_->SignalIceState.connect(this,
                                                       &PeerConnection::OnIceState);
@@ -374,6 +377,7 @@ namespace xrtc {
             }
 
             single_packet->SetSequenceNumber(video_seq_++);
+//            single_packet->set_packet_type(RtpPacketMediaType::kVideo);
 
             if (video_send_stream_) {
                 video_send_stream_->UpdateRtpStats(single_packet, false, false);
@@ -382,8 +386,11 @@ namespace xrtc {
             AddVideoCache(single_packet);
             // 发送数据包
             // TODO, transport_name此处写死，后面可以换成变量
-            transport_controller_->SendPacket("audio", (const char*)single_packet->data(),
-                                              single_packet->size());
+            /*transport_controller_->SendPacket("audio", (const char*)single_packet->data(),
+                single_packet->size());*/
+            std::unique_ptr<RtpPacketToSend> packet =
+                    std::make_unique<RtpPacketToSend>(*single_packet);
+            transport_send_->EnqueuePacket(std::move(packet));
         }
 
         return true;
@@ -423,6 +430,15 @@ namespace xrtc {
                 }
             }
         }
+    }
+
+    void PeerConnection::SendPacket(std::unique_ptr<RtpPacketToSend> packet) {
+        if (pc_state_ != PeerConnectionState::kConnected) {
+            return;
+        }
+
+        transport_controller_->SendPacket("audio", (const char*)packet->data(),
+                                          packet->size());
     }
 
     void PeerConnection::OnIceState(TransportController*,
