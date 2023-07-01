@@ -9,7 +9,7 @@
 
 namespace xrtc {
 
-    const size_t kDefaultCapacity = 1500; // mtu
+    const size_t kDefaultCapacity = 1500;
     const size_t kFixedHeaderSize = 12;
     const uint8_t kRtpVersion = 2;
 
@@ -106,4 +106,3 @@ namespace xrtc {
     }
 
 } // namespace xrtc
-

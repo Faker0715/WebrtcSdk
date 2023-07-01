@@ -40,7 +40,7 @@ namespace xrtc {
             clock_(clock),
             packet_sender_(packet_sender),
             last_process_time_(clock_->CurrentTime()),
-//            packet_queue_(last_process_time_),
+            packet_queue_(last_process_time_),
             min_packet_limit_(kDefaultMinPacketLimit),
 //            media_budget_(0),
             pacing_bitrate_(webrtc::DataRate::Zero()),
@@ -60,38 +60,38 @@ namespace xrtc {
     void PacingController::ProcessPackets() {
         //RTC_LOG(LS_INFO) << "=========packet queue size: " << packet_queue_.SizePackets();
 
-//        webrtc::Timestamp now = clock_->CurrentTime();
-//        webrtc::Timestamp target_send_time = now;
-//        // 计算流逝的时间（当前时间距离上一次发送过去了多长时间）
-//        webrtc::TimeDelta elapsed_time = UpdateTimeAndGetElapsed(now);
-//        if (elapsed_time > webrtc::TimeDelta::Zero()) {
-//            webrtc::DataRate target_rate = pacing_bitrate_;
-//            packet_queue_.UpdateQueueTime(now);
-//            // 队列当中正在排队的总字节数
-//            webrtc::DataSize queue_data_size = packet_queue_.Size();
-//            if (queue_data_size > webrtc::DataSize::Zero()) {
-//                if (drain_large_queue_) {
-//                    // 当前队列的平均排队时间
-//                    webrtc::TimeDelta avg_queue_time = packet_queue_.AverageQueueTime();
-//                    webrtc::TimeDelta avg_queue_left = std::max(
-//                            webrtc::TimeDelta::Millis(1),
-//                            queue_time_limit_ - avg_queue_time);
-//                    webrtc::DataRate min_rate_need = queue_data_size / avg_queue_left;
-//                    if (min_rate_need > target_rate) {
-//                        target_rate = min_rate_need;
-//                        RTC_LOG(LS_INFO) << "large queue, pacing_rate: " << pacing_bitrate_.kbps()
-//                                         << ", min_rate_need: " << min_rate_need.kbps()
-//                                         << ", queue_data_size: " << queue_data_size.bytes()
-//                                         << ", avg_queue_time: " << avg_queue_time.ms()
-//                                         << ", avg_queue_left: " << avg_queue_left.ms();
-//                    }
-//                }
-//            }
-//
-//            // 更新预算
+        webrtc::Timestamp now = clock_->CurrentTime();
+        webrtc::Timestamp target_send_time = now;
+        // 计算流逝的时间（当前时间距离上一次发送过去了多长时间）
+        webrtc::TimeDelta elapsed_time = UpdateTimeAndGetElapsed(now);
+        if (elapsed_time > webrtc::TimeDelta::Zero()) {
+            webrtc::DataRate target_rate = pacing_bitrate_;
+            packet_queue_.UpdateQueueTime(now);
+            // 队列当中正在排队的总字节数
+            webrtc::DataSize queue_data_size = packet_queue_.Size();
+            if (queue_data_size > webrtc::DataSize::Zero()) {
+                if (drain_large_queue_) {
+                    // 当前队列的平均排队时间
+                    webrtc::TimeDelta avg_queue_time = packet_queue_.AverageQueueTime();
+                    webrtc::TimeDelta avg_queue_left = std::max(
+                            webrtc::TimeDelta::Millis(1),
+                            queue_time_limit_ - avg_queue_time);
+                    webrtc::DataRate min_rate_need = queue_data_size / avg_queue_left;
+                    if (min_rate_need > target_rate) {
+                        target_rate = min_rate_need;
+                        RTC_LOG(LS_INFO) << "large queue, pacing_rate: " << pacing_bitrate_.kbps()
+                                         << ", min_rate_need: " << min_rate_need.kbps()
+                                         << ", queue_data_size: " << queue_data_size.bytes()
+                                         << ", avg_queue_time: " << avg_queue_time.ms()
+                                         << ", avg_queue_left: " << avg_queue_left.ms();
+                    }
+                }
+            }
+
+            // 更新预算
 //            media_budget_.set_target_bitrate_kbps(target_rate.kbps());
-//            UpdateBudgetWithElapsedTime(elapsed_time);
-//        }
+            UpdateBudgetWithElapsedTime(elapsed_time);
+        }
 
         while (true) {
             // 从队列当中获取rtp数据包进行发送
@@ -127,7 +127,7 @@ namespace xrtc {
     void PacingController::EnqueuePacketInternal(int priority,
                                                  std::unique_ptr<RtpPacketToSend> packet) {
         webrtc::Timestamp now = clock_->CurrentTime();
-//        packet_queue_.Push(priority, now, packet_counter_++, std::move(packet));
+        packet_queue_.Push(priority, now, packet_counter_++, std::move(packet));
     }
 
     webrtc::TimeDelta PacingController::UpdateTimeAndGetElapsed(webrtc::Timestamp now) {

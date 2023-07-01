@@ -16,6 +16,7 @@ namespace xrtc {
         RtpPacket(size_t capacity);
 
         uint16_t sequence_number() const { return sequence_number_; }
+        uint32_t ssrc() const { return ssrc_; }
         bool marker() const { return marker_; }
         uint32_t timestamp() const { return timestamp_; }
         rtc::ArrayView<const uint8_t> payload() const {
@@ -52,8 +53,8 @@ namespace xrtc {
         }
 
     private:
-        bool marker_; // 最后的包
-        uint8_t payload_type_; // 负载类型
+        bool marker_;
+        uint8_t payload_type_;
         uint16_t sequence_number_;
         uint32_t timestamp_;
         uint32_t ssrc_;
@@ -64,6 +65,7 @@ namespace xrtc {
     };
 
 } // namespace xrtc
+
 
 
 
