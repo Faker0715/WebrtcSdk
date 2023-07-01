@@ -102,7 +102,7 @@ namespace xrtc {
         webrtc::DataSize max_size_;
         webrtc::DataSize size_ = webrtc::DataSize::Zero();
         std::unordered_map<uint32_t, Stream> streams_;
-        // 按照StreamPrioKey从小到到进行排序
+        // 按照StreamPrioKey从小到大进行排序
         std::multimap<StreamPrioKey, uint32_t> stream_priorities_;
         webrtc::Timestamp last_time_updated_;
         webrtc::TimeDelta queue_time_sum_ = webrtc::TimeDelta::Zero();

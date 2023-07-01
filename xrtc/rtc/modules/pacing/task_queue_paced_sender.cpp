@@ -50,19 +50,19 @@ namespace xrtc {
 
         webrtc::Timestamp now = clock_->CurrentTime();
         // 需要过多长时间之后，再次进行这个调度
-//        absl::optional<webrtc::TimeDelta> time_to_next_send;
-//        if (next_process_time_.IsMinusInfinity()) {
-//            // 当前还没有设定下一次的调度任务，需要创建一个
-//            time_to_next_send = std::max(next_process_time - now, hold_back_window_);
-//        }
-//
-//        if (time_to_next_send) {
-//            next_process_time_ = next_process_time;
-//
-//            task_queue_.PostDelayedTask([this, next_process_time]() {
-//                MaybeProcessPackets(next_process_time);
-//            }, time_to_next_send->ms<uint32_t>());
-//        }
+        absl::optional<webrtc::TimeDelta> time_to_next_send;
+        if (next_process_time_.IsMinusInfinity()) {
+            // 当前还没有设定下一次的调度任务，需要创建一个
+            time_to_next_send = std::max(next_process_time - now, hold_back_window_);
+        }
+
+        if (time_to_next_send) {
+            next_process_time_ = next_process_time;
+
+            task_queue_.PostDelayedTask([this, next_process_time]() {
+                MaybeProcessPackets(next_process_time);
+            }, time_to_next_send->ms<uint32_t>());
+        }
     }
 
 } // namespace xrtc
