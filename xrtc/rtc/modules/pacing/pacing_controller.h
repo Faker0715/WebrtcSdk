@@ -11,7 +11,7 @@
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
 #include "xrtc/rtc/modules/pacing/round_robin_packet_queue.h"
-//#include "xrtc/rtc/modules/pacing/interval_budget.h"
+#include "xrtc/rtc/modules/pacing/interval_budget.h"
 
 namespace xrtc {
 
@@ -51,7 +51,7 @@ namespace xrtc {
         webrtc::Timestamp last_process_time_;
         RoundRobinPacketQueue packet_queue_;
         webrtc::TimeDelta min_packet_limit_;
-//        IntervalBudget media_budget_;
+        IntervalBudget media_budget_;
         webrtc::DataRate pacing_bitrate_;
         bool drain_large_queue_ = true;
         // 期望的最大延迟时间

@@ -42,7 +42,7 @@ namespace xrtc {
             last_process_time_(clock_->CurrentTime()),
             packet_queue_(last_process_time_),
             min_packet_limit_(kDefaultMinPacketLimit),
-//            media_budget_(0),
+            media_budget_(0),
             pacing_bitrate_(webrtc::DataRate::Zero()),
             queue_time_limit_(kMaxExpectedQueueLength) {
     }
@@ -58,7 +58,7 @@ namespace xrtc {
     }
 
     void PacingController::ProcessPackets() {
-        //RTC_LOG(LS_INFO) << "=========packet queue size: " << packet_queue_.SizePackets();
+//        RTC_LOG(LS_INFO) << "=========packet queue size: " << packet_queue_.SizePackets();
 
         webrtc::Timestamp now = clock_->CurrentTime();
         webrtc::Timestamp target_send_time = now;
@@ -89,7 +89,7 @@ namespace xrtc {
             }
 
             // 更新预算
-//            media_budget_.set_target_bitrate_kbps(target_rate.kbps());
+            media_budget_.set_target_bitrate_kbps(target_rate.kbps());
             UpdateBudgetWithElapsedTime(elapsed_time);
         }
 
@@ -110,7 +110,7 @@ namespace xrtc {
             packet_sender_->SendPacket(std::move(rtp_packet));
 
             // 更新预算
-//            OnPacketSent(packet_size, target_send_time);
+            OnPacketSent(packet_size, target_send_time);
         }
     }
 
@@ -149,27 +149,26 @@ namespace xrtc {
     void PacingController::UpdateBudgetWithElapsedTime(
             webrtc::TimeDelta elapsed_time) {
         webrtc::TimeDelta delta = std::min(elapsed_time, kMaxProcessingInterval);
-//        media_budget_.IncreaseBudget(delta.ms());
+        media_budget_.IncreaseBudget(delta.ms());
     }
 
     void PacingController::UpdateBudgetWithSendData(webrtc::DataSize size) {
-//        media_budget_.UseBudget(size.bytes());
+        media_budget_.UseBudget(size.bytes());
     }
 
     std::unique_ptr<RtpPacketToSend> PacingController::GetPendingPacket() {
         // 如果队列已经为空
-//        if (packet_queue_.Empty()) {
-//            return nullptr;
-//        }
+        if (packet_queue_.Empty()) {
+            return nullptr;
+        }
 
         // 如果本轮预算已经耗尽
-//        if (media_budget_.bytes_remaining() <= 0) {
-//            return nullptr;
-//        }
+        if (media_budget_.bytes_remaining() <= 0) {
+            return nullptr;
+        }
 
 
-//        return packet_queue_.Pop();
-        return nullptr;
+        return packet_queue_.Pop();
     }
 
     void PacingController::OnPacketSent(webrtc::DataSize packet_size,
