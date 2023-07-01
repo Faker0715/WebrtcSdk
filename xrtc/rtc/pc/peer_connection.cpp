@@ -378,7 +378,7 @@ namespace xrtc {
             }
 
             single_packet->SetSequenceNumber(video_seq_++);
-//            single_packet->set_packet_type(RtpPacketMediaType::kVideo);
+            single_packet->set_packet_type(RtpPacketMediaType::kVideo);
 
             if (video_send_stream_) {
                 video_send_stream_->UpdateRtpStats(single_packet, false, false);

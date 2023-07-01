@@ -43,6 +43,13 @@ namespace xrtc {
         RtpPacketCounter transmmited;
         RtpPacketCounter retransmitted;
     };
+    enum class RtpPacketMediaType : size_t {
+        kAudio,
+        kVideo,
+        kRetransmission,
+        kForwardErrorCorrection,
+        kPadding,
+    };
 
 } // namespace xrtc
 

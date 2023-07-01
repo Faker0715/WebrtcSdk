@@ -3,6 +3,7 @@
 //
 
 #include "xrtc/rtc/modules/pacing/pacing_controller.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_defines.h"
 
 #include <rtc_base/logging.h>
 
@@ -18,19 +19,19 @@ namespace xrtc {
 // 值越小，优先级越高
         const int kFirstPriority = 0;
 
-//        int GetPriorityForType(RtpPacketMediaType type) {
-//            switch (type) {
-//                case RtpPacketMediaType::kAudio:
-//                    return kFirstPriority + 1;
-//                case RtpPacketMediaType::kRetransmission:
-//                    return kFirstPriority + 2;
-//                case RtpPacketMediaType::kVideo:
-//                case RtpPacketMediaType::kForwardErrorCorrection:
-//                    return kFirstPriority + 3;
-//                case RtpPacketMediaType::kPadding:
-//                    return kFirstPriority + 4;
-//            }
-//        }
+        int GetPriorityForType(RtpPacketMediaType type) {
+            switch (type) {
+                case RtpPacketMediaType::kAudio:
+                    return kFirstPriority + 1;
+                case RtpPacketMediaType::kRetransmission:
+                    return kFirstPriority + 2;
+                case RtpPacketMediaType::kVideo:
+                case RtpPacketMediaType::kForwardErrorCorrection:
+                    return kFirstPriority + 3;
+                case RtpPacketMediaType::kPadding:
+                    return kFirstPriority + 4;
+            }
+        }
 
     } // namespace
 
@@ -51,9 +52,9 @@ namespace xrtc {
 
     void PacingController::EnqueuePacket(std::unique_ptr<RtpPacketToSend> packet) {
         // 1. 获得RTP packet的优先级
-//        int priority = GetPriorityForType(*packet->packet_type());
+        int priority = GetPriorityForType(*packet->packet_type());
         // 2. 插入packet
-//        EnqueuePacketInternal(priority, std::move(packet));
+        EnqueuePacketInternal(priority, std::move(packet));
     }
 
     void PacingController::ProcessPackets() {
