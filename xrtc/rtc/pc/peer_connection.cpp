@@ -24,7 +24,8 @@ namespace xrtc {
             clock_(webrtc::Clock::GetRealTimeClock()),
             video_cache_(RTC_PACKET_CACHE_SIZE),
             task_queue_factory_(webrtc::CreateDefaultTaskQueueFactory()),
-            transport_send_(std::make_unique<RtpTransportControllerSend>(clock_))
+            transport_send_(std::make_unique<RtpTransportControllerSend>(clock_,
+                                                                         this, task_queue_factory_.get()))
     {
         transport_controller_->SignalIceState.connect(this,
                                                       &PeerConnection::OnIceState);

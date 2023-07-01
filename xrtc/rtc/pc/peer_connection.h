@@ -33,8 +33,8 @@ namespace xrtc {
     };
 
     class PeerConnection : public sigslot::has_slots<>,
-                           public RtpRtcpModuleObserver
-//                           public PacingController::PacketSender
+                           public RtpRtcpModuleObserver,
+                           public PacingController::PacketSender
     {
     public:
         PeerConnection();
@@ -55,8 +55,7 @@ namespace xrtc {
                             const std::vector<uint16_t>& nack_list) override;
 
         // PacingController::PacketSender
-//        void SendPacket(std::unique_ptr<RtpPacketToSend> packet) override;
-        void SendPacket(std::unique_ptr<RtpPacketToSend> packet) ;
+        void SendPacket(std::unique_ptr<RtpPacketToSend> packet) override;
 
         sigslot::signal2<PeerConnection*, PeerConnectionState> SignalConnectionState;
         sigslot::signal5<PeerConnection*, int64_t, int32_t, uint8_t, uint32_t>
