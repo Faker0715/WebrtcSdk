@@ -20,6 +20,7 @@
 #include "xrtc/rtc/audio/audio_send_stream.h"
 #include "xrtc/rtc/video/video_send_stream.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_interface.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_header_extension_map.h"
 
 namespace xrtc {
 
@@ -93,9 +94,11 @@ namespace xrtc {
         std::vector<std::shared_ptr<RtpPacketToSend>> video_cache_;
         std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
         std::unique_ptr<RtpTransportControllerSend> transport_send_;
+        RtpHeaderExtensionMap rtp_header_extension_map_;
     };
 
 } // namespace xrtc
+
 
 
 

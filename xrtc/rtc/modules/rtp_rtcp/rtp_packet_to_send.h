@@ -16,7 +16,8 @@ namespace xrtc {
     class RtpPacketToSend : public RtpPacket {
     public:
         RtpPacketToSend();
-        RtpPacketToSend(size_t capacity);
+        RtpPacketToSend(const RtpHeaderExtensionMap* extensions);
+        RtpPacketToSend(const RtpHeaderExtensionMap* extensions, size_t capacity);
 
         void set_packet_type(RtpPacketMediaType type) {
             packet_type_ = type;
@@ -31,6 +32,4 @@ namespace xrtc {
     };
 
 } // namespace xrtc
-
-
 #endif //XRTCSDK_RTP_PACKET_TO_SEND_H

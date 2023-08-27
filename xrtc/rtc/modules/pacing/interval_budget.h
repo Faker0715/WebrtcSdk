@@ -11,6 +11,7 @@
 namespace xrtc {
 
     class IntervalBudget {
+
     public:
         IntervalBudget(int initial_target_bitrate_kbps,
                        bool can_build_up_underuse = false);

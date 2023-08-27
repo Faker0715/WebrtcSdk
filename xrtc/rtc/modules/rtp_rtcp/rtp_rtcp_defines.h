@@ -14,6 +14,12 @@ namespace xrtc {
 
 #define IP_PACKET_SIZE 1500
 
+    enum RTPExtensionType : int {
+        kRtpExtensionNone,
+        kRtpExtensionTransportSequenceNumber,
+        kRtpExtensionNumberOfExtensions,
+    };
+
     enum RTCPPacketType : uint32_t {
         kRtcpReport = 0x0001, // sr rr 合成
         kRtcpSr = 0x0002,
@@ -23,14 +29,11 @@ namespace xrtc {
     class RtpPacketCounter {
     public:
         RtpPacketCounter() = default;
+        explicit RtpPacketCounter(const RtpPacket& packet);
 
-        explicit RtpPacketCounter(const RtpPacket &packet);
-
-        void Add(const RtpPacketCounter &other);
-
-        void Subtract(const RtpPacketCounter &other);
-
-        void AddPacket(const RtpPacket &packet);
+        void Add(const RtpPacketCounter& other);
+        void Subtract(const RtpPacketCounter& other);
+        void AddPacket(const RtpPacket& packet);
 
         size_t header_bytes = 0;
         size_t payload_bytes = 0;
@@ -43,6 +46,7 @@ namespace xrtc {
         RtpPacketCounter transmmited;
         RtpPacketCounter retransmitted;
     };
+
     enum class RtpPacketMediaType : size_t {
         kAudio,
         kVideo,

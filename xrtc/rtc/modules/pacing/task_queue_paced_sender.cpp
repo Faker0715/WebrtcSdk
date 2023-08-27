@@ -17,7 +17,7 @@ namespace xrtc {
             hold_back_window_(hold_back_window)
     {
         // for test
-        pacing_controller_.SetPacingBitrate(webrtc::DataRate::KilobitsPerSec(500));
+        pacing_controller_.SetPacingBitrate(webrtc::DataRate::KilobitsPerSec(1000));
     }
 
     TaskQueuePacedSender::~TaskQueuePacedSender() {

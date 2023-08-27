@@ -1,6 +1,3 @@
-//
-// Created by faker on 2023/6/18.
-//
 #include "xrtc/rtc/pc/peer_connection.h"
 
 #include <vector>
@@ -13,6 +10,7 @@
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_header_extensions.h"
 #include "xrtc/base/xrtc_global.h"
 
 namespace xrtc {
@@ -31,6 +29,10 @@ namespace xrtc {
                                                       &PeerConnection::OnIceState);
         transport_controller_->SignalRtcpPacketReceived.connect(this,
                                                                 &PeerConnection::OnRtcpPacketReceived);
+
+        // 注册扩展
+        rtp_header_extension_map_.RegisterUri(TransportSequenceNumber::kId,
+                                              TransportSequenceNumber::Uri());
     }
 
     PeerConnection::~PeerConnection() {
@@ -368,10 +370,12 @@ namespace xrtc {
                                                 config);
 
         while (true) {
-            auto single_packet = std::make_shared<RtpPacketToSend>();
+            auto single_packet = std::make_shared<RtpPacketToSend>(&rtp_header_extension_map_);
             single_packet->SetPayloadType(video_pt_);
             single_packet->SetTimestamp(rtp_timestamp);
             single_packet->SetSsrc(local_video_ssrc_);
+
+            // 给RTP头部扩展分配内存空间
 
             if (!packetizer->NextPacket(single_packet.get())) {
                 break;

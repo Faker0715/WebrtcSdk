@@ -11,8 +11,14 @@ namespace xrtc {
     {
     }
 
-    RtpPacketToSend::RtpPacketToSend(size_t capacity) :
-            RtpPacket(capacity)
+    RtpPacketToSend::RtpPacketToSend(const RtpHeaderExtensionMap* extensions) :
+            RtpPacket(extensions)
+    {
+    }
+
+    RtpPacketToSend::RtpPacketToSend(const RtpHeaderExtensionMap* extensions,
+                                     size_t capacity) :
+            RtpPacket(extensions, capacity)
     {
     }
 
