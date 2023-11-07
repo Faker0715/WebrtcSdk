@@ -6,11 +6,13 @@
 
 #include <rtc_base/logging.h>
 #include <rtc_base/task_utils/to_queued_task.h>
-#include "xrtc/base/xrtc_http.h"
+
 #include "xrtc/base/xrtc_global.h"
+#include "xrtc/base/xrtc_http.h"
 #include "xrtc/base/xrtc_json.h"
-#include "xrtc/media/base/in_pin.h"
 #include "xrtc/base/xrtc_utils.h"
+#include "xrtc/media/base/in_pin.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_format_h264.h"
 
 namespace xrtc {
 
@@ -18,7 +20,8 @@ namespace xrtc {
             media_chain_(media_chain),
             audio_in_pin_(std::make_unique<InPin>(this)),
             video_in_pin_(std::make_unique<InPin>(this)),
-            pc_(std::make_unique<PeerConnection>()){
+            pc_(std::make_unique<PeerConnection>())
+    {
         MediaFormat audio_fmt;
         audio_fmt.media_type = MainMediaType::kMainTypeAudio;
         audio_fmt.sub_fmt.audio_fmt.type = SubMediaType::kSubTypeOpus;
@@ -33,7 +36,6 @@ namespace xrtc {
 
         pc_->SignalConnectionState.connect(this, &XRTCMediaSink::OnConnectionState);
         pc_->SignalNetworkInfo.connect(this, &XRTCMediaSink::OnNetworkInfo);
-
     }
 
     XRTCMediaSink::~XRTCMediaSink() {
@@ -45,6 +47,7 @@ namespace xrtc {
         if (!ParseUrl(url_, protocol_, host_, action_, request_params_)) {
             return false;
         }
+
         if (action_ != "push" || request_params_["uid"].empty() || request_params_["streamName"].empty()) {
             RTC_LOG(LS_WARNING) << "invalid url: " << url_;
             return false;
@@ -55,7 +58,7 @@ namespace xrtc {
         std::stringstream body;
         body << "uid=" << request_params_["uid"]
              << "&streamName=" << request_params_["streamName"]
-             << "&audio=1&video=1&isDtls=0";
+             << "&audio=1&video=1&isDtls=0&isTest=1";
         std::string url = "https://" + host_ + "/signaling/push";
         HttpRequest request(url, body.str());
 
@@ -70,6 +73,7 @@ namespace xrtc {
 
             std::string type;
             std::string sdp;
+
             if (!ParseReply(reply, type, sdp)) {
                 if (media_chain_) {
                     media_chain_->OnChainFailed(this, XRTCError::kPushRequestOfferErr);
@@ -80,7 +84,7 @@ namespace xrtc {
             if (pc_->SetRemoteSDP(sdp) != 0) {
                 return;
             }
-            // 推流是不接收音视频的
+
             RTCOfferAnswerOptions options;
             options.recv_audio = false;
             options.recv_video = false;
@@ -88,6 +92,7 @@ namespace xrtc {
             SendAnswer(answer);
 
         }, this);
+
         return true;
     }
 
@@ -101,12 +106,12 @@ namespace xrtc {
 
     void XRTCMediaSink::Stop() {
         RTC_LOG(LS_INFO) << "XRTCMediaSink Stop";
-
-
+        // 向后台服务发送停止推流请求
+        SendStop();
     }
 
     void XRTCMediaSink::OnNewMediaFrame(std::shared_ptr<MediaFrame> frame) {
-        // 通过网络线程，将x264压缩后的数据发送到服务器
+        // 通过网络线程，将音视频压缩后的数据发送到服务器
         XRTCGlobal::Instance()->network_thread()->PostTask(webrtc::ToQueuedTask([=]() {
             if (MainMediaType::kMainTypeVideo == frame->fmt.media_type) {
                 PacketAndSendVideo(frame);
@@ -115,10 +120,36 @@ namespace xrtc {
                 PacketAndSendAudio(frame);
             }
         }));
-
     }
 
-    bool XRTCMediaSink::ParseReply(const HttpReply &reply, std::string &type, std::string &sdp) {
+    void XRTCMediaSink::OnNetworkInfo(PeerConnection*, int64_t rtt_ms,
+                                      int32_t packets_lost, uint8_t fraction_lost, uint32_t jitter)
+    {
+        XRTCGlobal::Instance()->api_thread()->PostTask(
+                webrtc::ToQueuedTask([=]() {
+                    XRTCGlobal::Instance()->engine_observer()->OnNetworkInfo(
+                            rtt_ms, packets_lost, fraction_lost, jitter);
+                }));
+    }
+
+    void XRTCMediaSink::OnConnectionState(PeerConnection*,
+                                          PeerConnectionState pc_state)
+    {
+        if (PeerConnectionState::kConnected == pc_state) {
+            if (media_chain_) {
+                media_chain_->OnChainSuccess();
+            }
+        }
+        else if (PeerConnectionState::kFailed == pc_state) {
+            if (media_chain_) {
+                media_chain_->OnChainFailed(this, XRTCError::kPushIceConnectionErr);
+            }
+        }
+    }
+
+    bool XRTCMediaSink::ParseReply(const HttpReply& reply, std::string& type,
+                                   std::string& sdp)
+    {
         if (reply.get_status_code() != 200 || reply.get_errno() != 0) {
             RTC_LOG(LS_WARNING) << "signaling response error";
             return false;
@@ -147,10 +178,9 @@ namespace xrtc {
         }
 
         return true;
-
     }
 
-    void XRTCMediaSink::SendAnswer(const std::string &answer) {
+    void XRTCMediaSink::SendAnswer(const std::string& answer) {
         if (request_params_["uid"].empty() || request_params_["streamName"].empty()) {
             RTC_LOG(LS_WARNING) << "send answer failed, invalid url: " << url_;
             return;
@@ -160,7 +190,7 @@ namespace xrtc {
         std::stringstream body;
         body << "uid=" << request_params_["uid"]
              << "&streamName=" << request_params_["streamName"]
-             << "&type=push"
+             << "&type=push&isTest=1"
              << "&answer=" << HttpManager::UrlEncode(answer);
 
         std::string url = "https://" + host_ + "/signaling/sendanswer";
@@ -194,33 +224,11 @@ namespace xrtc {
 
         }, this);
     }
-    void XRTCMediaSink::PacketAndSendVideo(std::shared_ptr<MediaFrame> frame) {
-        pc_->SendEncodedImage(frame);
-    }
-
-    void XRTCMediaSink::OnNetworkInfo(PeerConnection *, int64_t rtt_ms, int32_t packets_lost, uint8_t fraction_lost,
-                                      uint32_t jitter) {
-        XRTCGlobal::Instance()->api_thread()->PostTask(webrtc::ToQueuedTask([=]() {
-            XRTCGlobal::Instance()->engine_observer()->OnNetworkInfo(
-                    rtt_ms, packets_lost, fraction_lost, jitter);
-        }));
-
-    }
-
-    void XRTCMediaSink::OnConnectionState(PeerConnection *, PeerConnectionState state) {
-        if(PeerConnectionState::kConnected == state){
-            if(media_chain_){
-                media_chain_->OnChainSuccess();
-            }
-        }else if(PeerConnectionState::kFailed == state){
-            if(media_chain_){
-                media_chain_->OnChainFailed(this, XRTCError::kPushIceConnectionErr);
-            }
-        }
-
-    }
 
     void XRTCMediaSink::SendStop() {
+        // 发送停止推流的信令请求
+        // https://www.str2num.com/signaling/stoppush?uid=xxx&streamName=xxx
+        // 构造body
         std::stringstream body;
         body << "uid=" << request_params_["uid"]
              << "&streamName=" << request_params_["streamName"];
@@ -255,12 +263,14 @@ namespace xrtc {
             }
 
         }, this);
-
-
     }
 
     void XRTCMediaSink::PacketAndSendAudio(std::shared_ptr<MediaFrame> frame) {
         pc_->SendEncodedAudio(frame);
+    }
+
+    void XRTCMediaSink::PacketAndSendVideo(std::shared_ptr<MediaFrame> frame) {
+        pc_->SendEncodedImage(frame);
     }
 
 } // namespace xrtc

@@ -376,6 +376,7 @@ namespace xrtc {
             single_packet->SetSsrc(local_video_ssrc_);
 
             // 给RTP头部扩展分配内存空间
+            single_packet->ReserveExtension<TransportSequenceNumber>();
 
             if (!packetizer->NextPacket(single_packet.get())) {
                 break;
@@ -383,6 +384,7 @@ namespace xrtc {
 
             single_packet->SetSequenceNumber(video_seq_++);
             single_packet->set_packet_type(RtpPacketMediaType::kVideo);
+            single_packet->SetExtension<TransportSequenceNumber>(transport_seq_++);
 
             if (video_send_stream_) {
                 video_send_stream_->UpdateRtpStats(single_packet, false, false);

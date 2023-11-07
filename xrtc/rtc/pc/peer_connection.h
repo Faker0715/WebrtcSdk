@@ -2,9 +2,8 @@
 // Created by faker on 2023/6/18.
 //
 
-#ifndef XRTCSDK_PEER_CONNECTION_H
-#define XRTCSDK_PEER_CONNECTION_H
-
+#ifndef XRTCSDK_XRTC_RTC_PC_PEER_CONNECTION_H_
+#define XRTCSDK_XRTC_RTC_PC_PEER_CONNECTION_H_
 
 #include <string>
 #include <memory>
@@ -86,6 +85,7 @@ namespace xrtc {
         // 按照规范该值的初始值需要随机
         uint16_t audio_seq_ = 1000;
         uint16_t video_seq_ = 1000;
+        uint16_t transport_seq_ = 1000;
 
         PeerConnectionState pc_state_ = PeerConnectionState::kNew;
         webrtc::Clock* clock_;
@@ -99,7 +99,4 @@ namespace xrtc {
 
 } // namespace xrtc
 
-
-
-
-#endif //XRTCSDK_PEER_CONNECTION_H
+#endif // XRTCSDK_XRTC_RTC_PC_PEER_CONNECTION_H_

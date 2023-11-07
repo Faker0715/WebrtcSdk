@@ -202,8 +202,8 @@ namespace xrtc {
         }
         else { // 第一次添加头部扩展
             profile_id = two_bytes_header_required
-                         ? kTwoByteHeaderExtensionLength
-                         : kOneByteHeaderExtensionLength;
+                         ? kTwoByteHeaderExtensionProfileId
+                         : kOneByteHeaderExtensionProfileId;
         }
 
         // 添加新的扩展

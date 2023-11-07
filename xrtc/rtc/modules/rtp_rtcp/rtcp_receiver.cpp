@@ -8,6 +8,7 @@
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/receiver_report.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/nack.h"
+#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/transport_feedback.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_utils.h"
 
 namespace xrtc {
@@ -67,6 +68,11 @@ namespace xrtc {
                         case rtcp::Nack::kFeedbackMessageType: // 1
                             HandleNack(rtcp_block, packet_info);
                             break;
+                        case rtcp::TransportFeedback::kFeedbackMessageType: // 15
+                            //HandleTransportFeedback(rtcp_block, packet_info);
+                            RTC_LOG(LS_WARNING) << "============transport feedback: "
+                                                << static_cast<int>(rtcp_block.fmt());
+                            break;
                         default:
                             ++num_skipped_packets_;
                             break;
@@ -102,7 +108,6 @@ namespace xrtc {
                                          uint32_t remote_ssrc,
                                          PacketInformation& packet_info)
     {
-        // 过滤掉音频的ssrc
         if (!IsRegisteredSsrc(report_block.source_ssrc())) {
             return;
         }

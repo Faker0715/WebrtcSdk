@@ -2,9 +2,8 @@
 // Created by faker on 2023/6/23.
 //
 
-#ifndef XRTCSDK_RTP_PACKET_H
-#define XRTCSDK_RTP_PACKET_H
-
+#ifndef XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTP_PACKET_H_
+#define XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTP_PACKET_H_
 
 #include <vector>
 
@@ -57,6 +56,9 @@ namespace xrtc {
             buffer_.MutableData()[offset] = byte;
         }
 
+        template <typename Extension, typename... Values>
+        bool SetExtension(const Values&... values);
+
         template <typename Extension>
         bool ReserveExtension();
         rtc::ArrayView<uint8_t> AllocateExtension(RTPExtensionType type, size_t length);
@@ -96,6 +98,17 @@ namespace xrtc {
         rtc::CopyOnWriteBuffer buffer_;
     };
 
+    template <typename Extension, typename... Values>
+    bool RtpPacket::SetExtension(const Values&... values) {
+        size_t value_size = Extension::ValueSize(values...);
+        auto buffer = AllocateExtension(Extension::kId, value_size);
+        if (buffer.empty()) {
+            return false;
+        }
+
+        return Extension::Write(buffer, values...);
+    }
+
     template <typename Extension>
     bool RtpPacket::ReserveExtension() {
         auto buffer = AllocateExtension(Extension::kId, Extension::kValueSizeBytes);
@@ -109,5 +122,4 @@ namespace xrtc {
 
 } // namespace xrtc
 
-
-#endif //XRTCSDK_RTP_PACKET_H
+#endif // XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTP_PACKET_H_
