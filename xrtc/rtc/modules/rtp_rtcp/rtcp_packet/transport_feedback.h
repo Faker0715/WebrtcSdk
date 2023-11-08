@@ -5,6 +5,8 @@
 #ifndef XRTCSDK_XRTC_MODULES_RTP_RTCP_RTCP_PACKET_TRANSPORT_FEEDBACK_H_
 #define XRTCSDK_XRTC_MODULES_RTP_RTCP_RTCP_PACKET_TRANSPORT_FEEDBACK_H_
 
+#include <vector>
+
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/rtpfb.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/common_header.h"
 
@@ -28,15 +30,18 @@ namespace xrtc {
             class LastChunk {
             public:
                 void Decode(uint16_t chunk, size_t max_size);
+                void AppendTo(std::vector<uint8_t>* deltas);
 
             private:
                 static const size_t kRunLengthCapacity = 0x1fff;
                 static const size_t kOneBitCapacity = 14;
-                static const size_t kTwoBitCapcacity = 7;
+                static const size_t kTwoBitCapacity = 7;
                 static const size_t kVectorCapacity = kOneBitCapacity;
                 static const uint8_t kLarge = 2;
 
                 void DecodeRunLength(uint16_t chunk, size_t max_size);
+                void DecodeOneBit(uint16_t chunk, size_t max_size);
+                void DecodeTwoBit(uint16_t chunk, size_t max_size);
 
             private:
                 uint8_t delta_sizes_[kVectorCapacity];

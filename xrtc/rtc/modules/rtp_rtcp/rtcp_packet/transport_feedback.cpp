@@ -117,8 +117,20 @@ namespace xrtc {
             if (0 == (chunk & 0x8000)) { // run length编码块
                 DecodeRunLength(chunk, max_size);
             }
+            else if (0 == (chunk & 0x4000)) { // 1bit状态矢量编码
+                DecodeOneBit(chunk, max_size);
+            }
             else {
+                DecodeTwoBit(chunk, max_size);
+            }
+        }
 
+        void TransportFeedback::LastChunk::AppendTo(std::vector<uint8_t>* deltas) {
+            if (all_same_) {
+                deltas->insert(deltas->end(), size_, delta_sizes_[0]);
+            }
+            else {
+                deltas->insert(deltas->end(), delta_sizes_, delta_sizes_ + size_);
             }
         }
 
@@ -133,5 +145,27 @@ namespace xrtc {
             delta_sizes_[0] = delta_size;
         }
 
+        void TransportFeedback::LastChunk::DecodeOneBit(uint16_t chunk,
+                                                        size_t max_size)
+        {
+            size_ = std::min(kOneBitCapacity, max_size);
+            has_large_data_ = false;
+            all_same_ = false;
+            for (size_t i = 0; i < size_; ++i) {
+                delta_sizes_[i] = (chunk >> (kOneBitCapacity - 1 - i)) & 0x01;
+            }
+        }
+
+        void TransportFeedback::LastChunk::DecodeTwoBit(uint16_t chunk,
+                                                        size_t max_size)
+        {
+            size_ = std::min(kTwoBitCapacity, max_size);
+            has_large_data_ = true;
+            all_same_ = false;
+            for (size_t i = 0; i < size_; ++i) {
+                delta_sizes_[i] = (chunk >> 2 * (kTwoBitCapacity - 1 - i)) & 0x03;
+            }
+        }
+
     } // namespace rtcp
-} // namespace xrtc
+} // namespace xrtc} // namespace xrtc
