@@ -25,9 +25,31 @@ namespace xrtc {
                                 PacketReadyCallback callback) const override;
 
         private:
+            class LastChunk {
+            public:
+                void Decode(uint16_t chunk, size_t max_size);
+
+            private:
+                static const size_t kRunLengthCapacity = 0x1fff;
+                static const size_t kOneBitCapacity = 14;
+                static const size_t kTwoBitCapcacity = 7;
+                static const size_t kVectorCapacity = kOneBitCapacity;
+                static const uint8_t kLarge = 2;
+
+                void DecodeRunLength(uint16_t chunk, size_t max_size);
+
+            private:
+                uint8_t delta_sizes_[kVectorCapacity];
+                size_t size_ = 0;
+                bool all_same_ = false;
+                bool has_large_data_ = false;
+            };
+
+        private:
             uint16_t base_seq_no_ = 0;
             int32_t base_time_ticks_ = 0;
             uint8_t feedback_seq_ = 0;
+            LastChunk last_chunk_;
         };
 
     } // namespace rtcp

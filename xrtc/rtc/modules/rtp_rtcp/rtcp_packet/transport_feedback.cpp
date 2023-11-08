@@ -15,6 +15,7 @@ namespace xrtc {
 // transport feedback头部，8字节
 // 至少需要包含一个packet chunk, 2字节
             const size_t kMinPayloadSizeBytes = 8 + 8 + 2;
+            const size_t kChunkSizeBytes = 2;
 
 //    Message format
 //
@@ -65,6 +66,36 @@ namespace xrtc {
             base_time_ticks_ = webrtc::ByteReader<int32_t, 3>::ReadBigEndian(&payload[12]);
             feedback_seq_ = payload[15];
 
+            if (0 == status_count) {
+                RTC_LOG(LS_WARNING) << "Empty transport feedback message not allowd";
+                return false;
+            }
+
+            // 数据块的起始位置
+            size_t index = 16;
+            // 数据块的结束位置
+            size_t end_index = packet.payload_size();
+
+            // 定义一个vector来保存所有的rtp包状态
+            std::vector<uint8_t> delta_sizes;
+            delta_sizes.reserve(status_count);
+
+            // 读取完所有的RTP包的状态信息，才会结束循环
+            while (delta_sizes.size() < status_count) {
+                if (index + kChunkSizeBytes > end_index) {
+                    RTC_LOG(LS_WARNING) << "Buffer overlow when parsing packet";
+                    return false;
+                }
+
+                // 读取一个chunk进行处理
+                uint16_t chunk = webrtc::ByteReader<uint16_t>::ReadBigEndian(&payload[index]);
+                // 偏移指向下一个chunk
+                index += kChunkSizeBytes;
+
+                // 解码chunk
+                last_chunk_.Decode(chunk, status_count - delta_sizes.size());
+            }
+
             return false;
         }
 
@@ -78,6 +109,28 @@ namespace xrtc {
                                        PacketReadyCallback callback) const
         {
             return false;
+        }
+
+        void TransportFeedback::LastChunk::Decode(uint16_t chunk,
+                                                  size_t max_size)
+        {
+            if (0 == (chunk & 0x8000)) { // run length编码块
+                DecodeRunLength(chunk, max_size);
+            }
+            else {
+
+            }
+        }
+
+        void TransportFeedback::LastChunk::DecodeRunLength(uint16_t chunk,
+                                                           size_t max_size)
+        {
+            size_ = std::min<size_t>(chunk & 0x1FFF, max_size);
+            all_same_ = true;
+            // RTP包的状态值
+            uint8_t delta_size = (chunk >> 13) & 0x3;
+            has_large_data_ = (delta_size > kLarge);
+            delta_sizes_[0] = delta_size;
         }
 
     } // namespace rtcp
