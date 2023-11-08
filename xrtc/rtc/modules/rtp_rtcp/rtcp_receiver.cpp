@@ -1,7 +1,3 @@
-//
-// Created by faker on 2023/6/27.
-//
-
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_receiver.h"
 
 #include <rtc_base/logging.h>
@@ -69,9 +65,9 @@ namespace xrtc {
                             HandleNack(rtcp_block, packet_info);
                             break;
                         case rtcp::TransportFeedback::kFeedbackMessageType: // 15
-                            //HandleTransportFeedback(rtcp_block, packet_info);
                             RTC_LOG(LS_WARNING) << "============transport feedback: "
                                                 << static_cast<int>(rtcp_block.fmt());
+                            HandleTransportFeedback(rtcp_block, packet_info);
                             break;
                         default:
                             ++num_skipped_packets_;
@@ -150,6 +146,17 @@ namespace xrtc {
         }
     }
 
+    void RTCPReceiver::HandleTransportFeedback(const rtcp::CommonHeader& rtcp_block,
+                                               PacketInformation& packet_info)
+    {
+        std::unique_ptr<rtcp::TransportFeedback> transport_feedback =
+                std::make_unique<rtcp::TransportFeedback>();
+        if (!transport_feedback->Parse(rtcp_block)) {
+            ++num_skipped_packets_;
+            return;
+        }
+    }
+
     bool RTCPReceiver::IsRegisteredSsrc(uint32_t ssrc) {
         for (auto rssrc : registered_ssrcs_) {
             if (rssrc == ssrc) {
@@ -160,4 +167,3 @@ namespace xrtc {
     }
 
 } // namespace xrtc
-

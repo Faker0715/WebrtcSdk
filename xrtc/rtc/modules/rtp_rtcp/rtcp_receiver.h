@@ -2,9 +2,8 @@
 // Created by faker on 2023/6/27.
 //
 
-#ifndef XRTCSDK_RTCP_RECEIVER_H
-#define XRTCSDK_RTCP_RECEIVER_H
-
+#ifndef XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTCP_RECEIVER_H_
+#define XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTCP_RECEIVER_H_
 
 #include <vector>
 
@@ -34,6 +33,8 @@ namespace xrtc {
                                uint32_t remote_ssrc, PacketInformation& packet_info);
         void HandleNack(const rtcp::CommonHeader& rtcp_block,
                         PacketInformation& packet_info);
+        void HandleTransportFeedback(const rtcp::CommonHeader& rtcp_block,
+                                     PacketInformation& packet_info);
 
         bool IsRegisteredSsrc(uint32_t ssrc);
 
@@ -48,6 +49,4 @@ namespace xrtc {
 
 } // namespace xrtc
 
-
-
-#endif //XRTCSDK_RTCP_RECEIVER_H
+#endif // XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTCP_RECEIVER_H_
