@@ -4,12 +4,15 @@
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/transport_feedback.h"
 
+#include <absl/algorithm/container.h>
 #include <rtc_base/logging.h>
 #include <modules/rtp_rtcp/source/byte_io.h>
 
 namespace xrtc {
     namespace rtcp {
         namespace {
+
+            const size_t kRtcpTransportFeedbackHeaderSize = 4 + 8 + 8;
 
 // 通用的rtcp部分，8字节
 // transport feedback头部，8字节
@@ -71,6 +74,8 @@ namespace xrtc {
                 return false;
             }
 
+            Clear();
+
             // 数据块的起始位置
             size_t index = 16;
             // 数据块的结束位置
@@ -84,6 +89,7 @@ namespace xrtc {
             while (delta_sizes.size() < status_count) {
                 if (index + kChunkSizeBytes > end_index) {
                     RTC_LOG(LS_WARNING) << "Buffer overlow when parsing packet";
+                    Clear();
                     return false;
                 }
 
@@ -94,9 +100,84 @@ namespace xrtc {
 
                 // 解码chunk
                 last_chunk_.Decode(chunk, status_count - delta_sizes.size());
+                last_chunk_.AppendTo(&delta_sizes);
             }
 
-            return false;
+            uint16_t seq_no = base_seq_no_;
+
+            // 0, RTP包没有收到，就没有对应的recv_delta
+            // 1, RTP包收到了，数据包间隔比较小，recv_delta使用1字节来表示时间
+            // 2, RTP包收到了，数据包间隔比较大，recv_delta使用2字节来表示时间
+            size_t recv_delta_size = absl::c_accumulate(delta_sizes, 0);
+
+            if (end_index >= index + recv_delta_size) { // 表示存在recv_delta数据块
+                for (size_t delta_size : delta_sizes) {
+                    if (index + delta_size > end_index) {
+                        RTC_LOG(LS_WARNING) << "Buffer overflow when parsing packet";
+                        Clear();
+                        return false;
+                    }
+
+                    switch (delta_size) {
+                        case 0:
+                            if (include_lost_) {
+                                all_packets_.emplace_back(seq_no);
+                            }
+                            break;
+                        case 1: {
+                            int16_t delta = payload[index];
+                            received_packets_.emplace_back(seq_no, delta);
+                            if (include_lost_) {
+                                all_packets_.emplace_back(seq_no, delta);
+                            }
+                            index += delta_size;
+                            break;
+                        }
+                        case 2: {
+                            int16_t delta = webrtc::ByteReader<int16_t>::ReadBigEndian(
+                                    &payload[index]);
+                            received_packets_.emplace_back(seq_no, delta);
+                            if (include_lost_) {
+                                all_packets_.emplace_back(seq_no, delta);
+                            }
+                            index += delta_size;
+                            break;
+                        }
+                        case 3:
+                            RTC_LOG(LS_WARNING) << "invalid delta size for seq_no: " << seq_no;
+                            Clear();
+                            return false;
+                        default:
+                            break;
+                    }
+
+                    ++seq_no;
+                }
+            }
+            else { // 不包含recv_delta数据块
+                include_timestamps_ = false;
+                for (size_t delta_size : delta_sizes) {
+                    if (delta_size > 0) {
+                        received_packets_.emplace_back(seq_no, 0);
+                    }
+
+                    if (include_lost_) {
+                        if (delta_size > 0) {
+                            // 数据包收到了，但是不包含时间信息
+                            all_packets_.emplace_back(seq_no, 0);
+                        }
+                        else {
+                            // 数据包没有收到
+                            all_packets_.emplace_back(seq_no);
+                        }
+                    }
+
+                    ++seq_no;
+                }
+            }
+
+            size_bytes_ = RtcpPacket::kHeaderSize + index;
+            return true;
         }
 
         size_t TransportFeedback::BlockLength() const {
@@ -109,6 +190,13 @@ namespace xrtc {
                                        PacketReadyCallback callback) const
         {
             return false;
+        }
+
+        void TransportFeedback::Clear() {
+            last_chunk_.Clear();
+            all_packets_.clear();
+            received_packets_.clear();
+            size_bytes_ = kRtcpTransportFeedbackHeaderSize;
         }
 
         void TransportFeedback::LastChunk::Decode(uint16_t chunk,
@@ -134,6 +222,12 @@ namespace xrtc {
             }
         }
 
+        void TransportFeedback::LastChunk::Clear() {
+            size_ = 0;
+            all_same_ = true;
+            has_large_delta_ = false;
+        }
+
         void TransportFeedback::LastChunk::DecodeRunLength(uint16_t chunk,
                                                            size_t max_size)
         {
@@ -141,7 +235,7 @@ namespace xrtc {
             all_same_ = true;
             // RTP包的状态值
             uint8_t delta_size = (chunk >> 13) & 0x3;
-            has_large_data_ = (delta_size > kLarge);
+            has_large_delta_ = (delta_size > kLarge);
             delta_sizes_[0] = delta_size;
         }
 
@@ -149,7 +243,7 @@ namespace xrtc {
                                                         size_t max_size)
         {
             size_ = std::min(kOneBitCapacity, max_size);
-            has_large_data_ = false;
+            has_large_delta_ = false;
             all_same_ = false;
             for (size_t i = 0; i < size_; ++i) {
                 delta_sizes_[i] = (chunk >> (kOneBitCapacity - 1 - i)) & 0x01;
@@ -160,7 +254,7 @@ namespace xrtc {
                                                         size_t max_size)
         {
             size_ = std::min(kTwoBitCapacity, max_size);
-            has_large_data_ = true;
+            has_large_delta_ = true;
             all_same_ = false;
             for (size_t i = 0; i < size_; ++i) {
                 delta_sizes_[i] = (chunk >> 2 * (kTwoBitCapacity - 1 - i)) & 0x03;
@@ -168,4 +262,4 @@ namespace xrtc {
         }
 
     } // namespace rtcp
-} // namespace xrtc} // namespace xrtc
+} // namespace xrtc

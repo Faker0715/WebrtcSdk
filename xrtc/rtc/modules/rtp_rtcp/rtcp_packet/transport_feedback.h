@@ -15,6 +15,22 @@ namespace xrtc {
 
         class TransportFeedback : public Rtpfb {
         public:
+            class ReceivePacket {
+            public:
+                ReceivePacket(uint16_t sequence_number, int64_t time_ticks) :
+                        sequence_number_(sequence_number),
+                        time_ticks_(time_ticks),
+                        received(true) { }
+                ReceivePacket(uint16_t sequence_number) :
+                        sequence_number_(sequence_number),
+                        received(false) {}
+
+            private:
+                uint16_t sequence_number_;
+                int64_t time_ticks_ = 0;
+                bool received;
+            };
+
             static const uint8_t kFeedbackMessageType = 15;
 
             bool Parse(const rtcp::CommonHeader& packet);
@@ -31,6 +47,7 @@ namespace xrtc {
             public:
                 void Decode(uint16_t chunk, size_t max_size);
                 void AppendTo(std::vector<uint8_t>* deltas);
+                void Clear();
 
             private:
                 static const size_t kRunLengthCapacity = 0x1fff;
@@ -47,14 +64,23 @@ namespace xrtc {
                 uint8_t delta_sizes_[kVectorCapacity];
                 size_t size_ = 0;
                 bool all_same_ = false;
-                bool has_large_data_ = false;
+                bool has_large_delta_ = false;
             };
+
+            void Clear();
 
         private:
             uint16_t base_seq_no_ = 0;
             int32_t base_time_ticks_ = 0;
             uint8_t feedback_seq_ = 0;
             LastChunk last_chunk_;
+            // 存放所有的数据包，包含没有收到的数据包
+            std::vector<ReceivePacket> all_packets_;
+            // 存放收到的数据包
+            std::vector<ReceivePacket> received_packets_;
+            bool include_lost_ = true;
+            bool include_timestamps_ = true;
+            bool size_bytes_ = 0;
         };
 
     } // namespace rtcp
