@@ -41,12 +41,13 @@ namespace xrtc {
     private:
         webrtc::Clock* clock_;
         bool audio_;
+        uint32_t media_ssrc_;
         RtpRtcpModuleObserver* rtp_rtcp_module_observer_;
+        TransportFeedbackObserver* transport_feedback_observer_;
         uint32_t num_skipped_packets_ = 0;
         std::vector<uint32_t> registered_ssrcs_;
         webrtc::Timestamp last_received_rb_ = webrtc::Timestamp::PlusInfinity();
     };
 
 } // namespace xrtc
-
 #endif // XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTCP_RECEIVER_H_

@@ -11,6 +11,7 @@
 namespace xrtc {
 
     class RtpRtcpModuleObserver;
+    class TransportFeedbackObserver;
 
     struct VideoSendStreamConfig {
         struct Rtp {
@@ -28,6 +29,7 @@ namespace xrtc {
         // 视频的rtcp包发送间隔
         int rtcp_report_interval_ms = 1000;
         RtpRtcpModuleObserver* rtp_rtcp_module_observer = nullptr;
+        TransportFeedbackObserver* transport_feedback_observer = nullptr;
     };
 
 } // namespace xrtc

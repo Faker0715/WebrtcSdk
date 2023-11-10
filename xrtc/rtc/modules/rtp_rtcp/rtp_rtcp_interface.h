@@ -6,8 +6,10 @@
 #define XRTCSDK_RTP_RTCP_INTERFACE_H
 #include <vector>
 
-#include "system_wrappers/include/clock.h"
-#include "api/media_types.h"
+#include <system_wrappers/include/clock.h>
+#include <api/media_types.h>
+
+#include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_defines.h"
 
 namespace xrtc {
 
@@ -32,6 +34,7 @@ namespace xrtc {
             int clock_rate = 0;
             int rtcp_report_interval_ms = 0;
             RtpRtcpModuleObserver* rtp_rtcp_module_observer = nullptr;
+            TransportFeedbackObserver* transport_feedback_observer = nullptr;
         };
     };
 

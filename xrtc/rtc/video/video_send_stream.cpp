@@ -1,7 +1,3 @@
-//
-// Created by faker on 2023/6/23.
-//
-
 #include "xrtc/rtc/video/video_send_stream.h"
 
 #include <modules/rtp_rtcp/source/byte_io.h>
@@ -22,6 +18,7 @@ namespace xrtc {
         config.rtcp_report_interval_ms = vsconfig.rtcp_report_interval_ms;
         config.clock_rate = vsconfig.rtp.clock_rate;
         config.rtp_rtcp_module_observer = vsconfig.rtp_rtcp_module_observer;
+        config.transport_feedback_observer = vsconfig.transport_feedback_observer;
 
         auto rtp_rtcp = std::make_unique<ModuleRtpRtcpImpl>(config);
         return std::move(rtp_rtcp);
@@ -67,16 +64,16 @@ namespace xrtc {
         rtx_packet->SetMarker(packet->marker());
         rtx_packet->SetTimestamp(packet->timestamp());
 
-//         分配负载的内存
+        // 分配负载的内存
         auto rtx_payload = rtx_packet->AllocatePayload(packet->payload_size()
                                                        + kRtxHeaderSize);
         if (!rtx_payload) {
             return nullptr;
         }
 
-//         写入原始的sequence_number
+        // 写入原始的sequence_number
         webrtc::ByteWriter<uint16_t>::WriteBigEndian(rtx_payload, packet->sequence_number());
-//         写入原始的负载数据
+        // 写入原始的负载数据
         auto payload = packet->payload();
         memcpy(rtx_payload + kRtxHeaderSize, payload.data(), payload.size());
 

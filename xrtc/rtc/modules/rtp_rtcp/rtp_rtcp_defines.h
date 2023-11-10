@@ -9,6 +9,11 @@
 #include <stdint.h>
 
 namespace xrtc {
+    namespace rtcp {
+
+        class TransportFeedback;
+
+    } // namespace rtcp
 
     class RtpPacket;
 
@@ -21,7 +26,7 @@ namespace xrtc {
     };
 
     enum RTCPPacketType : uint32_t {
-        kRtcpReport = 0x0001, // sr rr 合成
+        kRtcpReport = 0x0001,
         kRtcpSr = 0x0002,
         kRtcpRr = 0x0004,
     };
@@ -55,7 +60,16 @@ namespace xrtc {
         kPadding,
     };
 
+    class TransportFeedbackObserver {
+    public:
+        virtual ~TransportFeedbackObserver() {}
+
+        virtual void OnTransportFeedback(
+                const rtcp::TransportFeedback& feedback) = 0;
+    };
+
 } // namespace xrtc
+
 
 
 

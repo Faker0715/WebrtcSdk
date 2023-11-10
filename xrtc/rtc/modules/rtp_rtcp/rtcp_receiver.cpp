@@ -16,7 +16,9 @@ namespace xrtc {
     RTCPReceiver::RTCPReceiver(const RtpRtcpInterface::Configuration& config) :
             clock_(config.clock),
             audio_(config.audio),
-            rtp_rtcp_module_observer_(config.rtp_rtcp_module_observer)
+            media_ssrc_(config.local_media_ssrc),
+            rtp_rtcp_module_observer_(config.rtp_rtcp_module_observer),
+            transport_feedback_observer_(config.transport_feedback_observer)
     {
         registered_ssrcs_.push_back(config.local_media_ssrc);
     }
@@ -154,6 +156,14 @@ namespace xrtc {
         if (!transport_feedback->Parse(rtcp_block)) {
             ++num_skipped_packets_;
             return;
+        }
+
+        if (transport_feedback_observer_) {
+            uint32_t ssrc = transport_feedback->media_ssrc();
+            if (ssrc == media_ssrc_) {
+                transport_feedback_observer_->OnTransportFeedback(
+                        *transport_feedback);
+            }
         }
     }
 

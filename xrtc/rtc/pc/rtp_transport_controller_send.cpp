@@ -1,7 +1,3 @@
-//
-// Created by faker on 2023/6/30.
-//
-
 #include "xrtc/rtc/pc/rtp_transport_controller_send.h"
 
 #include <rtc_base/logging.h>
@@ -50,6 +46,11 @@ namespace xrtc {
                 MaybeCreateController();
             }
         });
+    }
+
+    void RtpTransportControllerSend::OnTransportFeedback(
+            const rtcp::TransportFeedback& feedback)
+    {
     }
 
     void RtpTransportControllerSend::MaybeCreateController() {

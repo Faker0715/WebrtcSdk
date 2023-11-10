@@ -12,10 +12,9 @@
 #include "xrtc/rtc/modules/pacing/task_queue_paced_sender.h"
 #include "xrtc/rtc/pc/network_controller.h"
 
-
 namespace xrtc {
 
-    class RtpTransportControllerSend {
+    class RtpTransportControllerSend : public TransportFeedbackObserver {
     public:
         RtpTransportControllerSend(webrtc::Clock* clock,
                                    PacingController::PacketSender* packet_sender,
@@ -25,6 +24,10 @@ namespace xrtc {
         void EnqueuePacket(std::unique_ptr<RtpPacketToSend> packet);
 
         void OnNetworkOk(bool network_ok);
+
+        // TransportFeedbackObserver
+        void OnTransportFeedback(
+                const rtcp::TransportFeedback& feedback) override;
 
     private:
         void MaybeCreateController();

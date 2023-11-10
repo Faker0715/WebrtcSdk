@@ -537,6 +537,7 @@ namespace xrtc {
                 config.rtp.ssrc = stream.ssrcs[0];
                 config.rtp.payload_type = video_pt_;
                 config.rtp_rtcp_module_observer = this;
+                config.transport_feedback_observer = transport_send_.get();
                 if (stream.ssrcs.size() > 1) {
                     config.rtp.rtx.ssrc = stream.ssrcs[1];
                     config.rtp.rtx.payload_type = video_rtx_pt_;
