@@ -482,6 +482,15 @@ namespace xrtc {
             pc_state_ = pc_state;
             SignalConnectionState(this, pc_state);
         }
+
+        if (PeerConnectionState::kConnected == pc_state_) {
+            transport_send_->OnNetworkOk(true);
+        }
+        else if (PeerConnectionState::kDisconnected == pc_state_ ||
+                 PeerConnectionState::kFailed == pc_state_)
+        {
+            transport_send_->OnNetworkOk(false);
+        }
     }
 
     void PeerConnection::OnRtcpPacketReceived(TransportController*,
