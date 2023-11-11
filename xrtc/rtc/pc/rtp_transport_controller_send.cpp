@@ -2,6 +2,7 @@
 
 #include <rtc_base/logging.h>
 
+#include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/transport_feedback.h"
 #include "xrtc/rtc/modules/congestion_controller/goog_cc/goog_cc_network_controller.h"
 
 namespace xrtc {
@@ -51,6 +52,9 @@ namespace xrtc {
     void RtpTransportControllerSend::OnTransportFeedback(
             const rtcp::TransportFeedback& feedback)
     {
+        for (auto packet : feedback.AllPackets()) {
+            RTC_LOG(LS_INFO) << "===========" << packet.ToString();
+        }
     }
 
     void RtpTransportControllerSend::MaybeCreateController() {

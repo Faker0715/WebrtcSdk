@@ -7,6 +7,8 @@
 
 #include <vector>
 
+#include <api/units/time_delta.h>
+
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/rtpfb.h"
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/common_header.h"
 
@@ -17,21 +19,44 @@ namespace xrtc {
         public:
             class ReceivePacket {
             public:
-                ReceivePacket(uint16_t sequence_number, int64_t time_ticks) :
+                ReceivePacket(uint16_t sequence_number, int16_t delta_ticks) :
                         sequence_number_(sequence_number),
-                        time_ticks_(time_ticks),
-                        received(true) { }
+                        delta_ticks_(delta_ticks),
+                        received_(true) { }
                 ReceivePacket(uint16_t sequence_number) :
                         sequence_number_(sequence_number),
-                        received(false) {}
+                        received_(false) {}
+
+                uint16_t sequence_number() const {
+                    return sequence_number_;
+                }
+
+                int16_t delta_ticks() const { return delta_ticks_; }
+                int32_t delta_us() const { return delta_ticks_ * kDeltaScaleFactor; }
+                webrtc::TimeDelta delta() const {
+                    return webrtc::TimeDelta::Micros(delta_us());
+                }
+
+                bool received() const { return received_; }
+
+                std::string ToString() const;
 
             private:
                 uint16_t sequence_number_;
-                int64_t time_ticks_ = 0;
-                bool received;
+                int16_t delta_ticks_ = 0;
+                bool received_;
             };
 
             static const uint8_t kFeedbackMessageType = 15;
+            static const int kDeltaScaleFactor = 250; // 250us
+
+            const std::vector<ReceivePacket>& AllPackets() const {
+                return all_packets_;
+            }
+
+            const std::vector<ReceivePacket>& ReceivedPackets() const {
+                return received_packets_;
+            }
 
             bool Parse(const rtcp::CommonHeader& packet);
 
@@ -80,7 +105,7 @@ namespace xrtc {
             std::vector<ReceivePacket> received_packets_;
             bool include_lost_ = true;
             bool include_timestamps_ = true;
-            bool size_bytes_ = 0;
+            size_t size_bytes_ = 0;
         };
 
     } // namespace rtcp

@@ -1,8 +1,6 @@
-//
-// Created by faker on 2023/11/8.
-//
-
 #include "xrtc/rtc/modules/rtp_rtcp/rtcp_packet/transport_feedback.h"
+
+#include <sstream>
 
 #include <absl/algorithm/container.h>
 #include <rtc_base/logging.h>
@@ -70,7 +68,7 @@ namespace xrtc {
             feedback_seq_ = payload[15];
 
             if (0 == status_count) {
-                RTC_LOG(LS_WARNING) << "Empty transport feedback message not allowd";
+                RTC_LOG(LS_WARNING) << "Empty transport feedback message not allowed";
                 return false;
             }
 
@@ -88,7 +86,7 @@ namespace xrtc {
             // 读取完所有的RTP包的状态信息，才会结束循环
             while (delta_sizes.size() < status_count) {
                 if (index + kChunkSizeBytes > end_index) {
-                    RTC_LOG(LS_WARNING) << "Buffer overlow when parsing packet";
+                    RTC_LOG(LS_WARNING) << "Buffer overflow when parsing packet";
                     Clear();
                     return false;
                 }
@@ -259,6 +257,14 @@ namespace xrtc {
             for (size_t i = 0; i < size_; ++i) {
                 delta_sizes_[i] = (chunk >> 2 * (kTwoBitCapacity - 1 - i)) & 0x03;
             }
+        }
+
+        std::string TransportFeedback::ReceivePacket::ToString() const {
+            std::stringstream ss;
+            ss << "sequence_number: " << sequence_number_
+               << ", delta_us: " << delta_us()
+               << ", received: " << received_;
+            return ss.str();
         }
 
     } // namespace rtcp
