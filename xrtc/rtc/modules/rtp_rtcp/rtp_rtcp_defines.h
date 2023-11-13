@@ -8,6 +8,8 @@
 
 #include <stdint.h>
 
+#include <absl/types/optional.h>
+
 namespace xrtc {
     namespace rtcp {
 
@@ -60,17 +62,27 @@ namespace xrtc {
         kPadding,
     };
 
+    struct RtpPacketSendInfo {
+        RtpPacketSendInfo() = default;
+
+        uint16_t transport_sequence_number = 0;
+        absl::optional<uint32_t> media_ssrc;
+        uint16_t rtp_sequence_number = 0;
+        uint32_t rtp_timestamp = 0;
+        size_t length = 0;
+        absl::optional<RtpPacketMediaType> packet_type;
+    };
+
     class TransportFeedbackObserver {
     public:
         virtual ~TransportFeedbackObserver() {}
 
+        virtual void OnAddPacket(const RtpPacketSendInfo& send_info) = 0;
         virtual void OnTransportFeedback(
                 const rtcp::TransportFeedback& feedback) = 0;
     };
 
-} // namespace xrtc
-
-
+} // namespace x
 
 
 #endif //XRTCSDK_RTP_RTCP_DEFINES_H

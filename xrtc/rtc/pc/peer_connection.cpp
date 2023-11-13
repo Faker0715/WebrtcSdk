@@ -384,7 +384,9 @@ namespace xrtc {
 
             single_packet->SetSequenceNumber(video_seq_++);
             single_packet->set_packet_type(RtpPacketMediaType::kVideo);
-            single_packet->SetExtension<TransportSequenceNumber>(transport_seq_++);
+            uint16_t packet_id = transport_seq_++;
+            single_packet->SetExtension<TransportSequenceNumber>(packet_id);
+            AddPacketToTransportFeedback(packet_id, single_packet.get());
 
             if (video_send_stream_) {
                 video_send_stream_->UpdateRtpStats(single_packet, false, false);
@@ -572,6 +574,28 @@ namespace xrtc {
         }
 
         return nullptr;
+    }
+
+    void PeerConnection::AddPacketToTransportFeedback(uint16_t packet_id,
+                                                      RtpPacketToSend* packet)
+    {
+        RtpPacketSendInfo send_info;
+        send_info.transport_sequence_number = packet_id;
+        send_info.rtp_timestamp = packet->timestamp();
+        send_info.length = packet->size();
+        send_info.packet_type = packet->packet_type();
+
+        switch (*send_info.packet_type) {
+            case RtpPacketMediaType::kAudio:
+            case RtpPacketMediaType::kVideo:
+                send_info.media_ssrc = packet->ssrc();
+                send_info.rtp_sequence_number = packet->sequence_number();
+                break;
+            default:
+                break;
+        }
+
+        transport_send_->OnAddPacket(send_info);
     }
 
 } // namespace xrtc

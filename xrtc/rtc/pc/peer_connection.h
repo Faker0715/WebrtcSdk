@@ -69,6 +69,8 @@ namespace xrtc {
         void CreateVideoSendStream(VideoContentDescription* video_content);
         void AddVideoCache(std::shared_ptr<RtpPacketToSend> packet);
         std::shared_ptr<RtpPacketToSend> FindVideoCache(uint16_t seq);
+        void AddPacketToTransportFeedback(uint16_t packet_id,
+                                          RtpPacketToSend* packet);
 
     private:
         std::unique_ptr<SessionDescription> remote_desc_;
@@ -97,6 +99,4 @@ namespace xrtc {
         RtpHeaderExtensionMap rtp_header_extension_map_;
     };
 
-} // namespace xrtc
-
-#endif // XRTCSDK_XRTC_RTC_PC_PEER_CONNECTION_H_
+} // namespace xrtc#endif // XRTCSDK_XRTC_RTC_PC_PEER_CONNECTION_H_

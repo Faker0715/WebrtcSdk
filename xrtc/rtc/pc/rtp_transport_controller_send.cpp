@@ -49,6 +49,17 @@ namespace xrtc {
         });
     }
 
+    void RtpTransportControllerSend::OnAddPacket(
+            const RtpPacketSendInfo& send_info)
+    {
+        webrtc::Timestamp creation_time = webrtc::Timestamp::Millis(
+                clock_->TimeInMilliseconds());
+        task_queue_.PostTask([this, creation_time, send_info]() {
+            transport_feedback_adapter_.AddPacket(creation_time, 0,
+                                                  send_info);
+        });
+    }
+
     void RtpTransportControllerSend::OnTransportFeedback(
             const rtcp::TransportFeedback& feedback)
     {
