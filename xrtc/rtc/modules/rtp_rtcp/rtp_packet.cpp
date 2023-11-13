@@ -112,6 +112,23 @@ namespace xrtc {
         return SetPayloadSize(payload_size);
     }
 
+    rtc::ArrayView<const uint8_t> RtpPacket::FindExtension(
+            RTPExtensionType type) const
+    {
+        uint8_t id = extensions_.GetId(type);
+        if (id == RtpHeaderExtensionMap::kInvalidId) { // 扩展没有注册
+            return nullptr;
+        }
+
+        const ExtensionInfo* extension_info = FindExtensionInfo(id);
+        if (!extension_info) {
+            return nullptr;
+        }
+
+        return rtc::MakeArrayView<const uint8_t>(data() + extension_info->offset,
+                                                 extension_info->length);
+    }
+
     rtc::ArrayView<uint8_t> RtpPacket::AllocateExtension(RTPExtensionType type,
                                                          size_t length)
     {
@@ -133,7 +150,7 @@ namespace xrtc {
                                                             size_t length)
     {
         // 判断将要添加的扩展，是否已经添加过了
-        const ExtensionInfo* extension_entry = FindExtension(id);
+        const ExtensionInfo* extension_entry = FindExtensionInfo(id);
         if (extension_entry) {
             // 扩展已经添加过
             if (extension_entry->length == length) {
@@ -261,7 +278,7 @@ namespace xrtc {
                                   length);
     }
 
-    const RtpPacket::ExtensionInfo* RtpPacket::FindExtension(uint8_t id) {
+    const RtpPacket::ExtensionInfo* RtpPacket::FindExtensionInfo(uint8_t id) const {
         for (const ExtensionInfo& entry : extension_entries_) {
             if (id == entry.id) {
                 return &entry;

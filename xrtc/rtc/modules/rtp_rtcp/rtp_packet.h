@@ -56,6 +56,11 @@ namespace xrtc {
             buffer_.MutableData()[offset] = byte;
         }
 
+        rtc::ArrayView<const uint8_t> FindExtension(RTPExtensionType type) const;
+
+        template <typename Extension>
+        absl::optional<typename Extension::value_type> GetExtension() const;
+
         template <typename Extension, typename... Values>
         bool SetExtension(const Values&... values);
 
@@ -76,7 +81,7 @@ namespace xrtc {
 
         rtc::ArrayView<uint8_t> AllocateRawExtension(uint8_t id,
                                                      size_t length);
-        const ExtensionInfo* FindExtension(uint8_t id);
+        const ExtensionInfo* FindExtensionInfo(uint8_t id) const;
         void PromoteToTwoByteHeaderExtension();
         uint16_t SetExtensionLengthMaybeAddZeroPadding(size_t extension_offset);
 
@@ -97,6 +102,17 @@ namespace xrtc {
 
         rtc::CopyOnWriteBuffer buffer_;
     };
+
+    template <typename Extension>
+    absl::optional<typename Extension::value_type> RtpPacket::GetExtension() const {
+        absl::optional<typename Extension::value_type> result;
+        auto raw = FindExtension(Extension::kId);
+        if (raw.empty() || !Extension::Parse(raw, &result.emplace())) {
+            return absl::nullopt;
+        }
+
+        return result;
+    }
 
     template <typename Extension, typename... Values>
     bool RtpPacket::SetExtension(const Values&... values) {
@@ -121,5 +137,4 @@ namespace xrtc {
     }
 
 } // namespace xrtc
-
 #endif // XRTCSDK_XRTC_RTC_MODULES_RTP_RTCP_RTP_PACKET_H_

@@ -4,6 +4,18 @@
 
 namespace xrtc {
 
+    bool TransportSequenceNumber::Parse(rtc::ArrayView<const uint8_t> data,
+                                        uint16_t* transport_sequence_number)
+    {
+        if (data.size() != kValueSizeBytes) {
+            return false;
+        }
+
+        *transport_sequence_number = webrtc::ByteReader<uint16_t>::ReadBigEndian(
+                data.data());
+        return true;
+    }
+
     bool TransportSequenceNumber::Write(rtc::ArrayView<uint8_t> data,
                                         uint16_t transport_sequence_number)
     {

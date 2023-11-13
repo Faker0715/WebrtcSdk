@@ -5,6 +5,8 @@
 #include <rtc_base/logging.h>
 #include <rtc_base/string_encode.h>
 #include <rtc_base/helpers.h>
+#include <rtc_base/network/sent_packet.h>
+#include <rtc_base/time_utils.h>
 #include <api/task_queue/default_task_queue_factory.h>
 #include <ice/candidate.h>
 
@@ -448,6 +450,14 @@ namespace xrtc {
 
         transport_controller_->SendPacket("audio", (const char*)packet->data(),
                                           packet->size());
+
+        rtc::SentPacket sent;
+        sent.send_time_ms = rtc::TimeMillis();
+        if (auto packet_id = packet->GetExtension<TransportSequenceNumber>()) {
+            sent.packet_id = *packet_id;
+        }
+
+        transport_send_->OnSentPacket(sent);
     }
 
     void PeerConnection::OnIceState(TransportController*,

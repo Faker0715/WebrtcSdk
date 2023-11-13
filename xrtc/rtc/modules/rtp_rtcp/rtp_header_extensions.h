@@ -10,6 +10,7 @@ namespace xrtc {
 
     class TransportSequenceNumber {
     public:
+        using value_type = uint16_t;
         static const RTPExtensionType kId = kRtpExtensionTransportSequenceNumber;
         static const size_t kValueSizeBytes = 2;
         static const absl::string_view Uri() {
@@ -19,6 +20,9 @@ namespace xrtc {
         static size_t ValueSize(uint16_t) {
             return kValueSizeBytes;
         }
+
+        static bool Parse(rtc::ArrayView<const uint8_t> data,
+                          uint16_t* transport_sequence_number);
 
         static bool Write(rtc::ArrayView<uint8_t> data,
                           uint16_t transport_sequence_number);

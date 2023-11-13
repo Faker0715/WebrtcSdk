@@ -49,6 +49,14 @@ namespace xrtc {
         });
     }
 
+    void RtpTransportControllerSend::OnSentPacket(
+            const rtc::SentPacket& sent_packet)
+    {
+        task_queue_.PostTask([this, sent_packet]() {
+            transport_feedback_adapter_.ProcessSentPacket(sent_packet);
+        });
+    }
+
     void RtpTransportControllerSend::OnAddPacket(
             const RtpPacketSendInfo& send_info)
     {

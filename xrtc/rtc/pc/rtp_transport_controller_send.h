@@ -4,8 +4,8 @@
 
 #ifndef XRTCSDK_RTP_TRANSPORT_CONTROLLER_SEND_H
 #define XRTCSDK_RTP_TRANSPORT_CONTROLLER_SEND_H
-
 #include <system_wrappers/include/clock.h>
+#include <rtc_base/network/sent_packet.h>
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_packet_to_send.h"
 #include "xrtc/rtc/modules/pacing/task_queue_paced_sender.h"
@@ -24,6 +24,7 @@ namespace xrtc {
         void EnqueuePacket(std::unique_ptr<RtpPacketToSend> packet);
 
         void OnNetworkOk(bool network_ok);
+        void OnSentPacket(const rtc::SentPacket& sent_packet);
 
         // TransportFeedbackObserver
         void OnAddPacket(const RtpPacketSendInfo& send_info) override;

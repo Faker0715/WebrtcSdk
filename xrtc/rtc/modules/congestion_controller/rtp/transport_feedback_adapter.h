@@ -4,6 +4,7 @@
 
 #include <api/units/time_delta.h>
 #include <api/transport/network_types.h>
+#include <rtc_base/network/sent_packet.h>
 #include <modules/include/module_common_types_public.h>
 
 #include "xrtc/rtc/modules/rtp_rtcp/rtp_rtcp_defines.h"
@@ -24,6 +25,8 @@ namespace xrtc {
         TransportFeedbackAdapter();
         ~TransportFeedbackAdapter();
 
+        absl::optional<webrtc::SentPacket> ProcessSentPacket(
+                const rtc::SentPacket& sent_packet);
         void AddPacket(webrtc::Timestamp creation_time,
                        size_t overhead_bytes,
                        const RtpPacketSendInfo& send_info);
@@ -41,6 +44,7 @@ namespace xrtc {
         webrtc::TimeDelta last_timestamp_ = webrtc::TimeDelta::MinusInfinity();
         std::map<int64_t, PacketFeedback> history_;
         webrtc::SequenceNumberUnwrapper seq_num_unwrapper_;
+        webrtc::Timestamp last_send_time_ = webrtc::Timestamp::MinusInfinity();
     };
 
 } // namespace xrtc

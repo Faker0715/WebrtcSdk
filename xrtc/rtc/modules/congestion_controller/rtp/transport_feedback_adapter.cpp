@@ -12,6 +12,26 @@ namespace xrtc {
     TransportFeedbackAdapter::~TransportFeedbackAdapter() {
     }
 
+    absl::optional<webrtc::SentPacket> TransportFeedbackAdapter::ProcessSentPacket(
+            const rtc::SentPacket& sent_packet)
+    {
+        auto send_time = webrtc::Timestamp::Millis(sent_packet.send_time_ms);
+        int64_t unwrapped_seq_num = seq_num_unwrapper_.Unwrap(
+                sent_packet.packet_id);
+        auto it = history_.find(unwrapped_seq_num);
+        if (it != history_.end()) { // 找到了发送记录
+            bool packet_retransmit = it->second.sent.send_time.IsFinite();
+            it->second.sent.send_time = send_time;
+            last_send_time_ = std::max(last_send_time_, send_time);
+
+            if (!packet_retransmit) {
+                return it->second.sent;
+            }
+        }
+
+        return absl::nullopt;
+    }
+
     void TransportFeedbackAdapter::AddPacket(webrtc::Timestamp creation_time,
                                              size_t overhead_bytes,
                                              const RtpPacketSendInfo& send_info)
