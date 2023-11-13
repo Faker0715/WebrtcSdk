@@ -99,4 +99,6 @@ namespace xrtc {
         RtpHeaderExtensionMap rtp_header_extension_map_;
     };
 
-} // namespace xrtc#endif // XRTCSDK_XRTC_RTC_PC_PEER_CONNECTION_H_
+} // namespace xrtc
+
+#endif // XRTCSDK_XRTC_RTC_PC_PEER_CONNECTION_H_

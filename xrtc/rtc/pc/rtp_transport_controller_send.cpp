@@ -74,8 +74,12 @@ namespace xrtc {
         webrtc::Timestamp feedback_time =
                 webrtc::Timestamp::Millis(clock_->TimeInMilliseconds());
         task_queue_.PostTask([this, feedback, feedback_time]() {
-            transport_feedback_adapter_.ProcessTransportFeedback(
-                    feedback, feedback_time);
+            absl::optional<webrtc::TransportPacketsFeedback> feedback_msg =
+                    transport_feedback_adapter_.ProcessTransportFeedback(
+                            feedback, feedback_time);
+            if (feedback_msg && controller_) {
+                controller_->OnTransportPacketsFeedback(*feedback_msg);
+            }
         });
     }
 

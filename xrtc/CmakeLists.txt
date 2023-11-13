@@ -25,7 +25,8 @@ add_library(xrtc SHARED ${all_src} base/xrtc_global.cpp device/cam_impl.cpp devi
         rtc/modules/rtp_rtcp/rtcp_packet/transport_feedback.cpp
         rtc/modules/congestion_controller/goog_cc/goog_cc_network_controller.h
         rtc/modules/congestion_controller/goog_cc/goog_cc_network_controller.cpp
-        rtc/modules/congestion_controller/rtp/transport_feedback_adapter.cpp)
+        rtc/modules/congestion_controller/rtp/transport_feedback_adapter.cpp
+        rtc/modules/congestion_controller/goog_cc/delay_based_bwe.cpp)
 #add_library(xrtc STATIC ${all_src} base/xrtc_global.cpp)
 
 target_link_libraries(xrtc

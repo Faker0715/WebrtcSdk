@@ -69,7 +69,16 @@ namespace xrtc {
         msg.packet_feedbacks = ProcessTransportFeedbackInner(
                 feedback, feedback_time);
 
-        return absl::optional<webrtc::TransportPacketsFeedback>();
+        if (msg.packet_feedbacks.empty()) {
+            return absl::nullopt;
+        }
+
+        auto it = history_.find(last_ack_seq_num_);
+        if (it != history_.end()) {
+            msg.first_unacked_send_time = it->second.sent.send_time;
+        }
+
+        return msg;
     }
 
     std::vector<webrtc::PacketResult>
@@ -127,6 +136,8 @@ namespace xrtc {
                 packet_offset += packet.delta();
                 it->second.receive_time = current_offset_ +
                                           packet_offset.RoundDownTo(webrtc::TimeDelta::Millis(1));
+                // 一旦我们收到了rtp包的feedback反馈，我们将历史记录清除
+                history_.erase(it);
             }
 
             PacketFeedback packet_feedback = it->second;
