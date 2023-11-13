@@ -52,9 +52,12 @@ namespace xrtc {
     void RtpTransportControllerSend::OnTransportFeedback(
             const rtcp::TransportFeedback& feedback)
     {
-        for (auto packet : feedback.AllPackets()) {
-            RTC_LOG(LS_INFO) << "===========" << packet.ToString();
-        }
+        webrtc::Timestamp feedback_time =
+                webrtc::Timestamp::Millis(clock_->TimeInMilliseconds());
+        task_queue_.PostTask([this, feedback, feedback_time]() {
+            transport_feedback_adapter_.ProcessTransportFeedback(
+                    feedback, feedback_time);
+        });
     }
 
     void RtpTransportControllerSend::MaybeCreateController() {

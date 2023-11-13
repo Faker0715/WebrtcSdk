@@ -2,9 +2,6 @@
 // Created by faker on 2023/11/8.
 //
 
-#ifndef XRTCSDK_XRTC_MODULES_RTP_RTCP_RTCP_PACKET_TRANSPORT_FEEDBACK_H_
-#define XRTCSDK_XRTC_MODULES_RTP_RTCP_RTCP_PACKET_TRANSPORT_FEEDBACK_H_
-
 #include <vector>
 
 #include <api/units/time_delta.h>
@@ -58,6 +55,14 @@ namespace xrtc {
                 return received_packets_;
             }
 
+            uint16_t GetPacketStatusCount() const { return num_seq_no_; }
+
+            webrtc::TimeDelta GetBaseTime() const;
+            int64_t GetBaseTimeUs() const;
+
+            webrtc::TimeDelta GetBaseDelta(int64_t prev_timestamp_us) const;
+            int64_t GetBaseDeltaUs(int64_t prev_timestamp_us) const;
+
             bool Parse(const rtcp::CommonHeader& packet);
 
             size_t BlockLength() const override;
@@ -96,6 +101,7 @@ namespace xrtc {
 
         private:
             uint16_t base_seq_no_ = 0;
+            uint16_t num_seq_no_ = 0;
             int32_t base_time_ticks_ = 0;
             uint8_t feedback_seq_ = 0;
             LastChunk last_chunk_;
