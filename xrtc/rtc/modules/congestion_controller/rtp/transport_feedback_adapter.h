@@ -45,6 +45,7 @@ namespace xrtc {
         std::map<int64_t, PacketFeedback> history_;
         webrtc::SequenceNumberUnwrapper seq_num_unwrapper_;
         webrtc::Timestamp last_send_time_ = webrtc::Timestamp::MinusInfinity();
+        int64_t last_ack_seq_num_ = -1;
     };
 
 } // namespace xrtc

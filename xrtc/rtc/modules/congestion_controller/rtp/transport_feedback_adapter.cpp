@@ -95,7 +95,48 @@ namespace xrtc {
 
         last_timestamp_ = feedback.GetBaseTime();
 
-        return std::vector<webrtc::PacketResult>();
+        std::vector<webrtc::PacketResult> packet_result_vector;
+        packet_result_vector.reserve(feedback.GetPacketStatusCount());
+
+        size_t failed_lookups = 0;
+        webrtc::TimeDelta packet_offset = webrtc::TimeDelta::Zero();
+        for (const auto& packet : feedback.AllPackets()) {
+            int64_t seq_num = seq_num_unwrapper_.Unwrap(
+                    packet.sequence_number());
+
+            if (seq_num > last_ack_seq_num_) {
+                last_ack_seq_num_ = seq_num;
+            }
+
+            // 查找seq_num是否在发送历史记录中存在
+            auto it = history_.find(seq_num);
+            if (it == history_.end()) {
+                ++failed_lookups;
+                continue;
+            }
+
+            // RTP数据包还未标记发送就已经收到feedback
+            if (it->second.sent.send_time.IsInfinite()) {
+                RTC_LOG(LS_WARNING) << "Received feedback before packet "
+                                    << "was indicated as sent";
+                continue;
+            }
+
+            // 计算每个RTP包的达到时间，转换成发送端的时间
+            if (packet.received()) {
+                packet_offset += packet.delta();
+                it->second.receive_time = current_offset_ +
+                                          packet_offset.RoundDownTo(webrtc::TimeDelta::Millis(1));
+            }
+
+            PacketFeedback packet_feedback = it->second;
+            webrtc::PacketResult result;
+            result.sent_packet = packet_feedback.sent;
+            result.receive_time = packet_feedback.receive_time;
+            packet_result_vector.push_back(result);
+        }
+
+        return packet_result_vector;
     }
 
 } // namespace xrtc
