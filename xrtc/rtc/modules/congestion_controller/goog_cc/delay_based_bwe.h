@@ -5,6 +5,7 @@
 #include <api/units/data_rate.h>
 
 #include "xrtc/rtc/modules/congestion_controller/goog_cc/inter_arrival_delta.h"
+#include "xrtc/rtc/modules/congestion_controller/goog_cc/trendline_estimator.h"
 
 namespace xrtc {
 
@@ -27,6 +28,7 @@ namespace xrtc {
 
     private:
         std::unique_ptr<InterArrivalDelta> video_inter_arrival_delta_;
+        std::unique_ptr<TrendlineEstimator> video_delay_detector_;
         webrtc::Timestamp last_seen_timestamp_ = webrtc::Timestamp::MinusInfinity();
     };
 

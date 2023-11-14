@@ -19,6 +19,7 @@ namespace xrtc {
 
         DelayBasedBwe::Result result;
         result = delay_base_bwe_->IncomingPacketFeedbackVector(report);
+        return webrtc::NetworkControlUpdate();
     }
 
 } // namespace xrtc

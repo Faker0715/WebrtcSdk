@@ -1,5 +1,7 @@
 #include "xrtc/rtc/modules/congestion_controller/goog_cc/delay_based_bwe.h"
 
+#include <rtc_base/logging.h>
+
 namespace xrtc {
     namespace {
 
@@ -8,7 +10,9 @@ namespace xrtc {
 
     } // namespace
 
-    DelayBasedBwe::DelayBasedBwe() {
+    DelayBasedBwe::DelayBasedBwe() :
+            video_delay_detector_(std::make_unique<TrendlineEstimator>())
+    {
     }
 
     DelayBasedBwe::~DelayBasedBwe() {
@@ -40,6 +44,7 @@ namespace xrtc {
         {
             video_inter_arrival_delta_ = std::make_unique<InterArrivalDelta>(
                     kSendTimeGroupLength);
+            video_delay_detector_.reset(new TrendlineEstimator());
         }
 
         last_seen_timestamp_ = at_time;
@@ -56,6 +61,20 @@ namespace xrtc {
                 at_time,
                 packet_size,
                 &send_time_delta, &recv_time_delta, &packet_size_delta);
+
+        /*
+        if (calculated_delta) {
+            RTC_LOG(LS_WARNING) << "**************send_delta: " << send_time_delta.ms()
+                << ", recv_delta: " << recv_time_delta.ms()
+                << ", packet_size_delta: " << packet_size_delta;
+        }
+        */
+
+        video_delay_detector_->Update(recv_time_delta, send_time_delta,
+                                      packet_feedback.sent_packet.send_time,
+                                      packet_feedback.receive_time,
+                                      packet_size,
+                                      calculated_delta);
     }
 
 } // namespace xrtc

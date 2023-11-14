@@ -93,7 +93,7 @@ namespace xrtc {
             webrtc::TimeDelta delta = feedback.GetBaseDelta(last_timestamp_.us())
                     .RoundDownTo(webrtc::TimeDelta::Millis(1));
 
-            if (current_offset_ < webrtc::Timestamp::Zero() - delta) {
+            if (delta < webrtc::Timestamp::Zero() - current_offset_) {
                 RTC_LOG(LS_WARNING) << "Unexpected timestamp in transport feedback packet";
                 current_offset_ = feedback_time;
             }
@@ -131,16 +131,17 @@ namespace xrtc {
                 continue;
             }
 
+            PacketFeedback packet_feedback = it->second;
+
             // 计算每个RTP包的达到时间，转换成发送端的时间
             if (packet.received()) {
                 packet_offset += packet.delta();
-                it->second.receive_time = current_offset_ +
-                                          packet_offset.RoundDownTo(webrtc::TimeDelta::Millis(1));
+                packet_feedback.receive_time = current_offset_ +
+                                               packet_offset.RoundDownTo(webrtc::TimeDelta::Millis(1));
                 // 一旦我们收到了rtp包的feedback反馈，我们将历史记录清除
                 history_.erase(it);
             }
 
-            PacketFeedback packet_feedback = it->second;
             webrtc::PacketResult result;
             result.sent_packet = packet_feedback.sent;
             result.receive_time = packet_feedback.receive_time;
