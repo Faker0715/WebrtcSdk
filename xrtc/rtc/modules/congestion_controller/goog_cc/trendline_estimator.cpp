@@ -63,10 +63,37 @@ namespace xrtc {
         }
     }
 
+// 线性回归最小二乘法
     absl::optional<double> TrendlineEstimator::LinearFitSlope(
             const std::deque<PacketTiming>& packets)
     {
-        return absl::optional<double>();
+        double sum_x = 0.0f;
+        double sum_y = 0.0f;
+        for (const auto& packet : packets) {
+            sum_x += packet.arrival_time_ms;
+            sum_y += packet.smoothed_delay_ms;
+        }
+
+        // 计算x，y的平均值
+        double avg_x = sum_x / packets.size();
+        double avg_y = sum_y / packets.size();
+
+        // 分别计算分子和分母
+        double num = 0.0f;
+        double den = 0.0f;
+        for (const auto& packet : packets) {
+            double x = packet.arrival_time_ms;
+            double y = packet.smoothed_delay_ms;
+
+            num += (x - avg_x) * (y - avg_y);
+            den += (x - avg_x) * (x - avg_x);
+        }
+
+        if (0.0f == den) {
+            return absl::nullopt;
+        }
+
+        return num / den;
     }
 
 } // namespace xrtc
