@@ -6,6 +6,7 @@
 #include <absl/types/optional.h>
 #include <api/units/time_delta.h>
 #include <api/units/timestamp.h>
+#include <api/network_state_predictor.h>
 
 namespace xrtc {
 
@@ -44,14 +45,23 @@ namespace xrtc {
         absl::optional<double> LinearFitSlope(
                 const std::deque<PacketTiming>& packets);
 
+        void Detect(double trend, double ts_delta, int64_t now_ms);
+
     private:
         int64_t first_arrival_time_ms_ = -1;
         double accumulated_delay_ms_ = 0;
         double smoothed_delay_ms_ = 0;
         // 表示了历史数据的权重
         double smoothing_coef_;
+        // trend增益的阈值
+        double threshold_gain_;
         std::deque<PacketTiming> delay_hist_;
         double prev_trend_ = 0.0f;
+        webrtc::BandwidthUsage hypothesis_ = webrtc::BandwidthUsage::kBwNormal;
+        double threshold_ = 12.5; // 经验值，后续会动态自适应调整
+        double time_over_using_ = -1;
+        int overuse_counter_ = 0;
+        int num_of_deltas_ = 0;
     };
 
 } // namespace xrtc

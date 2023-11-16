@@ -1,15 +1,21 @@
 ﻿#include "xrtc/rtc/modules/congestion_controller/goog_cc/trendline_estimator.h"
 
+#include <rtc_base/numerics/safe_minmax.h>
+
 namespace xrtc {
     namespace {
 
         const double kDefaultTrendlineSmoothingCoef = 0.9;
         const size_t kDefaultTrendlineWindowSize = 20;
+        const double kDefaultTrendlineThresholdGain = 4.0;
+        const int kMinNumDeltas = 60;
+        const double kOverUsingTimeThreshold = 10;
 
     } // namespace
 
     xrtc::TrendlineEstimator::TrendlineEstimator() :
-            smoothing_coef_(kDefaultTrendlineSmoothingCoef)
+            smoothing_coef_(kDefaultTrendlineSmoothingCoef),
+            threshold_gain_(kDefaultTrendlineThresholdGain)
     {
     }
 
@@ -41,6 +47,9 @@ namespace xrtc {
             first_arrival_time_ms_ = arrival_time_ms;
         }
 
+        // 统计样本的个数
+        ++num_of_deltas_;
+
         // 计算传输的延迟差
         double delta_ms = recv_delta_ms - send_delta_ms;
         accumulated_delay_ms_ += delta_ms;
@@ -61,6 +70,9 @@ namespace xrtc {
         if (delay_hist_.size() == kDefaultTrendlineWindowSize) {
             trend = LinearFitSlope(delay_hist_).value_or(trend);
         }
+
+        // 根据trend值进行过载检测
+        Detect(trend, send_delta_ms, arrival_time_ms);
     }
 
 // 线性回归最小二乘法
@@ -94,6 +106,54 @@ namespace xrtc {
         }
 
         return num / den;
+    }
+
+    void TrendlineEstimator::Detect(double trend, double ts_delta,
+                                    int64_t now_ms)
+    {
+        if (num_of_deltas_ < 2) {
+            hypothesis_ = webrtc::BandwidthUsage::kBwNormal;
+            return;
+        }
+
+        // 1. 对原始的trend值进行增益处理，增加区分度
+        double modified_trend =
+                std::min(num_of_deltas_, kMinNumDeltas) * trend * threshold_gain_;
+
+        // 2. 进行过载检测
+        if (modified_trend > threshold_) { // 有可能过载了
+            if (-1 == time_over_using_) { // 第一次超过阈值
+                time_over_using_ = ts_delta / 2;
+            }
+            else {
+                time_over_using_ += ts_delta;
+            }
+
+            ++overuse_counter_;
+
+            if (time_over_using_ > kOverUsingTimeThreshold && overuse_counter_ > 1) {
+                if (trend > prev_trend_) {
+                    // 判定过载
+                    time_over_using_ = 0;
+                    overuse_counter_ = 0;
+                    hypothesis_ = webrtc::BandwidthUsage::kBwOverusing;
+                }
+            }
+        }
+        else if (modified_trend < -threshold_) {
+            // 判定负载过低了
+            time_over_using_ = -1;
+            overuse_counter_ = 0;
+            hypothesis_ = webrtc::BandwidthUsage::kBwUnderusing;
+        }
+        else {
+            // 判定正常网络状态
+            time_over_using_ = -1;
+            overuse_counter_ = 0;
+            hypothesis_ = webrtc::BandwidthUsage::kBwNormal;
+        }
+
+        prev_trend_ = trend;
     }
 
 } // namespace xrtc
