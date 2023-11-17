@@ -18,6 +18,9 @@ namespace xrtc {
             smoothing_coef_(kDefaultTrendlineSmoothingCoef),
             threshold_gain_(kDefaultTrendlineThresholdGain)
     {
+        x_time_.open("D:/test/x_time.txt");
+        y_trend_.open("D:/test/y_trend.txt");
+        y_threshold_.open("D:/test/y_threshold.txt");
     }
 
     TrendlineEstimator::~TrendlineEstimator() {
@@ -158,6 +161,11 @@ namespace xrtc {
 
         // 阈值的动态自适应调整
         UpdateThreshold(modified_trend, now_ms);
+
+        // for test
+        x_time_ << now_ms - first_arrival_time_ms_ << std::endl;
+        y_trend_ << modified_trend << std::endl;
+        y_threshold_ << threshold_ << std::endl;
     }
 
     void TrendlineEstimator::UpdateThreshold(double modified_trend,
@@ -175,7 +183,7 @@ namespace xrtc {
 
         // 调整阈值，当阈值调小的时候，使用的系数0.039
         // 当阈值调大的时候，使用的系数是0.0087
-        double k = fabs(modified_trend) < threshold_ ? k_down : k_up;
+        double k = fabs(modified_trend) < threshold_ ? k_down_ : k_up_;
         const int64_t kMaxTimeDelta = 100;
         int64_t time_delta_ms = std::min(now_ms - last_update_ms_, kMaxTimeDelta);
         threshold_ += k * (fabs(modified_trend) - threshold_) * time_delta_ms;

@@ -2,6 +2,7 @@
 #define XRTCSDK_XRTC_RTC_MODULES_CONGESTION_CONTROLLER_GOOG_CC_TRENDLINE_ESTIMATOR_H_
 
 #include <deque>
+#include <fstream>
 
 #include <absl/types/optional.h>
 #include <api/units/time_delta.h>
@@ -64,8 +65,13 @@ namespace xrtc {
         int overuse_counter_ = 0;
         int num_of_deltas_ = 0;
         int64_t last_update_ms_ = -1;
-        double k_up = 0.0087;
-        double k_down = 0.039;
+        double k_up_ = 0.0087;
+        double k_down_ = 0.039;
+
+        // for test
+        std::ofstream x_time_;
+        std::ofstream y_trend_;
+        std::ofstream y_threshold_;
     };
 
 } // namespace xrtc
