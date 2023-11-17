@@ -10,6 +10,7 @@ namespace xrtc {
         const double kDefaultTrendlineThresholdGain = 4.0;
         const int kMinNumDeltas = 60;
         const double kOverUsingTimeThreshold = 10;
+        const double kMaxAdaptOffset = 15.0;
 
     } // namespace
 
@@ -154,6 +155,32 @@ namespace xrtc {
         }
 
         prev_trend_ = trend;
+
+        // 阈值的动态自适应调整
+        UpdateThreshold(modified_trend, now_ms);
+    }
+
+    void TrendlineEstimator::UpdateThreshold(double modified_trend,
+                                             int64_t now_ms)
+    {
+        if (-1 == last_update_ms_) {
+            last_update_ms_ = now_ms;
+        }
+
+        // 如果modified_trend异常大的时候，忽略本次更新
+        if (modified_trend > threshold_ + kMaxAdaptOffset) {
+            last_update_ms_ = now_ms;
+            return;
+        }
+
+        // 调整阈值，当阈值调小的时候，使用的系数0.039
+        // 当阈值调大的时候，使用的系数是0.0087
+        double k = fabs(modified_trend) < threshold_ ? k_down : k_up;
+        const int64_t kMaxTimeDelta = 100;
+        int64_t time_delta_ms = std::min(now_ms - last_update_ms_, kMaxTimeDelta);
+        threshold_ += k * (fabs(modified_trend) - threshold_) * time_delta_ms;
+        threshold_ = rtc::SafeClamp(threshold_, 6.0f, 600.0f);
+        last_update_ms_ = now_ms;
     }
 
 } // namespace xrtc

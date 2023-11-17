@@ -46,6 +46,7 @@ namespace xrtc {
                 const std::deque<PacketTiming>& packets);
 
         void Detect(double trend, double ts_delta, int64_t now_ms);
+        void UpdateThreshold(double modified_trend, int64_t now_ms);
 
     private:
         int64_t first_arrival_time_ms_ = -1;
@@ -62,6 +63,9 @@ namespace xrtc {
         double time_over_using_ = -1;
         int overuse_counter_ = 0;
         int num_of_deltas_ = 0;
+        int64_t last_update_ms_ = -1;
+        double k_up = 0.0087;
+        double k_down = 0.039;
     };
 
 } // namespace xrtc
