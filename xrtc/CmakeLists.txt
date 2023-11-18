@@ -30,7 +30,8 @@ add_library(xrtc SHARED ${all_src} base/xrtc_global.cpp device/cam_impl.cpp devi
         rtc/modules/congestion_controller/goog_cc/inter_arrival_delta.cpp
         rtc/modules/congestion_controller/goog_cc/inter_arrival_delta.h
         rtc/modules/congestion_controller/goog_cc/trendline_estimator.h
-        rtc/modules/congestion_controller/goog_cc/trendline_estimator.cpp)
+        rtc/modules/congestion_controller/goog_cc/trendline_estimator.cpp
+        rtc/modules/congestion_controller/goog_cc/aimd_rate_control.cpp)
 #add_library(xrtc STATIC ${all_src} base/xrtc_global.cpp)
 
 target_link_libraries(xrtc

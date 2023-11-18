@@ -17,8 +17,10 @@ namespace xrtc {
             return webrtc::NetworkControlUpdate();
         }
 
+        absl::optional<webrtc::DataRate> acked_bitrate;
         DelayBasedBwe::Result result;
-        result = delay_base_bwe_->IncomingPacketFeedbackVector(report);
+        result = delay_base_bwe_->IncomingPacketFeedbackVector(report, acked_bitrate);
+
         return webrtc::NetworkControlUpdate();
     }
 

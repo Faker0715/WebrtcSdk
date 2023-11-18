@@ -23,6 +23,8 @@ namespace xrtc {
                     size_t packet_size,
                     bool calculated_delta);
 
+        webrtc::BandwidthUsage State() const;
+
         struct PacketTiming {
             PacketTiming(double arrival_time_ms,
                          double smoothed_delay_ms,
@@ -69,9 +71,9 @@ namespace xrtc {
         double k_down_ = 0.039;
 
         // for test
-        std::ofstream x_time_;
+        /*std::ofstream x_time_;
         std::ofstream y_trend_;
-        std::ofstream y_threshold_;
+        std::ofstream y_threshold_;*/
     };
 
 } // namespace xrtc

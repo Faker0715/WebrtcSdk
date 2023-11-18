@@ -25,4 +25,21 @@ namespace xrtc {
         return bitrate_is_init_;
     }
 
+    bool AimdRateControl::TimeToReduceFurther(webrtc::Timestamp at_time,
+                                              webrtc::DataRate estimated_throughput) const
+    {
+        return false;
+    }
+
+    bool AimdRateControl::InitialTimeToReduceFurther(
+            webrtc::Timestamp at_time) const
+    {
+        return ValidEstimate() && TimeToReduceFurther(at_time,
+                                                      LatestEstimate() / 2 - webrtc::DataRate::BitsPerSec(1));
+    }
+
+    webrtc::DataRate AimdRateControl::LatestEstimate() const {
+        return current_bitrate_;
+    }
+
 } // namespace xrtc

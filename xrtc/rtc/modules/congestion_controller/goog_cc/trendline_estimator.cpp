@@ -18,9 +18,9 @@ namespace xrtc {
             smoothing_coef_(kDefaultTrendlineSmoothingCoef),
             threshold_gain_(kDefaultTrendlineThresholdGain)
     {
-        x_time_.open("D:/test/x_time.txt");
-        y_trend_.open("D:/test/y_trend.txt");
-        y_threshold_.open("D:/test/y_threshold.txt");
+        /* x_time_.open("D:/test/x_time.txt");
+         y_trend_.open("D:/test/y_trend.txt");
+         y_threshold_.open("D:/test/y_threshold.txt");*/
     }
 
     TrendlineEstimator::~TrendlineEstimator() {
@@ -39,6 +39,10 @@ namespace xrtc {
                             send_time.ms(), arrival_time.ms(),
                             packet_size);
         }
+    }
+
+    webrtc::BandwidthUsage TrendlineEstimator::State() const {
+        return hypothesis_;
     }
 
     void TrendlineEstimator::UpdateTrendline(double recv_delta_ms,
@@ -163,9 +167,9 @@ namespace xrtc {
         UpdateThreshold(modified_trend, now_ms);
 
         // for test
-        x_time_ << now_ms - first_arrival_time_ms_ << std::endl;
-        y_trend_ << modified_trend << std::endl;
-        y_threshold_ << threshold_ << std::endl;
+        /* x_time_ << now_ms - first_arrival_time_ms_ << std::endl;
+         y_trend_ << modified_trend << std::endl;
+         y_threshold_ << threshold_ << std::endl;*/
     }
 
     void TrendlineEstimator::UpdateThreshold(double modified_trend,

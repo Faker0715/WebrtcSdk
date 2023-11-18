@@ -7,6 +7,7 @@
 
 
 #include <api/units/data_rate.h>
+#include <api/units/timestamp.h>
 
 namespace xrtc {
 
@@ -17,6 +18,11 @@ namespace xrtc {
 
         void SetStartBitrate(webrtc::DataRate start_bitrate);
         bool ValidEstimate() const;
+
+        bool TimeToReduceFurther(webrtc::Timestamp at_time,
+                                 webrtc::DataRate estimated_throughput) const;
+        bool InitialTimeToReduceFurther(webrtc::Timestamp at_time) const;
+        webrtc::DataRate LatestEstimate() const;
 
     private:
         webrtc::DataRate min_config_bitrate_;

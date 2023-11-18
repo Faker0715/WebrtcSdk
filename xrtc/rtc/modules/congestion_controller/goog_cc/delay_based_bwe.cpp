@@ -19,7 +19,8 @@ namespace xrtc {
     }
 
     DelayBasedBwe::Result DelayBasedBwe::IncomingPacketFeedbackVector(
-            const webrtc::TransportPacketsFeedback& msg)
+            const webrtc::TransportPacketsFeedback& msg,
+            absl::optional<webrtc::DataRate> acked_bitrate)
     {
         // 数据包按照到达时间进行排序
         auto packet_feedback_vector = msg.SortedByReceiveTime();
@@ -27,11 +28,19 @@ namespace xrtc {
             return DelayBasedBwe::Result();
         }
 
+        bool recover_from_overusing = false;
+        webrtc::BandwidthUsage prev_detector_state = video_delay_detector_->State();
         for (const auto& packet_feedback : packet_feedback_vector) {
             IncomingPacketFeedback(packet_feedback, msg.feedback_time);
+            if (prev_detector_state == webrtc::BandwidthUsage::kBwUnderusing &&
+                video_delay_detector_->State() == webrtc::BandwidthUsage::kBwNormal)
+            {
+                recover_from_overusing = true;
+            }
+            prev_detector_state = video_delay_detector_->State();
         }
 
-        return DelayBasedBwe::Result();
+        return MaybeUpdateEstimate(acked_bitrate, recover_from_overusing, msg.feedback_time);
     }
 
     void DelayBasedBwe::IncomingPacketFeedback(const webrtc::PacketResult& packet_feedback,
@@ -75,6 +84,34 @@ namespace xrtc {
                                       packet_feedback.receive_time,
                                       packet_size,
                                       calculated_delta);
+    }
+
+    DelayBasedBwe::Result DelayBasedBwe::MaybeUpdateEstimate(
+            absl::optional<webrtc::DataRate> acked_bitrate,
+            bool recover_from_overusing,
+            webrtc::Timestamp at_time)
+    {
+        // 根据网络检测状态来动态的调整发送码率
+        Result result;
+        // 当网络出现过载的时候
+        if (video_delay_detector_->State() == webrtc::BandwidthUsage::kBwOverusing) {
+            // 已知吞吐量时
+            if (acked_bitrate && rate_control_.TimeToReduceFurther(at_time, *acked_bitrate)) {
+
+            }
+                // 当我们不知道吞吐量的时候
+            else if (!acked_bitrate && rate_control_.ValidEstimate() &&
+                     rate_control_.InitialTimeToReduceFurther(at_time))
+            {
+
+            }
+        }
+            // 网络没有出现过载
+        else {
+
+        }
+
+        return result;
     }
 
 } // namespace xrtc
