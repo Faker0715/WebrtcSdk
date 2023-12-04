@@ -33,6 +33,9 @@ namespace xrtc {
                 absl::optional<webrtc::DataRate> acked_bitrate,
                 bool recover_from_overusing,
                 webrtc::Timestamp at_time);
+        bool UpdateEstimate(absl::optional<webrtc::DataRate> acked_bitrate,
+                            webrtc::Timestamp at_time,
+                            webrtc::DataRate* target_bitrate);
 
     private:
         std::unique_ptr<InterArrivalDelta> video_inter_arrival_delta_;

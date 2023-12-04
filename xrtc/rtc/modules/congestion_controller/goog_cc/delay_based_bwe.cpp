@@ -101,7 +101,7 @@ namespace xrtc {
         if (video_delay_detector_->State() == webrtc::BandwidthUsage::kBwOverusing) {
             // 已知吞吐量时
             if (acked_bitrate && rate_control_.TimeToReduceFurther(at_time, *acked_bitrate)) {
-
+                result.updated = UpdateEstimate(acked_bitrate, at_time, &result.target_bitrate);
             }
                 // 当我们不知道吞吐量的时候
             else if (!acked_bitrate && rate_control_.ValidEstimate() &&
@@ -120,6 +120,15 @@ namespace xrtc {
         }
 
         return result;
+    }
+
+    bool DelayBasedBwe::UpdateEstimate(absl::optional<webrtc::DataRate> acked_bitrate,
+                                       webrtc::Timestamp at_time,
+                                       webrtc::DataRate* target_bitrate)
+    {
+        *target_bitrate = rate_control_.Update(acked_bitrate,
+                                               video_delay_detector_->State(), at_time);
+        return rate_control_.ValidEstimate();
     }
 
 } // namespace xrtc

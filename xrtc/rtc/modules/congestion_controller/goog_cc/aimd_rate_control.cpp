@@ -78,9 +78,36 @@ namespace xrtc {
         }
     }
 
+    webrtc::DataRate AimdRateControl::Update(
+            absl::optional<webrtc::DataRate> throughput_estimate,
+            webrtc::BandwidthUsage state,
+            webrtc::Timestamp at_time)
+    {
+        if (!bitrate_is_init_) {
+            const webrtc::TimeDelta kInitTime = webrtc::TimeDelta::Seconds(5);
+            if (time_first_throughput_estimate_.IsInfinite()) {
+                time_first_throughput_estimate_ = at_time;
+            }
+            else if (at_time - time_first_throughput_estimate_ > kInitTime) {
+                current_bitrate_ = *throughput_estimate;
+                bitrate_is_init_ = true;
+            }
+        }
+
+        ChangeBitrate(throughput_estimate, state, at_time);
+
+        return current_bitrate_;
+    }
+
     webrtc::DataRate AimdRateControl::ClampBitrate(webrtc::DataRate new_bitrate) {
         new_bitrate = std::max(new_bitrate, min_config_bitrate_);
         return new_bitrate;
+    }
+
+    void AimdRateControl::ChangeBitrate(absl::optional<webrtc::DataRate> throughput_estimate,
+                                        webrtc::BandwidthUsage state,
+                                        webrtc::Timestamp at_time)
+    {
     }
 
 } // namespace xrtc

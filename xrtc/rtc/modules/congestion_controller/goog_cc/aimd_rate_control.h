@@ -8,7 +8,8 @@
 
 #include <api/units/data_rate.h>
 #include <api/units/timestamp.h>
-
+#include <api/network_state_predictor.h>
+#include <absl/types/optional.h>
 namespace xrtc {
 
     class AimdRateControl {
@@ -25,9 +26,15 @@ namespace xrtc {
         webrtc::DataRate LatestEstimate() const;
         void SetRtt(webrtc::TimeDelta rtt);
         void SetEstimate(webrtc::DataRate new_bitrate, webrtc::Timestamp at_time);
+        webrtc::DataRate Update(absl::optional<webrtc::DataRate> throughput_estimate,
+                                webrtc::BandwidthUsage state,
+                                webrtc::Timestamp at_time);
 
     private:
         webrtc::DataRate ClampBitrate(webrtc::DataRate new_bitrate);
+        void ChangeBitrate(absl::optional<webrtc::DataRate> throughput_estimate,
+                           webrtc::BandwidthUsage state,
+                           webrtc::Timestamp at_time);
 
     private:
         webrtc::DataRate min_config_bitrate_;
@@ -37,6 +44,7 @@ namespace xrtc {
         webrtc::TimeDelta rtt_;
         webrtc::Timestamp time_last_bitrate_change_ = webrtc::Timestamp::MinusInfinity();
         webrtc::Timestamp time_last_bitrate_decrease_ = webrtc::Timestamp::MinusInfinity();
+        webrtc::Timestamp time_first_throughput_estimate_ = webrtc::Timestamp::MinusInfinity();
     };
 
 } // namespace xrtc
