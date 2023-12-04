@@ -107,7 +107,11 @@ namespace xrtc {
             else if (!acked_bitrate && rate_control_.ValidEstimate() &&
                      rate_control_.InitialTimeToReduceFurther(at_time))
             {
-
+                // 当我们不知道吞吐量的时候，将当前的码率下降一半
+                rate_control_.SetEstimate(rate_control_.LatestEstimate() / 2,
+                                          at_time);
+                result.updated = true;
+                result.target_bitrate = rate_control_.LatestEstimate();
             }
         }
             // 网络没有出现过载

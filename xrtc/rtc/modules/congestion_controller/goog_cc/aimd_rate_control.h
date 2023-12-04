@@ -24,6 +24,10 @@ namespace xrtc {
         bool InitialTimeToReduceFurther(webrtc::Timestamp at_time) const;
         webrtc::DataRate LatestEstimate() const;
         void SetRtt(webrtc::TimeDelta rtt);
+        void SetEstimate(webrtc::DataRate new_bitrate, webrtc::Timestamp at_time);
+
+    private:
+        webrtc::DataRate ClampBitrate(webrtc::DataRate new_bitrate);
 
     private:
         webrtc::DataRate min_config_bitrate_;
@@ -32,8 +36,8 @@ namespace xrtc {
         bool bitrate_is_init_ = false;
         webrtc::TimeDelta rtt_;
         webrtc::Timestamp time_last_bitrate_change_ = webrtc::Timestamp::MinusInfinity();
+        webrtc::Timestamp time_last_bitrate_decrease_ = webrtc::Timestamp::MinusInfinity();
     };
 
 } // namespace xrtc
-
 #endif // XRTCSDK_XRTC_RTC_MODULES_CONGESTION_CONTROLLER_GOOG_CC_AIMD_RATE_CONTROL_H_

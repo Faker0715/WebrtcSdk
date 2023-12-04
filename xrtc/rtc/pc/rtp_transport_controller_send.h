@@ -25,7 +25,7 @@ namespace xrtc {
 
         void OnNetworkOk(bool network_ok);
         void OnSentPacket(const rtc::SentPacket& sent_packet);
-
+        void OnRttUpdate(int64_t rtt_ms);
         // TransportFeedbackObserver
         void OnAddPacket(const RtpPacketSendInfo& send_info) override;
         void OnTransportFeedback(
