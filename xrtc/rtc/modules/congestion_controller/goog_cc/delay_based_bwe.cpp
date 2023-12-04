@@ -43,6 +43,10 @@ namespace xrtc {
         return MaybeUpdateEstimate(acked_bitrate, recover_from_overusing, msg.feedback_time);
     }
 
+    void DelayBasedBwe::OnRttUpdate(int64_t rtt_ms) {
+        rate_control_.SetRtt(webrtc::TimeDelta::Millis(rtt_ms));
+    }
+
     void DelayBasedBwe::IncomingPacketFeedback(const webrtc::PacketResult& packet_feedback,
                                                webrtc::Timestamp at_time)
     {

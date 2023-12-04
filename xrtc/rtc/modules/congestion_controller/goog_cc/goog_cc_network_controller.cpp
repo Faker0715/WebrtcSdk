@@ -24,4 +24,9 @@ namespace xrtc {
         return webrtc::NetworkControlUpdate();
     }
 
+    webrtc::NetworkControlUpdate GoogCcNetworkController::OnRttUpdate(int64_t rtt_ms) {
+        delay_base_bwe_->OnRttUpdate(rtt_ms);
+        return webrtc::NetworkControlUpdate();
+    }
+
 } // namespace xrtc

@@ -57,6 +57,12 @@ namespace xrtc {
         });
     }
 
+    void RtpTransportControllerSend::OnRttUpdate(int64_t rtt_ms) {
+        task_queue_.PostTask([this, rtt_ms]() {
+            controller_->OnRttUpdate(rtt_ms);
+        });
+    }
+
     void RtpTransportControllerSend::OnAddPacket(
             const RtpPacketSendInfo& send_info)
     {

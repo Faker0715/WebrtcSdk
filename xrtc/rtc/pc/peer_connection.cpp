@@ -424,6 +424,7 @@ namespace xrtc {
                                        uint8_t fraction_lost,
                                        uint32_t jitter)
     {
+        transport_send_->OnRttUpdate(rtt_ms);
         SignalNetworkInfo(this, rtt_ms, packets_lost, fraction_lost, jitter);
     }
 

@@ -18,6 +18,7 @@ namespace xrtc {
 
         webrtc::NetworkControlUpdate OnTransportPacketsFeedback(
                 const webrtc::TransportPacketsFeedback& report) override;
+        webrtc::NetworkControlUpdate OnRttUpdate(int64_t rtt_ms) override;
 
     private:
         std::unique_ptr<DelayBasedBwe> delay_base_bwe_;

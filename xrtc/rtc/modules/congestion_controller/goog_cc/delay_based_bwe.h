@@ -24,6 +24,7 @@ namespace xrtc {
         Result IncomingPacketFeedbackVector(
                 const webrtc::TransportPacketsFeedback& msg,
                 absl::optional<webrtc::DataRate> acked_bitrate);
+        void OnRttUpdate(int64_t rtt_ms);
 
     private:
         void IncomingPacketFeedback(const webrtc::PacketResult& packet_feedback,
@@ -41,5 +42,6 @@ namespace xrtc {
     };
 
 } // namespace xrtc
+
 
 #endif // XRTCSDK_XRTC_RTC_MODULES_CONGESTION_CONTROLLER_GOOG_CC_DELAY_BASED_BWE_H_
