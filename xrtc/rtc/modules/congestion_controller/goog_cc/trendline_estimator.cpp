@@ -69,7 +69,7 @@ namespace xrtc {
                 static_cast<double>(arrival_time_ms - first_arrival_time_ms_),
                 smoothed_delay_ms_, accumulated_delay_ms_);
 
-        if (delay_hist_.size() > 20) {
+        if (delay_hist_.size() > kDefaultTrendlineWindowSize) {
             delay_hist_.pop_front();
         }
 

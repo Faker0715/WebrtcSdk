@@ -13,6 +13,7 @@ namespace xrtc {
             min_config_bitrate_(webrtc::DataRate::KilobitsPerSec(5)),
             max_config_bitrate_(webrtc::DataRate::KilobitsPerSec(30000)),
             current_bitrate_(max_config_bitrate_),
+            latest_estimated_throughput_(current_bitrate_),
             rtt_(kDefaultRtt)
     {
     }
@@ -104,10 +105,47 @@ namespace xrtc {
         return new_bitrate;
     }
 
-    void AimdRateControl::ChangeBitrate(absl::optional<webrtc::DataRate> throughput_estimate,
-                                        webrtc::BandwidthUsage state,
-                                        webrtc::Timestamp at_time)
+    void AimdRateControl::ChangeBitrate(
+            absl::optional<webrtc::DataRate> acked_bitrate,
+            webrtc::BandwidthUsage state,
+            webrtc::Timestamp at_time)
     {
+        webrtc::DataRate estimated_throughput =
+                acked_bitrate.value_or(latest_estimated_throughput_);
+        // 更新最新的吞吐量
+        if (acked_bitrate) {
+            latest_estimated_throughput_ = *acked_bitrate;
+        }
+
+        // 当前网络状态是过载状态，即使没有初始化起始码率，仍然需要降低码率
+        if (!bitrate_is_init_ && state == webrtc::BandwidthUsage::kBwOverusing) {
+            return;
+        }
+
+        ChangeState(state, at_time);
+    }
+
+    void AimdRateControl::ChangeState(webrtc::BandwidthUsage state,
+                                      webrtc::Timestamp at_time)
+    {
+        switch (state) {
+            case webrtc::BandwidthUsage::kBwNormal:
+                if (rate_control_state_ == RateControlState::kRcHold) {
+                    rate_control_state_ = RateControlState::kRcIncrease;
+                    time_last_bitrate_change_ = at_time;
+                }
+                break;
+            case webrtc::BandwidthUsage::kBwOverusing:
+                if (rate_control_state_ != RateControlState::kRcDecrease) {
+                    rate_control_state_ = RateControlState::kRcDecrease;
+                }
+                break;
+            case webrtc::BandwidthUsage::kBwUnderusing:
+                rate_control_state_ = RateControlState::kRcHold;
+                break;
+            default:
+                break;
+        }
     }
 
 } // namespace xrtc

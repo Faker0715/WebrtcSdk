@@ -31,20 +31,30 @@ namespace xrtc {
                                 webrtc::Timestamp at_time);
 
     private:
+        enum class RateControlState {
+            kRcHold,     // 保持码率不变
+            kRcIncrease, // 增加码率
+            kRcDecrease, // 降低码率
+        };
+
         webrtc::DataRate ClampBitrate(webrtc::DataRate new_bitrate);
         void ChangeBitrate(absl::optional<webrtc::DataRate> throughput_estimate,
                            webrtc::BandwidthUsage state,
                            webrtc::Timestamp at_time);
+        void ChangeState(webrtc::BandwidthUsage state,
+                         webrtc::Timestamp at_time);
 
     private:
         webrtc::DataRate min_config_bitrate_;
         webrtc::DataRate max_config_bitrate_;
         webrtc::DataRate current_bitrate_;
+        webrtc::DataRate latest_estimated_throughput_;
         bool bitrate_is_init_ = false;
         webrtc::TimeDelta rtt_;
         webrtc::Timestamp time_last_bitrate_change_ = webrtc::Timestamp::MinusInfinity();
         webrtc::Timestamp time_last_bitrate_decrease_ = webrtc::Timestamp::MinusInfinity();
         webrtc::Timestamp time_first_throughput_estimate_ = webrtc::Timestamp::MinusInfinity();
+        RateControlState rate_control_state_ = RateControlState::kRcHold;
     };
 
 } // namespace xrtc
